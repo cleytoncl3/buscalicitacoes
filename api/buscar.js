@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
-  const { palavraChave = '', uf = '', dataFinal = '', pagina = 1, modalidade = '' } = req.query;
+  const { palavraChave = '', uf = '', dataFinal = '', modalidade = '' } = req.query;
 
   function fmt(data) { return data.replace(/-/g, ''); }
 
@@ -10,17 +10,20 @@ export default async function handler(req, res) {
     : fmt(new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
 
   function buildUrl(p) {
-    const params = new URLSearchParams({ dataFinal: dataFim, tamanhoPagina: 20, pagina: p });
+    const params = new URLSearchParams({ dataFinal: dataFim, pagina: p });
     if (uf) params.append('uf', uf);
     if (modalidade) params.append('codigoModalidadeContratacao', modalidade);
     return `https://pncp.gov.br/api/consulta/v1/contratacoes/proposta?${params}`;
   }
 
   try {
-    const paginas = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
-    const promises = paginas.map(p =>
+    const promises = [1, 2, 3].map(p =>
       fetch(buildUrl(p), { headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' } })
-        .then(r => r.ok ? r.json() : null).catch(() => null)
+        .then(r => r.text())
+        .then(text => {
+          try { return JSON.parse(text); } catch { return null; }
+        })
+        .catch(() => null)
     );
 
     const resultados = await Promise.all(promises);
@@ -36,8 +39,6 @@ export default async function handler(req, res) {
         return obj.includes(termo) || info.includes(termo);
       });
     }
-
-    itens.sort((a, b) => new Date(a.dataEncerramentoProposta || 0) - new Date(b.dataEncerramentoProposta || 0));
 
     return res.status(200).json({ data: itens, totalRegistros: itens.length });
 
