@@ -1,46 +1,42 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
-  const { palavraChave = '', uf = '', dataFinal = '', modalidade = '' } = req.query;
+  const { palavraChave = '', uf = '', pagina = 1, modalidade = '', status = 'recebendo_proposta' } = req.query;
 
-  function fmt(data) { return data.replace(/-/g, ''); }
+  const params = new URLSearchParams({
+    tipos_documento: 'edital',
+    ordenacao: '-data',
+    pagina: pagina,
+    tam_pagina: 20,
+    status: status,
+  });
 
-  const dataFim = dataFinal
-    ? fmt(dataFinal)
-    : fmt(new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
-
-  function buildUrl(p) {
-    const params = new URLSearchParams({ dataFinal: dataFim, pagina: p });
-    if (uf) params.append('uf', uf);
-    if (modalidade) params.append('codigoModalidadeContratacao', modalidade);
-    return `https://pncp.gov.br/api/consulta/v1/contratacoes/proposta?${params}`;
-  }
+  if (palavraChave) params.append('q', palavraChave);
+  if (uf) params.append('ufs', uf);
+  if (modalidade) params.append('modalidade', modalidade);
 
   try {
-    const promises = [1, 2, 3].map(p =>
-      fetch(buildUrl(p), { headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' } })
-        .then(r => r.text())
-        .then(text => {
-          try { return JSON.parse(text); } catch { return null; }
-        })
-        .catch(() => null)
-    );
+    const url = `https://pncp.gov.br/api/search/?${params}`;
 
-    const resultados = await Promise.all(promises);
+    const response = await fetch(url, {
+      headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' }
+    });
 
-    let itens = [];
-    resultados.forEach(r => { if (r && r.data) itens = itens.concat(r.data); });
+    const text = await response.text();
 
-    if (palavraChave) {
-      const termo = palavraChave.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-      itens = itens.filter(i => {
-        const obj = (i.objetoCompra || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        const info = (i.informacaoComplementar || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        return obj.includes(termo) || info.includes(termo);
-      });
+    let data;
+    try { data = JSON.parse(text); }
+    catch { return res.status(500).json({ erro: `PNCP retornou: ${text.substring(0, 300)}` }); }
+
+    if (!response.ok) {
+      return res.status(response.status).json({ erro: data.detail || data.message || text });
     }
 
-    return res.status(200).json({ data: itens, totalRegistros: itens.length });
+    return res.status(200).json({
+      data: data.items || data.results || data,
+      totalRegistros: data.total || data.count || 0,
+      totalPaginas: Math.ceil((data.total || data.count || 0) / 20)
+    });
 
   } catch (error) {
     return res.status(500).json({ erro: error.message });
