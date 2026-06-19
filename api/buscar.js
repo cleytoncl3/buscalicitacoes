@@ -39,6 +39,11 @@ export default async function handler(req, res) {
 
     let itens = data.data || [];
 
+    // DEBUG temporário — remover depois
+    if (itens.length === 0) {
+      return res.status(200).json({ debug: true, totalPNCP: data.totalRegistros, rawKeys: Object.keys(data), primeiroItem: data });
+    }
+
     if (palavraChave) {
       const termo = palavraChave.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       itens = itens.filter(i => {
