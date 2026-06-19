@@ -9,40 +9,24 @@ export default async function handler(req, res) {
     ? fmt(dataFinal)
     : fmt(new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
 
-  const params = new URLSearchParams({
-    dataFinal: dataFim,
-    pagina: pagina,
-  });
-
-  if (uf) params.append('uf', uf);
-  if (modalidade) params.append('codigoModalidadeContratacao', modalidade);
+  function buildUrl(p) {
+    const params = new URLSearchParams({ dataFinal: dataFim, tamanhoPagina: 20, pagina: p });
+    if (uf) params.append('uf', uf);
+    if (modalidade) params.append('codigoModalidadeContratacao', modalidade);
+    return `https://pncp.gov.br/api/consulta/v1/contratacoes/proposta?${params}`;
+  }
 
   try {
-    const url = `https://pncp.gov.br/api/consulta/v1/contratacoes/proposta?${params}`;
+    const paginas = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+    const promises = paginas.map(p =>
+      fetch(buildUrl(p), { headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' } })
+        .then(r => r.ok ? r.json() : null).catch(() => null)
+    );
 
-    const response = await fetch(url, {
-      headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' }
-    });
+    const resultados = await Promise.all(promises);
 
-    const text = await response.text();
-
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      return res.status(500).json({ erro: `PNCP retornou: ${text.substring(0, 200)}` });
-    }
-
-    if (!response.ok) {
-      return res.status(response.status).json({ erro: data.message || text });
-    }
-
-    let itens = data.data || [];
-
-    // DEBUG temporário — remover depois
-    if (itens.length === 0) {
-      return res.status(200).json({ debug: true, totalPNCP: data.totalRegistros, rawKeys: Object.keys(data), primeiroItem: data });
-    }
+    let itens = [];
+    resultados.forEach(r => { if (r && r.data) itens = itens.concat(r.data); });
 
     if (palavraChave) {
       const termo = palavraChave.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
