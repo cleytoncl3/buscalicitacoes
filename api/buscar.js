@@ -11,7 +11,6 @@ export default async function handler(req, res) {
 
   const params = new URLSearchParams({
     dataFinal: dataFim,
-    tamanhoPagina: 50,
     pagina: pagina,
   });
 
@@ -25,12 +24,19 @@ export default async function handler(req, res) {
       headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' }
     });
 
-    if (!response.ok) {
-      const text = await response.text();
-      return res.status(response.status).json({ erro: text });
+    const text = await response.text();
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return res.status(500).json({ erro: `PNCP retornou: ${text.substring(0, 200)}` });
     }
 
-    const data = await response.json();
+    if (!response.ok) {
+      return res.status(response.status).json({ erro: data.message || text });
+    }
+
     let itens = data.data || [];
 
     if (palavraChave) {
