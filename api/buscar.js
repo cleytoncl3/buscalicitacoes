@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
   const params = new URLSearchParams({
     dataFinal: dataFim,
-    tamanhoPagina: 500,
+    tamanhoPagina: 50,
     pagina: pagina,
   });
 
