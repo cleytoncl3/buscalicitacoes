@@ -3,13 +3,13 @@ export default async function handler(req, res) {
 
   const { palavraChave = '', uf = '', dataInicial = '', dataFinal = '', pagina = 1, modalidade = '' } = req.query;
 
-  function fmt(data) {
-    if (!data) return null;
-    return data.replace(/-/g, '');
+  function fmt(data) { return data.replace(/-/g, ''); }
+  function diasAtras(n) {
+    return fmt(new Date(Date.now() - n * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
   }
 
-  const dataIni = fmt(dataInicial) || fmt(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
-  const dataFim = fmt(dataFinal) || fmt(new Date().toISOString().split('T')[0]);
+  const dataIni = dataInicial ? fmt(dataInicial) : diasAtras(60);
+  const dataFim = dataFinal ? fmt(dataFinal) : fmt(new Date().toISOString().split('T')[0]);
 
   const modalidades = modalidade ? [modalidade] : ['6', '8', '4', '9', '7', '5'];
 
@@ -19,8 +19,8 @@ export default async function handler(req, res) {
         dataInicial: dataIni,
         dataFinal: dataFim,
         codigoModalidadeContratacao: mod,
-        tamanhoPagina: 20,
-        pagina: pagina,
+        tamanhoPagina: 500,
+        pagina: 1,
       });
       if (uf) params.append('uf', uf);
       return fetch(`https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?${params}`, {
@@ -34,11 +34,12 @@ export default async function handler(req, res) {
     resultados.forEach(r => { if (r && r.data) itens = itens.concat(r.data); });
 
     if (palavraChave) {
-      const termo = palavraChave.toLowerCase();
-      itens = itens.filter(i =>
-        (i.objetoCompra || '').toLowerCase().includes(termo) ||
-        (i.informacaoComplementar || '').toLowerCase().includes(termo)
-      );
+      const termo = palavraChave.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      itens = itens.filter(i => {
+        const obj = (i.objetoCompra || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const info = (i.informacaoComplementar || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        return obj.includes(termo) || info.includes(termo);
+      });
     }
 
     itens.sort((a, b) => new Date(b.dataPublicacaoPncp || 0) - new Date(a.dataPublicacaoPncp || 0));
