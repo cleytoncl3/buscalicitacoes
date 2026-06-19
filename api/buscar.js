@@ -1,64 +1,49 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET');
 
-  const {
-    palavraChave = '',
-    uf = '',
-    dataInicial = '',
-    dataFinal = '',
-    pagina = 1,
-    modalidade = ''
-  } = req.query;
+  const { palavraChave = '', uf = '', dataInicial = '', dataFinal = '', pagina = 1, modalidade = '' } = req.query;
 
-  function formatarData(data) {
+  function fmt(data) {
     if (!data) return null;
     return data.replace(/-/g, '');
   }
 
-  const hoje = new Date();
-  const trintaDias = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-  const dataIni = formatarData(dataInicial) || trintaDias.toISOString().split('T')[0].replace(/-/g, '');
-  const dataFim = formatarData(dataFinal) || hoje.toISOString().split('T')[0].replace(/-/g, '');
+  const dataIni = fmt(dataInicial) || fmt(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+  const dataFim = fmt(dataFinal) || fmt(new Date().toISOString().split('T')[0]);
 
-  const params = new URLSearchParams({
-    dataInicial: dataIni,
-    dataFinal: dataFim,
-    tamanhoPagina: 50,
-    pagina: pagina,
-  });
-
-  if (uf) params.append('uf', uf);
-  if (modalidade) params.append('codigoModalidadeContratacao', modalidade);
+  const modalidades = modalidade ? [modalidade] : ['6', '8', '4', '9', '7', '5'];
 
   try {
-    const url = `https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?${params}`;
-
-    const response = await fetch(url, {
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'Mozilla/5.0'
-      }
+    const promises = modalidades.map(mod => {
+      const params = new URLSearchParams({
+        dataInicial: dataIni,
+        dataFinal: dataFim,
+        codigoModalidadeContratacao: mod,
+        tamanhoPagina: 20,
+        pagina: pagina,
+      });
+      if (uf) params.append('uf', uf);
+      return fetch(`https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?${params}`, {
+        headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' }
+      }).then(r => r.ok ? r.json() : null).catch(() => null);
     });
 
-    if (!response.ok) {
-      const text = await response.text();
-      return res.status(response.status).json({ erro: text });
-    }
+    const resultados = await Promise.all(promises);
 
-    const data = await response.json();
+    let itens = [];
+    resultados.forEach(r => { if (r && r.data) itens = itens.concat(r.data); });
 
-    // Filtro por palavra-chave no servidor
-    if (palavraChave && data.data) {
+    if (palavraChave) {
       const termo = palavraChave.toLowerCase();
-      data.data = data.data.filter(item => {
-        const obj = (item.objetoCompra || '').toLowerCase();
-        const info = (item.informacaoComplementar || '').toLowerCase();
-        return obj.includes(termo) || info.includes(termo);
-      });
+      itens = itens.filter(i =>
+        (i.objetoCompra || '').toLowerCase().includes(termo) ||
+        (i.informacaoComplementar || '').toLowerCase().includes(termo)
+      );
     }
 
-    return res.status(200).json(data);
+    itens.sort((a, b) => new Date(b.dataPublicacaoPncp || 0) - new Date(a.dataPublicacaoPncp || 0));
+
+    return res.status(200).json({ data: itens, totalRegistros: itens.length });
 
   } catch (error) {
     return res.status(500).json({ erro: error.message });
