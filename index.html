@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Busca Licitações – Arantes Papéis</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
+      color: #222;
+    }
+
+    header {
+      background: #1a3d2b;
+      color: #d4a825;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: 1px; }
+    header span { font-size: 0.85rem; color: #aaa; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+
+    .filtros {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .filtros .campo-busca {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 10px;
+    }
+
+    .filtros input, .filtros select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: #fafafa;
+    }
+
+    .filtros input:focus, .filtros select:focus {
+      outline: none;
+      border-color: #1a3d2b;
+    }
+
+    .btn-buscar {
+      background: #1a3d2b;
+      color: #d4a825;
+      border: none;
+      padding: 10px 28px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+
+    .btn-buscar:hover { background: #245239; }
+
+    .btn-limpar {
+      background: transparent;
+      color: #888;
+      border: 1px solid #ddd;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .resumo {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 14px;
+    }
+
+    .resumo strong { color: #1a3d2b; }
+
+    .cards { display: flex; flex-direction: column; gap: 12px; }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 18px 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      border-left: 5px solid #1a3d2b;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+    }
+
+    .card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .card-titulo { font-weight: 600; font-size: 1rem; color: #1a3d2b; }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    .badge-verde { background: #e6f4ec; color: #1a7a3c; }
+    .badge-amarelo { background: #fff8e1; color: #b8860b; }
+    .badge-cinza { background: #f0f0f0; color: #666; }
+
+    .card-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      font-size: 0.85rem;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .card-info span { display: flex; align-items: center; gap: 4px; }
+
+    .card-orgao { font-size: 0.82rem; color: #888; }
+
+    .card-valor {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1a3d2b;
+      margin-top: 6px;
+    }
+
+    .paginacao {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .btn-pag {
+      background: #1a3d2b;
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .btn-pag:disabled { background: #ccc; cursor: default; }
+
+    .pagina-info { font-size: 0.9rem; color: #666; }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #888;
+      font-size: 1rem;
+    }
+
+    .erro {
+      background: #fff3f3;
+      border: 1px solid #f5c6c6;
+      color: #c0392b;
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .vazio {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+
+    @media (max-width: 700px) {
+      .filtros { grid-template-columns: 1fr 1fr; }
+      .filtros .campo-busca { grid-column: 1 / -1; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🔍 Busca de Licitações</h1>
+    <span>Arantes Papéis · Portal Nacional de Contratações Públicas</span>
+  </div>
+</header>
+
+<div class="container">
+  <div class="filtros">
+    <div class="campo-busca">
+      <input type="text" id="palavraChave" placeholder="Buscar por palavra-chave (ex: papel, bobina, kraft...)" />
+      <button class="btn-buscar" onclick="buscar(1)">Buscar</button>
+      <button class="btn-limpar" onclick="limpar()">Limpar</button>
+    </div>
+
+    <select id="uf">
+      <option value="">Todos os estados</option>
+      <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+      <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+      <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+      <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+      <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+      <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+      <option>SP</option><option>SE</option><option>TO</option>
+    </select>
+
+    <select id="modalidade">
+      <option value="">Todas as modalidades</option>
+      <option value="6">Pregão Eletrônico</option>
+      <option value="8">Dispensa de Licitação</option>
+      <option value="4">Concorrência Eletrônica</option>
+      <option value="9">Inexigibilidade</option>
+      <option value="7">Pregão Presencial</option>
+      <option value="5">Concorrência Presencial</option>
+    </select>
+
+    <input type="date" id="dataInicial" title="Data inicial" />
+    <input type="date" id="dataFinal" title="Data final" />
+  </div>
+
+  <div id="resumo" class="resumo"></div>
+  <div id="resultado"></div>
+
+  <div class="paginacao" id="paginacao" style="display:none">
+    <button class="btn-pag" id="btnAnterior" onclick="mudarPagina(-1)">← Anterior</button>
+    <span class="pagina-info" id="paginaInfo"></span>
+    <button class="btn-pag" id="btnProxima" onclick="mudarPagina(1)">Próxima →</button>
+  </div>
+</div>
+
+<script>
+  let paginaAtual = 1;
+  let totalPaginas = 1;
+
+  function formatarData(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR');
+  }
+
+  function formatarValor(v) {
+    if (!v) return null;
+    return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  function statusBadge(item) {
+    const agora = new Date();
+    const abertura = item.dataAberturaProposta ? new Date(item.dataAberturaProposta) : null;
+    const encerramento = item.dataEncerramentoProposta ? new Date(item.dataEncerramentoProposta) : null;
+
+    if (encerramento && agora > encerramento) return { texto: 'Encerrado', classe: 'badge-cinza' };
+    if (abertura && agora >= abertura) return { texto: 'Em andamento', classe: 'badge-verde' };
+    return { texto: 'Aguardando abertura', classe: 'badge-amarelo' };
+  }
+
+  async function buscar(pagina) {
+    paginaAtual = pagina;
+    const palavraChave = document.getElementById('palavraChave').value.trim();
+    const uf = document.getElementById('uf').value;
+    const modalidade = document.getElementById('modalidade').value;
+    const dataInicial = document.getElementById('dataInicial').value;
+    const dataFinal = document.getElementById('dataFinal').value;
+
+    const params = new URLSearchParams({ pagina });
+    if (palavraChave) params.append('palavraChave', palavraChave);
+    if (uf) params.append('uf', uf);
+    if (modalidade) params.append('modalidade', modalidade);
+    if (dataInicial) params.append('dataInicial', dataInicial);
+    if (dataFinal) params.append('dataFinal', dataFinal);
+
+    document.getElementById('resultado').innerHTML = '<div class="loading">⏳ Buscando licitações...</div>';
+    document.getElementById('paginacao').style.display = 'none';
+    document.getElementById('resumo').innerHTML = '';
+
+    try {
+      const resp = await fetch(`/api/buscar?${params}`);
+      const data = await resp.json();
+
+      if (data.erro) {
+        document.getElementById('resultado').innerHTML = `<div class="erro">Erro ao consultar o PNCP: ${data.erro}</div>`;
+        return;
+      }
+
+      const itens = data.data || data.content || data || [];
+      const total = data.totalRegistros || data.totalElements || itens.length;
+      totalPaginas = data.totalPaginas || data.totalPages || Math.ceil(total / 20) || 1;
+
+      document.getElementById('resumo').innerHTML =
+        `<strong>${total.toLocaleString('pt-BR')}</strong> licitações encontradas · Página ${paginaAtual} de ${totalPaginas}`;
+
+      if (!itens.length) {
+        document.getElementById('resultado').innerHTML = '<div class="vazio">Nenhuma licitação encontrada para esses filtros.</div>';
+        return;
+      }
+
+      const html = itens.map(item => {
+        const badge = statusBadge(item);
+        const valor = formatarValor(item.valorTotalEstimado || item.valorEstimadoTotal);
+        return `
+          <div class="card" onclick="abrirPNCP('${item.linkSistemaOrigem || ''}')">
+            <div class="card-header">
+              <div class="card-titulo">${item.objetoCompra || item.titulo || 'Sem título'}</div>
+              <span class="badge ${badge.classe}">${badge.texto}</span>
+            </div>
+            <div class="card-info">
+              <span>📍 ${item.ufNome || item.uf || '—'}</span>
+              <span>📋 ${item.modalidadeNome || item.modalidade || '—'}</span>
+              <span>📅 Abertura: ${formatarData(item.dataAberturaProposta)}</span>
+              <span>⏰ Encerramento: ${formatarData(item.dataEncerramentoProposta)}</span>
+            </div>
+            <div class="card-orgao">🏛️ ${item.orgaoEntidade?.razaoSocial || item.orgao || '—'} · Nº ${item.numeroCompra || item.numero || '—'}</div>
+            ${valor ? `<div class="card-valor">💰 ${valor}</div>` : ''}
+          </div>`;
+      }).join('');
+
+      document.getElementById('resultado').innerHTML = `<div class="cards">${html}</div>`;
+
+      document.getElementById('paginacao').style.display = 'flex';
+      document.getElementById('paginaInfo').textContent = `Página ${paginaAtual} de ${totalPaginas}`;
+      document.getElementById('btnAnterior').disabled = paginaAtual <= 1;
+      document.getElementById('btnProxima').disabled = paginaAtual >= totalPaginas;
+
+    } catch (err) {
+      document.getElementById('resultado').innerHTML = `<div class="erro">Erro de conexão: ${err.message}</div>`;
+    }
+  }
+
+  function mudarPagina(direcao) {
+    const nova = paginaAtual + direcao;
+    if (nova >= 1 && nova <= totalPaginas) buscar(nova);
+  }
+
+  function limpar() {
+    document.getElementById('palavraChave').value = '';
+    document.getElementById('uf').value = '';
+    document.getElementById('modalidade').value = '';
+    document.getElementById('dataInicial').value = '';
+    document.getElementById('dataFinal').value = '';
+    document.getElementById('resultado').innerHTML = '';
+    document.getElementById('resumo').innerHTML = '';
+    document.getElementById('paginacao').style.display = 'none';
+  }
+
+  function abrirPNCP(link) {
+    if (link) window.open(link, '_blank');
+  }
+
+  document.getElementById('palavraChave').addEventListener('keydown', e => {
+    if (e.key === 'Enter') buscar(1);
+  });
+</script>
+</body>
+</html>
