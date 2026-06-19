@@ -11,22 +11,28 @@ export default async function handler(req, res) {
     modalidade = ''
   } = req.query;
 
-  const hoje = new Date().toISOString().split('T')[0];
-  const trintaDias = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  function formatarData(data) {
+    if (!data) return null;
+    return data.replace(/-/g, '');
+  }
+
+  const hoje = new Date();
+  const trintaDias = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const dataIni = formatarData(dataInicial) || trintaDias.toISOString().split('T')[0].replace(/-/g, '');
+  const dataFim = formatarData(dataFinal) || hoje.toISOString().split('T')[0].replace(/-/g, '');
 
   const params = new URLSearchParams({
-    dataInicial: dataInicial || trintaDias,
-    dataFinal: dataFinal || hoje,
+    dataInicial: dataIni,
+    dataFinal: dataFim,
+    tamanhoPagina: 50,
     pagina: pagina,
-    tamanhoPagina: 20,
   });
 
-  if (palavraChave) params.append('palavraChave', palavraChave);
   if (uf) params.append('uf', uf);
   if (modalidade) params.append('codigoModalidadeContratacao', modalidade);
 
   try {
-    const url = `https://pncp.gov.br/api/pncp/v1/oportunidades/compras?${params}`;
+    const url = `https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?${params}`;
 
     const response = await fetch(url, {
       headers: {
@@ -41,6 +47,17 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
+
+    // Filtro por palavra-chave no servidor
+    if (palavraChave && data.data) {
+      const termo = palavraChave.toLowerCase();
+      data.data = data.data.filter(item => {
+        const obj = (item.objetoCompra || '').toLowerCase();
+        const info = (item.informacaoComplementar || '').toLowerCase();
+        return obj.includes(termo) || info.includes(termo);
+      });
+    }
+
     return res.status(200).json(data);
 
   } catch (error) {
