@@ -227,8 +227,8 @@
     const p=parseControle(item.numero_controle_pncp);
     if(!p)return{direto:'',busca:''};
     return{
-      direto:`https://pncp.gov.br/app/editais/${p.cnpj}/${p.seqOrgao}/${p.ano}/${p.seq}`,
-      busca:`https://pncp.gov.br/app/editais?q=${encodeURIComponent(item.numero_controle_pncp||'')}`
+      direto:`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`,
+      busca:`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`
     };
   }
 
