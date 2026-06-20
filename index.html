@@ -73,13 +73,28 @@
     .drawer-btn:hover{background:#245239}
     .drawer-btn-sec{background:#f0f0f0;color:#444}
     .drawer-btn-sec:hover{background:#e0e0e0}
-    .item-lista{display:flex;flex-direction:column;gap:8px}
-    .item-card{background:#f8f9fa;border-radius:8px;padding:12px;border-left:3px solid #1a3d2b}
-    .item-card .item-num{font-size:.75rem;color:#999;margin-bottom:3px}
-    .item-card .item-desc{font-size:.88rem;color:#222;font-weight:500;margin-bottom:4px}
-    .item-card .item-info{font-size:.78rem;color:#666;display:flex;gap:12px;flex-wrap:wrap}
+
+    /* ITENS ACCORDION */
+    .item-lista{display:flex;flex-direction:column;gap:6px}
+    .item-accordion{border:1px solid #e0e0e0;border-radius:8px;overflow:hidden}
+    .item-header{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:#f8f9fa;transition:background .15s}
+    .item-header:hover{background:#eef5f1}
+    .item-num-badge{background:#1a3d2b;color:#d4a825;border-radius:6px;padding:2px 8px;font-size:.75rem;font-weight:700;white-space:nowrap;min-width:56px;text-align:center}
+    .item-resumo{flex:1}
+    .item-nome{font-size:.88rem;font-weight:600;color:#222}
+    .item-qtd{font-size:.78rem;color:#666;margin-top:2px}
+    .item-chevron{color:#999;font-size:.85rem;transition:transform .2s;flex-shrink:0}
+    .item-chevron.aberto{transform:rotate(180deg)}
+    .item-detalhe{display:none;padding:14px;background:#fff;border-top:1px solid #eee}
+    .item-detalhe.aberto{display:block}
+    .item-detalhe-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+    .item-detalhe-campo{background:#f8f9fa;border-radius:6px;padding:8px 10px}
+    .item-detalhe-campo label{font-size:.7rem;color:#999;display:block;text-transform:uppercase;margin-bottom:2px}
+    .item-detalhe-campo span{font-size:.85rem;font-weight:600;color:#222}
+    .item-desc-full{font-size:.82rem;color:#555;line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid #eee}
     .item-loading{text-align:center;padding:20px;color:#999;font-size:.9rem}
-    @media(max-width:700px){.filtros{grid-template-columns:1fr}.filtros .campo-busca{flex-direction:column}.drawer{width:100%;right:-100%}.drawer-grid{grid-template-columns:1fr}}
+
+    @media(max-width:700px){.filtros{grid-template-columns:1fr}.filtros .campo-busca{flex-direction:column}.drawer{width:100%;right:-100%}.drawer-grid{grid-template-columns:1fr}.item-detalhe-grid{grid-template-columns:1fr 1fr}}
   </style>
 </head>
 <body>
@@ -139,7 +154,6 @@
   </div>
 </div>
 
-<!-- OVERLAY + DRAWER -->
 <div class="overlay" id="overlay" onclick="fecharDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-header">
@@ -168,8 +182,8 @@
       </div>
     </div>
 
-    <button class="drawer-btn" id="d-btn-acessar" onclick="">📄 Acessar edital no PNCP</button>
-    <button class="drawer-btn drawer-btn-sec" id="d-btn-busca" onclick="">🔍 Buscar no PNCP</button>
+    <button class="drawer-btn" id="d-btn-acessar">📄 Acessar edital no PNCP</button>
+    <button class="drawer-btn drawer-btn-sec" id="d-btn-busca">🔍 Buscar no PNCP</button>
 
     <div class="drawer-section">
       <h3>Itens do pregão</h3>
@@ -179,7 +193,7 @@
 </div>
 
 <script>
-  let paginaAtual=1, totalPaginas=1;
+  let paginaAtual=1,totalPaginas=1;
   const HIST_KEY='buscaLicitacoes_historico';
 
   function getHistorico(){try{return JSON.parse(localStorage.getItem(HIST_KEY)||'[]')}catch{return[]}}
@@ -223,6 +237,7 @@
     if(!m)return null;
     return{cnpj:m[1],seqOrgao:m[2],seq:parseInt(m[3]),ano:m[4]};
   }
+
   function buildLinks(item){
     const p=parseControle(item.numero_controle_pncp);
     if(!p)return{direto:'',busca:''};
@@ -232,11 +247,16 @@
     };
   }
 
-  // DRAWER
+  function toggleItem(i){
+    const det=document.getElementById('det-'+i);
+    const chev=document.getElementById('chev-'+i);
+    det.classList.toggle('aberto');
+    chev.classList.toggle('aberto');
+  }
+
   function abrirDrawer(item){
     const{direto,busca}=buildLinks(item);
     const badge=statusBadge(item);
-
     document.getElementById('d-titulo').textContent=item.title||'Sem título';
     document.getElementById('d-numero').textContent=item.numero_controle_pncp||'';
     document.getElementById('d-objeto').textContent=item.description||'—';
@@ -248,26 +268,21 @@
     document.getElementById('d-encerramento').textContent=fmt(item.data_fim_vigencia);
     document.getElementById('d-valor').textContent=fmtVal(item.valor_global);
     document.getElementById('d-situacao').textContent=badge.texto;
-
     document.getElementById('d-tags').innerHTML=`
       <span class="drawer-tag">${item.modalidade_licitacao_nome||'—'}</span>
       <span class="drawer-tag badge ${badge.cls}">${badge.texto}</span>
-      ${item.esfera_nome?`<span class="drawer-tag">${item.esfera_nome}</span>`:''}
-    `;
-
+      ${item.esfera_nome?`<span class="drawer-tag">${item.esfera_nome}</span>`:''}`;
     const btnAcessar=document.getElementById('d-btn-acessar');
     const btnBusca=document.getElementById('d-btn-busca');
     btnAcessar.onclick=()=>window.open(direto,'_blank');
     btnBusca.onclick=()=>window.open(busca,'_blank');
     btnAcessar.style.display=direto?'block':'none';
-
     document.getElementById('d-itens').innerHTML='<div class="item-loading">⏳ Carregando itens...</div>';
     document.getElementById('drawer').classList.add('ativo');
     document.getElementById('overlay').classList.add('ativo');
     document.body.style.overflow='hidden';
-
     const p=parseControle(item.numero_controle_pncp);
-    if(p) carregarItens(p.cnpj,p.ano,p.seq);
+    if(p)carregarItens(p.cnpj,p.ano,p.seq);
   }
 
   function fecharDrawer(){
@@ -282,16 +297,32 @@
       const data=await r.json();
       const itens=data.data||[];
       if(!itens.length){document.getElementById('d-itens').innerHTML='<div class="item-loading">Nenhum item encontrado.</div>';return}
-      document.getElementById('d-itens').innerHTML=`<div class="item-lista">${itens.map(it=>`
-        <div class="item-card">
-          <div class="item-num">Item ${it.numeroItem||'—'}</div>
-          <div class="item-desc">${it.descricao||it.materialServico||'Sem descrição'}</div>
-          <div class="item-info">
-            <span>Qtd: ${it.quantidade||'—'} ${it.unidadeMedida||''}</span>
-            ${it.valorUnitarioEstimado?`<span>Vlr unit.: ${Number(it.valorUnitarioEstimado).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span>`:''}
+      document.getElementById('d-itens').innerHTML=`<div class="item-lista">${itens.map((it,i)=>{
+        const nomeResumido=(it.descricao||'Sem descrição').substring(0,70)+((it.descricao||'').length>70?'...':'');
+        const val=it.valorUnitarioEstimado?fmtVal(it.valorUnitarioEstimado):'Não informado';
+        const valTotal=it.valorTotal?fmtVal(it.valorTotal):'Não informado';
+        return`<div class="item-accordion">
+          <div class="item-header" onclick="toggleItem(${i})">
+            <span class="item-num-badge">Item ${it.numeroItem||i+1}</span>
+            <div class="item-resumo">
+              <div class="item-nome">${nomeResumido}</div>
+              <div class="item-qtd">Qtd: <strong>${it.quantidade||'—'} ${it.unidadeMedida||''}</strong></div>
+            </div>
+            <span class="item-chevron" id="chev-${i}">▼</span>
           </div>
-        </div>`).join('')}</div>`;
-    }catch(e){document.getElementById('d-itens').innerHTML=`<div class="item-loading">Erro ao carregar itens.</div>`}
+          <div class="item-detalhe" id="det-${i}">
+            <div class="item-detalhe-grid">
+              <div class="item-detalhe-campo"><label>Quantidade</label><span>${it.quantidade||'—'} ${it.unidadeMedida||''}</span></div>
+              <div class="item-detalhe-campo"><label>Vlr. unitário</label><span>${val}</span></div>
+              <div class="item-detalhe-campo"><label>Vlr. total</label><span>${valTotal}</span></div>
+              <div class="item-detalhe-campo"><label>Tipo</label><span>${it.materialOuServicoNome||'—'}</span></div>
+              <div class="item-detalhe-campo"><label>Situação</label><span>${it.situacaoCompraItemNome||'—'}</span></div>
+              <div class="item-detalhe-campo"><label>Julgamento</label><span>${it.criterioJulgamentoNome||'—'}</span></div>
+            </div>
+            <div class="item-desc-full">${it.descricao||'Sem descrição'}</div>
+          </div>
+        </div>`}).join('')}</div>`;
+    }catch(e){document.getElementById('d-itens').innerHTML='<div class="item-loading">Erro ao carregar itens.</div>'}
   }
 
   async function buscar(pagina){
@@ -349,7 +380,7 @@
 
   function mudarPagina(d){const n=paginaAtual+d;if(n>=1&&n<=totalPaginas)buscar(n)}
   function limpar(){
-    ['palavraChave'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('palavraChave').value='';
     document.getElementById('uf').value='';
     document.getElementById('modalidade').value='';
     document.getElementById('status').value='recebendo_proposta';
