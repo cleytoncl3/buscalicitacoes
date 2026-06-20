@@ -20,7 +20,6 @@
     [data-tema="escuro"]{
       --bg:#0d1117;--surface:#161b27;--surface2:#1e2538;--border:#2a3050;
       --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--text4:#475569;
-      --primary:#1a3d2b;--primary-hover:#245239;--accent:#d4a825;
       --chip-bg:#1e2d24;--chip-border:#2d4a38;
       --card-shadow:0 2px 6px rgba(0,0,0,.3);--card-shadow-hover:0 4px 14px rgba(0,0,0,.5);
       --drawer-bg:#161b27;--overlay:rgba(0,0,0,.6);
@@ -31,12 +30,30 @@
     }
     *{box-sizing:border-box;margin:0;padding:0;transition:background-color .2s,color .2s,border-color .2s}
     body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text)}
-    header{background:var(--primary);color:var(--accent);padding:18px 32px;display:flex;justify-content:space-between;align-items:center}
-    header h1{font-size:1.4rem;font-weight:700;letter-spacing:1px}
-    header span{font-size:.85rem;color:#aaa}
-    .btn-tema{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+    /* HEADER */
+    header{background:var(--primary);color:var(--accent);padding:0 32px;display:flex;justify-content:space-between;align-items:center;height:58px}
+    .header-left{display:flex;align-items:center;gap:24px}
+    .header-logo{font-size:1.2rem;font-weight:700;letter-spacing:1px;white-space:nowrap}
+    .header-logo span{font-size:.75rem;color:#aaa;display:block;font-weight:400;letter-spacing:0}
+    .nav{display:flex;gap:4px}
+    .nav-btn{background:transparent;border:none;color:rgba(255,255,255,.7);padding:8px 14px;border-radius:8px;font-size:.9rem;cursor:pointer;display:flex;align-items:center;gap:6px;position:relative}
+    .nav-btn:hover,.nav-btn.ativo{background:rgba(255,255,255,.15);color:#fff}
+    .nav-btn.ativo{color:var(--accent)}
+    .dropdown{position:absolute;top:calc(100% + 4px);left:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);min-width:180px;z-index:200;display:none}
+    .dropdown.aberto{display:block}
+    .dropdown-item{display:block;padding:10px 16px;font-size:.9rem;color:var(--text);cursor:pointer;border-radius:6px;margin:4px}
+    .dropdown-item:hover{background:var(--chip-bg);color:var(--primary)}
+    .header-right{display:flex;align-items:center;gap:8px}
+    .btn-tema{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:pointer}
     .btn-tema:hover{background:rgba(255,255,255,.25)}
+
+    /* CONTAINER */
     .container{max-width:1100px;margin:0 auto;padding:24px 16px}
+    .view{display:none}
+    .view.ativo{display:block}
+
+    /* FILTROS */
     .filtros{background:var(--surface);border-radius:10px;padding:20px;box-shadow:var(--card-shadow);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:8px;border:1px solid var(--border)}
     .filtros .campo-busca{grid-column:1/-1;display:flex;gap:10px}
     .filtros input,.filtros select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.95rem;background:var(--surface2);color:var(--text)}
@@ -45,13 +62,17 @@
     .btn-buscar:hover{background:var(--primary-hover)}
     .btn-buscar:disabled{background:var(--text3);cursor:wait}
     .btn-limpar{background:transparent;color:var(--text3);border:1px solid var(--border);padding:10px 16px;border-radius:8px;font-size:.9rem;cursor:pointer}
+
+    /* HISTÓRICO */
     .historico-box{background:var(--surface);border-radius:10px;padding:12px 16px;box-shadow:var(--card-shadow);margin-bottom:16px;display:none;border:1px solid var(--border)}
     .historico-label{font-size:.78rem;color:var(--text4);margin-bottom:8px;display:flex;justify-content:space-between}
     .historico-label button{background:none;border:none;color:#ef4444;font-size:.78rem;cursor:pointer}
     .historico-chips{display:flex;flex-wrap:wrap;gap:8px}
     .chip{background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:20px;padding:4px 12px;font-size:.82rem;cursor:pointer;display:flex;align-items:center;gap:6px}
-    .chip:hover{opacity:.8}
+    [data-tema="escuro"] .chip{color:var(--accent)}
     .chip-x{color:var(--text3);font-size:.75rem;cursor:pointer}
+
+    /* RESUMO + CARDS */
     .resumo{font-size:.9rem;color:var(--text2);margin-bottom:14px}
     .resumo strong{color:var(--primary)}
     [data-tema="escuro"] .resumo strong{color:var(--accent)}
@@ -101,6 +122,9 @@
     .drawer-btn:hover{background:var(--primary-hover)}
     .drawer-btn-sec{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
     .drawer-btn-sec:hover{background:var(--border)}
+    .drawer-btn-destaque{background:#b45309;color:#fff}
+    .drawer-btn-destaque:hover{background:#92400e}
+    .drawer-btn-destaque.adicionado{background:#166534;color:#fff}
 
     /* ITENS ACCORDION */
     .item-lista{display:flex;flex-direction:column;gap:6px}
@@ -122,69 +146,173 @@
     .item-desc-full{font-size:.82rem;color:var(--text2);line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
     .item-loading{text-align:center;padding:20px;color:var(--text3);font-size:.9rem}
 
-    @media(max-width:700px){.filtros{grid-template-columns:1fr}.filtros .campo-busca{flex-direction:column}.drawer{width:100%;right:-100%}.drawer-grid{grid-template-columns:1fr}.item-detalhe-grid{grid-template-columns:1fr 1fr}}
+    /* ===== NEGÓCIOS ===== */
+    .negocios-tabs{display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0}
+    .neg-tab{background:transparent;border:none;color:var(--text2);padding:10px 16px;font-size:.9rem;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}
+    .neg-tab:hover{color:var(--text)}
+    .neg-tab.ativo{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+    [data-tema="escuro"] .neg-tab.ativo{color:var(--accent);border-bottom-color:var(--accent)}
+    .neg-view{display:none}
+    .neg-view.ativo{display:block}
+
+    /* FUNIL */
+    .funil{display:flex;flex-direction:column;gap:24px}
+    .fase-grupo{}
+    .fase-titulo{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+    .fase-badge{padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:700}
+    .fase-oportunidade{background:#fef3c7;color:#92400e}
+    .fase-qualificacao{background:#dbeafe;color:#1e40af}
+    .fase-disputa{background:#fed7aa;color:#9a3412}
+    .fase-classificacao{background:#ede9fe;color:#5b21b6}
+    .fase-contrato{background:#d1fae5;color:#065f46}
+    [data-tema="escuro"] .fase-oportunidade{background:#2b1900;color:#fbbf24}
+    [data-tema="escuro"] .fase-qualificacao{background:#0f1e3d;color:#93c5fd}
+    [data-tema="escuro"] .fase-disputa{background:#2b1000;color:#fb923c}
+    [data-tema="escuro"] .fase-classificacao{background:#1e1040;color:#c4b5fd}
+    [data-tema="escuro"] .fase-contrato{background:#0a2e1a;color:#6ee7b7}
+    .fase-count{font-size:.78rem;color:var(--text3)}
+    .neg-card{background:var(--surface);border-radius:8px;padding:14px 16px;box-shadow:var(--card-shadow);border:1px solid var(--border);margin-bottom:8px}
+    .neg-card-titulo{font-size:.9rem;font-weight:600;color:var(--text);margin-bottom:4px}
+    .neg-card-info{font-size:.78rem;color:var(--text2);display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+    .neg-card-actions{display:flex;gap:6px;flex-wrap:wrap}
+    .neg-btn{font-size:.75rem;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer}
+    .neg-btn:hover{background:var(--chip-bg);color:var(--primary)}
+    .neg-btn-danger{color:#ef4444;border-color:#fca5a5}
+    .neg-btn-danger:hover{background:#fff3f3;color:#dc2626}
+    .fase-vazio{color:var(--text3);font-size:.85rem;padding:10px 0}
+
+    /* QUADROS KANBAN */
+    .kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;overflow-x:auto;padding-bottom:8px}
+    .kanban-col{background:var(--surface2);border-radius:10px;padding:12px;border:1px solid var(--border);min-width:180px}
+    .kanban-col-titulo{font-size:.82rem;font-weight:700;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+    .kanban-card{background:var(--surface);border-radius:8px;padding:10px 12px;box-shadow:var(--card-shadow);border:1px solid var(--border);margin-bottom:8px;cursor:grab}
+    .kanban-card-titulo{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:4px}
+    .kanban-card-info{font-size:.72rem;color:var(--text2)}
+    .kanban-vazio{font-size:.78rem;color:var(--text3);text-align:center;padding:16px 0}
+
+    /* AGENDA */
+    .agenda-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .agenda-mes{font-size:1.1rem;font-weight:700;color:var(--text)}
+    .agenda-nav{display:flex;gap:6px}
+    .agenda-nav button{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:.85rem}
+    .agenda-nav button:hover{background:var(--chip-bg)}
+    .calendario{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+    .cal-dia-semana{text-align:center;font-size:.72rem;font-weight:600;color:var(--text3);padding:4px 0}
+    .cal-dia{min-height:70px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-size:.75rem}
+    .cal-dia.hoje{border-color:var(--primary);background:var(--chip-bg)}
+    .cal-dia.outro-mes{opacity:.4}
+    .cal-dia-num{font-weight:600;color:var(--text2);margin-bottom:2px}
+    .cal-evento{background:var(--primary);color:var(--accent);border-radius:3px;padding:1px 4px;font-size:.65rem;margin-bottom:1px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cal-evento.encerramento{background:#7f1d1d;color:#fca5a5}
+    [data-tema="escuro"] .cal-evento{background:#245239}
+
+    @media(max-width:800px){.filtros{grid-template-columns:1fr}.filtros .campo-busca{flex-direction:column}.drawer{width:100%;right:-100%}.drawer-grid{grid-template-columns:1fr}.item-detalhe-grid{grid-template-columns:1fr 1fr}.kanban{grid-template-columns:repeat(3,1fr)}.header-logo span{display:none}}
   </style>
 </head>
 <body>
 <header>
-  <div>
-    <h1>🔍 Busca de Licitações</h1>
-    <span>Arantes Papéis · Portal Nacional de Contratações Públicas</span>
+  <div class="header-left">
+    <div class="header-logo">🔍 Busca Licitações<span>Arantes Papéis · PNCP</span></div>
+    <nav class="nav">
+      <button class="nav-btn ativo" id="navBusca" onclick="irParaView('busca')">🔍 Busca</button>
+      <button class="nav-btn" id="navNegocios" onclick="toggleDropdown()">💼 Negócios ▾
+        <div class="dropdown" id="dropdownNegocios">
+          <div class="dropdown-item" onclick="irParaNegocios('funil')">📊 Funil de Licitações</div>
+          <div class="dropdown-item" onclick="irParaNegocios('quadros')">🗂️ Quadros</div>
+          <div class="dropdown-item" onclick="irParaNegocios('agenda')">📅 Agenda</div>
+        </div>
+      </button>
+    </nav>
   </div>
-  <button class="btn-tema" id="btnTema" onclick="alternarTema()" title="Alternar tema">🌙</button>
+  <div class="header-right">
+    <button class="btn-tema" id="btnTema" onclick="alternarTema()">🌙</button>
+  </div>
 </header>
 
-<div class="container">
-  <div class="filtros">
-    <div class="campo-busca">
-      <input type="text" id="palavraChave" placeholder="Palavra-chave (ex: papel, bobina, kraft, embalagem...)"/>
-      <button class="btn-buscar" id="btnBuscar" onclick="buscar(1)">Buscar</button>
-      <button class="btn-limpar" onclick="limpar()">Limpar</button>
+<!-- VIEW BUSCA -->
+<div class="view ativo" id="viewBusca">
+  <div class="container">
+    <div class="filtros">
+      <div class="campo-busca">
+        <input type="text" id="palavraChave" placeholder="Palavra-chave (ex: papel, bobina, kraft, embalagem...)"/>
+        <button class="btn-buscar" id="btnBuscar" onclick="buscar(1)">Buscar</button>
+        <button class="btn-limpar" onclick="limpar()">Limpar</button>
+      </div>
+      <select id="uf">
+        <option value="">Todos os estados</option>
+        <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+        <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+        <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+        <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+        <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+        <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+        <option>SP</option><option>SE</option><option>TO</option>
+      </select>
+      <select id="modalidade">
+        <option value="">Todas as modalidades</option>
+        <option value="6">Pregão Eletrônico</option>
+        <option value="8">Dispensa de Licitação</option>
+        <option value="4">Concorrência Eletrônica</option>
+        <option value="9">Inexigibilidade</option>
+        <option value="7">Pregão Presencial</option>
+        <option value="5">Concorrência Presencial</option>
+      </select>
+      <select id="status">
+        <option value="recebendo_proposta">Recebendo proposta</option>
+        <option value="em_julgamento">Em julgamento</option>
+        <option value="encerrada">Encerrada</option>
+        <option value="">Todos</option>
+      </select>
     </div>
-    <select id="uf">
-      <option value="">Todos os estados</option>
-      <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
-      <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
-      <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
-      <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
-      <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
-      <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
-      <option>SP</option><option>SE</option><option>TO</option>
-    </select>
-    <select id="modalidade">
-      <option value="">Todas as modalidades</option>
-      <option value="6">Pregão Eletrônico</option>
-      <option value="8">Dispensa de Licitação</option>
-      <option value="4">Concorrência Eletrônica</option>
-      <option value="9">Inexigibilidade</option>
-      <option value="7">Pregão Presencial</option>
-      <option value="5">Concorrência Presencial</option>
-    </select>
-    <select id="status">
-      <option value="recebendo_proposta">Recebendo proposta</option>
-      <option value="em_julgamento">Em julgamento</option>
-      <option value="encerrada">Encerrada</option>
-      <option value="">Todos</option>
-    </select>
-  </div>
-
-  <div class="historico-box" id="historicoBox">
-    <div class="historico-label">
-      <span>🕒 Buscas recentes</span>
-      <button onclick="limparHistorico()">Limpar tudo</button>
+    <div class="historico-box" id="historicoBox">
+      <div class="historico-label"><span>🕒 Buscas recentes</span><button onclick="limparHistorico()">Limpar tudo</button></div>
+      <div class="historico-chips" id="historicoChips"></div>
     </div>
-    <div class="historico-chips" id="historicoChips"></div>
-  </div>
-
-  <div id="resumo" class="resumo"></div>
-  <div id="resultado"></div>
-  <div class="paginacao" id="paginacao" style="display:none">
-    <button class="btn-pag" id="btnAnterior" onclick="mudarPagina(-1)">← Anterior</button>
-    <span class="pagina-info" id="paginaInfo"></span>
-    <button class="btn-pag" id="btnProxima" onclick="mudarPagina(1)">Próxima →</button>
+    <div id="resumo" class="resumo"></div>
+    <div id="resultado"></div>
+    <div class="paginacao" id="paginacao" style="display:none">
+      <button class="btn-pag" id="btnAnterior" onclick="mudarPagina(-1)">← Anterior</button>
+      <span class="pagina-info" id="paginaInfo"></span>
+      <button class="btn-pag" id="btnProxima" onclick="mudarPagina(1)">Próxima →</button>
+    </div>
   </div>
 </div>
 
+<!-- VIEW NEGÓCIOS -->
+<div class="view" id="viewNegocios">
+  <div class="container">
+    <div class="negocios-tabs">
+      <button class="neg-tab ativo" id="tabFunil" onclick="mudarAbaNegocios('funil')">📊 Funil</button>
+      <button class="neg-tab" id="tabQuadros" onclick="mudarAbaNegocios('quadros')">🗂️ Quadros</button>
+      <button class="neg-tab" id="tabAgenda" onclick="mudarAbaNegocios('agenda')">📅 Agenda</button>
+    </div>
+
+    <!-- FUNIL -->
+    <div class="neg-view ativo" id="negFunil">
+      <div class="funil" id="funilConteudo"></div>
+    </div>
+
+    <!-- QUADROS -->
+    <div class="neg-view" id="negQuadros">
+      <div class="kanban" id="kanbanConteudo"></div>
+    </div>
+
+    <!-- AGENDA -->
+    <div class="neg-view" id="negAgenda">
+      <div class="agenda-header">
+        <div class="agenda-mes" id="agendaMes"></div>
+        <div class="agenda-nav">
+          <button onclick="mudarMes(-1)">◀</button>
+          <button onclick="mudarMes(0)">Hoje</button>
+          <button onclick="mudarMes(1)">▶</button>
+        </div>
+      </div>
+      <div class="calendario" id="calendarioGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DRAWER -->
 <div class="overlay" id="overlay" onclick="fecharDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-header">
@@ -212,6 +340,7 @@
     </div>
     <button class="drawer-btn" id="d-btn-acessar">📄 Acessar edital no PNCP</button>
     <button class="drawer-btn drawer-btn-sec" id="d-btn-busca">🔍 Buscar no PNCP</button>
+    <button class="drawer-btn drawer-btn-destaque" id="d-btn-negocio" onclick="adicionarAosNegocios()">💼 Adicionar aos meus negócios</button>
     <div class="drawer-section">
       <h3>Itens do pregão</h3>
       <div id="d-itens"><div class="item-loading">⏳ Carregando itens...</div></div>
@@ -220,15 +349,25 @@
 </div>
 
 <script>
+  // ===== STATE =====
   let paginaAtual=1,totalPaginas=1;
+  let itemAtualDrawer=null;
+  let mesAtual=new Date();
   const HIST_KEY='buscaLicitacoes_historico';
   const TEMA_KEY='buscaLicitacoes_tema';
+  const NEG_KEY='buscaLicitacoes_negocios';
 
-  // TEMA
+  const FASES=[
+    {id:'oportunidade',nome:'Oportunidade',cls:'fase-oportunidade',emoji:'🟡'},
+    {id:'qualificacao',nome:'Qualificação',cls:'fase-qualificacao',emoji:'🔵'},
+    {id:'disputa',nome:'Disputa',cls:'fase-disputa',emoji:'🟠'},
+    {id:'classificacao',nome:'Classificação',cls:'fase-classificacao',emoji:'🟣'},
+    {id:'contrato',nome:'Contrato',cls:'fase-contrato',emoji:'🟢'},
+  ];
+
+  // ===== TEMA =====
   function alternarTema(){
-    const html=document.documentElement;
-    const atual=html.getAttribute('data-tema');
-    const novo=atual==='escuro'?'claro':'escuro';
+    const html=document.documentElement,novo=html.getAttribute('data-tema')==='escuro'?'claro':'escuro';
     html.setAttribute('data-tema',novo);
     document.getElementById('btnTema').textContent=novo==='escuro'?'☀️':'🌙';
     localStorage.setItem(TEMA_KEY,novo);
@@ -239,7 +378,160 @@
     document.getElementById('btnTema').textContent=t==='escuro'?'☀️':'🌙';
   }
 
-  // HISTÓRICO
+  // ===== NAVEGAÇÃO =====
+  function irParaView(view){
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('ativo'));
+    document.getElementById('view'+view.charAt(0).toUpperCase()+view.slice(1)).classList.add('ativo');
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('ativo'));
+    document.getElementById('nav'+view.charAt(0).toUpperCase()+view.slice(1)).classList.add('ativo');
+    document.getElementById('dropdownNegocios').classList.remove('aberto');
+  }
+  function irParaNegocios(aba){
+    irParaView('negocios');
+    mudarAbaNegocios(aba);
+  }
+  function toggleDropdown(){
+    document.getElementById('dropdownNegocios').classList.toggle('aberto');
+  }
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.nav-btn'))document.getElementById('dropdownNegocios').classList.remove('aberto');
+  });
+  function mudarAbaNegocios(aba){
+    document.querySelectorAll('.neg-tab').forEach(t=>t.classList.remove('ativo'));
+    document.querySelectorAll('.neg-view').forEach(v=>v.classList.remove('ativo'));
+    document.getElementById('tab'+aba.charAt(0).toUpperCase()+aba.slice(1)).classList.add('ativo');
+    document.getElementById('neg'+aba.charAt(0).toUpperCase()+aba.slice(1)).classList.add('ativo');
+    if(aba==='funil')renderFunil();
+    if(aba==='quadros')renderQuadros();
+    if(aba==='agenda')renderAgenda();
+  }
+
+  // ===== NEGÓCIOS =====
+  function getNegocios(){try{return JSON.parse(localStorage.getItem(NEG_KEY)||'[]')}catch{return[]}}
+  function salvarNegocios(n){localStorage.setItem(NEG_KEY,JSON.stringify(n))}
+
+  function adicionarAosNegocios(){
+    if(!itemAtualDrawer)return;
+    const negs=getNegocios();
+    const ja=negs.find(n=>n.numero_controle===itemAtualDrawer.numero_controle_pncp);
+    if(ja){alert('Esta licitação já está nos seus negócios!');return}
+    const p=parseControle(itemAtualDrawer.numero_controle_pncp);
+    const neg={
+      id:Date.now().toString(),
+      titulo:itemAtualDrawer.title||'Sem título',
+      objeto:itemAtualDrawer.description||'',
+      orgao:itemAtualDrawer.orgao_nome||'',
+      uf:itemAtualDrawer.uf||'',
+      modalidade:itemAtualDrawer.modalidade_licitacao_nome||'',
+      abertura:itemAtualDrawer.data_inicio_vigencia||'',
+      encerramento:itemAtualDrawer.data_fim_vigencia||'',
+      numero_controle:itemAtualDrawer.numero_controle_pncp||'',
+      link_pncp:p?`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`:'',
+      fase:'oportunidade',
+      adicionado_em:new Date().toISOString(),
+    };
+    negs.unshift(neg);
+    salvarNegocios(negs);
+    const btn=document.getElementById('d-btn-negocio');
+    btn.textContent='✅ Adicionado aos negócios!';
+    btn.classList.add('adicionado');
+    setTimeout(()=>{btn.textContent='💼 Adicionar aos meus negócios';btn.classList.remove('adicionado')},2500);
+  }
+
+  function moverFase(id,fase){
+    const negs=getNegocios();
+    const n=negs.find(x=>x.id===id);
+    if(n){n.fase=fase;salvarNegocios(negs);renderFunil();renderQuadros()}
+  }
+
+  function removerNegocio(id){
+    if(!confirm('Remover esta licitação dos negócios?'))return;
+    salvarNegocios(getNegocios().filter(n=>n.id!==id));
+    renderFunil();renderQuadros();renderAgenda();
+  }
+
+  function renderFunil(){
+    const negs=getNegocios();
+    document.getElementById('funilConteudo').innerHTML=FASES.map(f=>{
+      const itens=negs.filter(n=>n.fase===f.id);
+      return`<div class="fase-grupo">
+        <div class="fase-titulo">
+          <span class="fase-badge ${f.cls}">${f.emoji} ${f.nome}</span>
+          <span class="fase-count">${itens.length} licitação(ões)</span>
+        </div>
+        ${itens.length===0?'<div class="fase-vazio">Nenhuma licitação nesta fase.</div>':
+        itens.map(n=>`<div class="neg-card">
+          <div class="neg-card-titulo">${n.titulo}</div>
+          <div class="neg-card-info">
+            <span>📍 ${n.uf}</span>
+            <span>📋 ${n.modalidade}</span>
+            <span>⏰ ${n.encerramento?new Date(n.encerramento).toLocaleDateString('pt-BR'):'—'}</span>
+          </div>
+          <div class="neg-card-actions">
+            <select onchange="moverFase('${n.id}',this.value)" style="font-size:.75rem;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);cursor:pointer">
+              ${FASES.map(f2=>`<option value="${f2.id}"${f2.id===n.fase?' selected':''}>${f2.emoji} ${f2.nome}</option>`).join('')}
+            </select>
+            ${n.link_pncp?`<button class="neg-btn" onclick="window.open('${n.link_pncp}','_blank')">📄 PNCP</button>`:''}
+            <button class="neg-btn neg-btn-danger" onclick="removerNegocio('${n.id}')">✕ Remover</button>
+          </div>
+        </div>`).join('')}
+      </div>`;
+    }).join('');
+  }
+
+  function renderQuadros(){
+    const negs=getNegocios();
+    document.getElementById('kanbanConteudo').innerHTML=FASES.map(f=>{
+      const itens=negs.filter(n=>n.fase===f.id);
+      return`<div class="kanban-col">
+        <div class="kanban-col-titulo"><span class="fase-badge ${f.cls}">${f.emoji} ${f.nome}</span></div>
+        ${itens.length===0?'<div class="kanban-vazio">—</div>':
+        itens.map(n=>`<div class="kanban-card">
+          <div class="kanban-card-titulo">${n.titulo.substring(0,60)}${n.titulo.length>60?'...':''}</div>
+          <div class="kanban-card-info">📍 ${n.uf} · ⏰ ${n.encerramento?new Date(n.encerramento).toLocaleDateString('pt-BR'):'—'}</div>
+        </div>`).join('')}
+      </div>`;
+    }).join('');
+  }
+
+  function renderAgenda(){
+    const negs=getNegocios();
+    const ano=mesAtual.getFullYear(),mes=mesAtual.getMonth();
+    document.getElementById('agendaMes').textContent=mesAtual.toLocaleString('pt-BR',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
+    const primeiroDia=new Date(ano,mes,1).getDay();
+    const diasNoMes=new Date(ano,mes+1,0).getDate();
+    const hoje=new Date();
+    let grid='';
+    ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(d=>{grid+=`<div class="cal-dia-semana">${d}</div>`});
+    for(let i=0;i<primeiroDia;i++)grid+=`<div class="cal-dia outro-mes"></div>`;
+    for(let d=1;d<=diasNoMes;d++){
+      const dataAtual=new Date(ano,mes,d);
+      const ehHoje=dataAtual.toDateString()===hoje.toDateString();
+      const eventos=negs.filter(n=>{
+        const ab=n.abertura?new Date(n.abertura):null;
+        const en=n.encerramento?new Date(n.encerramento):null;
+        return (ab&&ab.getDate()===d&&ab.getMonth()===mes&&ab.getFullYear()===ano)||
+               (en&&en.getDate()===d&&en.getMonth()===mes&&en.getFullYear()===ano);
+      });
+      grid+=`<div class="cal-dia${ehHoje?' hoje':''}">
+        <div class="cal-dia-num">${d}</div>
+        ${eventos.map(n=>{
+          const ab=n.abertura?new Date(n.abertura):null;
+          const ehAbertura=ab&&ab.getDate()===d&&ab.getMonth()===mes&&ab.getFullYear()===ano;
+          return`<div class="cal-evento${ehAbertura?'':' encerramento'}" title="${ehAbertura?'Abertura':'Encerramento'}: ${n.titulo}">${ehAbertura?'📅':'⏰'} ${n.titulo.substring(0,20)}</div>`;
+        }).join('')}
+      </div>`;
+    }
+    document.getElementById('calendarioGrid').innerHTML=grid;
+  }
+
+  function mudarMes(dir){
+    if(dir===0)mesAtual=new Date();
+    else mesAtual=new Date(mesAtual.getFullYear(),mesAtual.getMonth()+dir,1);
+    renderAgenda();
+  }
+
+  // ===== HISTÓRICO =====
   function getHistorico(){try{return JSON.parse(localStorage.getItem(HIST_KEY)||'[]')}catch{return[]}}
   function salvarHistorico(kw,uf,mod,st){
     if(!kw)return;
@@ -251,12 +543,10 @@
   function renderHistorico(){
     const h=getHistorico();
     const box=document.getElementById('historicoBox');
-    const chips=document.getElementById('historicoChips');
     if(!h.length){box.style.display='none';return}
     box.style.display='block';
-    chips.innerHTML=h.map((x,i)=>`
-      <span class="chip" onclick="aplicarHistorico(${i})">
-        ${x.kw}${x.uf?' · '+x.uf:''}
+    document.getElementById('historicoChips').innerHTML=h.map((x,i)=>`
+      <span class="chip" onclick="aplicarHistorico(${i})">${x.kw}${x.uf?' · '+x.uf:''}
         <span class="chip-x" onclick="event.stopPropagation();removerHistorico(${i})">✕</span>
       </span>`).join('');
   }
@@ -264,9 +554,9 @@
   function removerHistorico(i){const h=getHistorico();h.splice(i,1);localStorage.setItem(HIST_KEY,JSON.stringify(h));renderHistorico()}
   function limparHistorico(){localStorage.removeItem(HIST_KEY);renderHistorico()}
 
+  // ===== UTILS =====
   function fmt(iso){if(!iso)return'—';return new Date(iso).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}
   function fmtVal(v){if(!v)return'Não informado';return Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
-
   function statusBadge(item){
     if(item.cancelado)return{texto:'Cancelado',cls:'badge-cinza'};
     const agora=new Date(),fim=item.data_fim_vigencia?new Date(item.data_fim_vigencia):null,ini=item.data_inicio_vigencia?new Date(item.data_inicio_vigencia):null;
@@ -274,7 +564,6 @@
     if(ini&&agora>=ini)return{texto:'Recebendo proposta',cls:'badge-verde'};
     return{texto:'Aguardando abertura',cls:'badge-amarelo'};
   }
-
   function parseControle(c){
     if(!c)return null;
     const m=c.match(/^(\d+)-(\d+)-(\d+)\/(\d+)$/);
@@ -283,19 +572,17 @@
   }
   function buildLinks(item){
     const p=parseControle(item.numero_controle_pncp);
-    if(!p)return{direto:'',busca:''};
-    return{
-      direto:`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`,
-      busca:`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`
-    };
+    if(!p)return{direto:''};
+    return{direto:`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`};
   }
 
+  // ===== DRAWER =====
   function toggleItem(i){
     document.getElementById('det-'+i).classList.toggle('aberto');
     document.getElementById('chev-'+i).classList.toggle('aberto');
   }
-
   function abrirDrawer(item){
+    itemAtualDrawer=item;
     const{direto}=buildLinks(item);
     const badge=statusBadge(item);
     document.getElementById('d-titulo').textContent=item.title||'Sem título';
@@ -316,6 +603,10 @@
     document.getElementById('d-btn-acessar').onclick=()=>window.open(direto,'_blank');
     document.getElementById('d-btn-busca').onclick=()=>window.open(direto,'_blank');
     document.getElementById('d-btn-acessar').style.display=direto?'block':'none';
+    const jaAdicionado=getNegocios().some(n=>n.numero_controle===item.numero_controle_pncp);
+    const btnNeg=document.getElementById('d-btn-negocio');
+    btnNeg.textContent=jaAdicionado?'✅ Já nos seus negócios':'💼 Adicionar aos meus negócios';
+    btnNeg.classList.toggle('adicionado',jaAdicionado);
     document.getElementById('d-itens').innerHTML='<div class="item-loading">⏳ Carregando itens...</div>';
     document.getElementById('drawer').classList.add('ativo');
     document.getElementById('overlay').classList.add('ativo');
@@ -323,13 +614,12 @@
     const p=parseControle(item.numero_controle_pncp);
     if(p)carregarItens(p.cnpj,p.ano,p.seq);
   }
-
   function fecharDrawer(){
     document.getElementById('drawer').classList.remove('ativo');
     document.getElementById('overlay').classList.remove('ativo');
     document.body.style.overflow='';
+    itemAtualDrawer=null;
   }
-
   async function carregarItens(cnpj,ano,seq){
     try{
       const r=await fetch(`/api/itens?cnpj=${cnpj}&ano=${ano}&sequencial=${seq}`);
@@ -360,10 +650,12 @@
             </div>
             <div class="item-desc-full">${it.descricao||'Sem descrição'}</div>
           </div>
-        </div>`}).join('')}</div>`;
+        </div>`;
+      }).join('')}</div>`;
     }catch(e){document.getElementById('d-itens').innerHTML='<div class="item-loading">Erro ao carregar itens.</div>'}
   }
 
+  // ===== BUSCA =====
   async function buscar(pagina){
     paginaAtual=pagina;
     const kw=document.getElementById('palavraChave').value.trim();
@@ -390,7 +682,7 @@
       totalPaginas=data.totalPaginas||1;
       document.getElementById('resumo').innerHTML=`<strong>${total.toLocaleString('pt-BR')}</strong> licitações encontradas · Página ${paginaAtual} de ${totalPaginas}`;
       if(!itens.length){document.getElementById('resultado').innerHTML='<div class="vazio">Nenhuma licitação encontrada.</div>';return}
-      const html=itens.map(item=>{
+      document.getElementById('resultado').innerHTML=`<div class="cards">${itens.map(item=>{
         const badge=statusBadge(item);
         return`<div class="card" onclick='abrirDrawer(${JSON.stringify(item)})'>
           <div class="card-header">
@@ -406,8 +698,7 @@
           </div>
           <div class="card-orgao">🏛️ ${item.orgao_nome||'—'}</div>
         </div>`;
-      }).join('');
-      document.getElementById('resultado').innerHTML=`<div class="cards">${html}</div>`;
+      }).join('')}</div>`;
       document.getElementById('paginacao').style.display='flex';
       document.getElementById('paginaInfo').textContent=`Página ${paginaAtual} de ${totalPaginas}`;
       document.getElementById('btnAnterior').disabled=paginaAtual<=1;
@@ -416,7 +707,6 @@
       document.getElementById('resultado').innerHTML=`<div class="erro">Erro de conexão: ${e.message}</div>`;
     }finally{btn.disabled=false;btn.textContent='Buscar'}
   }
-
   function mudarPagina(d){const n=paginaAtual+d;if(n>=1&&n<=totalPaginas)buscar(n)}
   function limpar(){
     document.getElementById('palavraChave').value='';
