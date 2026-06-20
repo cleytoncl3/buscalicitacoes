@@ -15,12 +15,13 @@ export default async function handler(req, res) {
 
     const text = await response.text();
     let data;
-    try { data = JSON.parse(text); } 
+    try { data = JSON.parse(text); }
     catch { return res.status(500).json({ erro: text.substring(0, 200) }); }
 
     if (!response.ok) return res.status(response.status).json({ erro: data.message || text });
 
-    return res.status(200).json(data);
+    const itens = Array.isArray(data) ? data : (data.data || []);
+    return res.status(200).json({ data: itens, total: itens.length });
 
   } catch (error) {
     return res.status(500).json({ erro: error.message });
