@@ -1,106 +1,137 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-tema="claro">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Busca Licitações – Arantes Papéis</title>
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;color:#222}
-    header{background:#1a3d2b;color:#d4a825;padding:18px 32px}
+    :root{
+      --bg:#f4f6f8;--surface:#fff;--surface2:#f8f9fa;--border:#e0e0e0;
+      --text:#222;--text2:#555;--text3:#888;--text4:#999;
+      --primary:#1a3d2b;--primary-hover:#245239;--accent:#d4a825;
+      --chip-bg:#eef5f1;--chip-border:#c5ddd0;
+      --card-shadow:0 2px 6px rgba(0,0,0,.06);--card-shadow-hover:0 4px 14px rgba(0,0,0,.12);
+      --drawer-bg:#fff;--overlay:rgba(0,0,0,.4);
+      --badge-verde-bg:#e6f4ec;--badge-verde-txt:#1a7a3c;
+      --badge-amarelo-bg:#fff8e1;--badge-amarelo-txt:#b8860b;
+      --badge-cinza-bg:#f0f0f0;--badge-cinza-txt:#666;
+      --erro-bg:#fff3f3;--erro-border:#f5c6c6;--erro-txt:#c0392b;
+    }
+    [data-tema="escuro"]{
+      --bg:#0d1117;--surface:#161b27;--surface2:#1e2538;--border:#2a3050;
+      --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--text4:#475569;
+      --primary:#1a3d2b;--primary-hover:#245239;--accent:#d4a825;
+      --chip-bg:#1e2d24;--chip-border:#2d4a38;
+      --card-shadow:0 2px 6px rgba(0,0,0,.3);--card-shadow-hover:0 4px 14px rgba(0,0,0,.5);
+      --drawer-bg:#161b27;--overlay:rgba(0,0,0,.6);
+      --badge-verde-bg:#0d2b1a;--badge-verde-txt:#4ade80;
+      --badge-amarelo-bg:#2b2000;--badge-amarelo-txt:#fbbf24;
+      --badge-cinza-bg:#1e2538;--badge-cinza-txt:#94a3b8;
+      --erro-bg:#2b0d0d;--erro-border:#7f1d1d;--erro-txt:#fca5a5;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;transition:background-color .2s,color .2s,border-color .2s}
+    body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text)}
+    header{background:var(--primary);color:var(--accent);padding:18px 32px;display:flex;justify-content:space-between;align-items:center}
     header h1{font-size:1.4rem;font-weight:700;letter-spacing:1px}
     header span{font-size:.85rem;color:#aaa}
+    .btn-tema{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .btn-tema:hover{background:rgba(255,255,255,.25)}
     .container{max-width:1100px;margin:0 auto;padding:24px 16px}
-    .filtros{background:#fff;border-radius:10px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.07);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:8px}
+    .filtros{background:var(--surface);border-radius:10px;padding:20px;box-shadow:var(--card-shadow);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:8px;border:1px solid var(--border)}
     .filtros .campo-busca{grid-column:1/-1;display:flex;gap:10px}
-    .filtros input,.filtros select{width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:.95rem;background:#fafafa}
-    .filtros input:focus,.filtros select:focus{outline:none;border-color:#1a3d2b}
-    .btn-buscar{background:#1a3d2b;color:#d4a825;border:none;padding:10px 28px;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .2s}
-    .btn-buscar:hover{background:#245239}
-    .btn-buscar:disabled{background:#888;cursor:wait}
-    .btn-limpar{background:transparent;color:#888;border:1px solid #ddd;padding:10px 16px;border-radius:8px;font-size:.9rem;cursor:pointer}
-    .historico-box{background:#fff;border-radius:10px;padding:12px 16px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:16px;display:none}
-    .historico-label{font-size:.78rem;color:#999;margin-bottom:8px;display:flex;justify-content:space-between}
-    .historico-label button{background:none;border:none;color:#c0392b;font-size:.78rem;cursor:pointer}
+    .filtros input,.filtros select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.95rem;background:var(--surface2);color:var(--text)}
+    .filtros input:focus,.filtros select:focus{outline:none;border-color:var(--primary)}
+    .btn-buscar{background:var(--primary);color:var(--accent);border:none;padding:10px 28px;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;white-space:nowrap}
+    .btn-buscar:hover{background:var(--primary-hover)}
+    .btn-buscar:disabled{background:var(--text3);cursor:wait}
+    .btn-limpar{background:transparent;color:var(--text3);border:1px solid var(--border);padding:10px 16px;border-radius:8px;font-size:.9rem;cursor:pointer}
+    .historico-box{background:var(--surface);border-radius:10px;padding:12px 16px;box-shadow:var(--card-shadow);margin-bottom:16px;display:none;border:1px solid var(--border)}
+    .historico-label{font-size:.78rem;color:var(--text4);margin-bottom:8px;display:flex;justify-content:space-between}
+    .historico-label button{background:none;border:none;color:#ef4444;font-size:.78rem;cursor:pointer}
     .historico-chips{display:flex;flex-wrap:wrap;gap:8px}
-    .chip{background:#eef5f1;color:#1a3d2b;border:1px solid #c5ddd0;border-radius:20px;padding:4px 12px;font-size:.82rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s}
-    .chip:hover{background:#d4ebe0}
-    .chip-x{color:#999;font-size:.75rem;cursor:pointer}
-    .chip-x:hover{color:#c0392b}
-    .resumo{font-size:.9rem;color:#555;margin-bottom:14px}
-    .resumo strong{color:#1a3d2b}
+    .chip{background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:20px;padding:4px 12px;font-size:.82rem;cursor:pointer;display:flex;align-items:center;gap:6px}
+    .chip:hover{opacity:.8}
+    .chip-x{color:var(--text3);font-size:.75rem;cursor:pointer}
+    .resumo{font-size:.9rem;color:var(--text2);margin-bottom:14px}
+    .resumo strong{color:var(--primary)}
+    [data-tema="escuro"] .resumo strong{color:var(--accent)}
     .cards{display:flex;flex-direction:column;gap:12px}
-    .card{background:#fff;border-radius:10px;padding:18px 20px;box-shadow:0 2px 6px rgba(0,0,0,.06);border-left:5px solid #1a3d2b;cursor:pointer;transition:box-shadow .2s}
-    .card:hover{box-shadow:0 4px 14px rgba(0,0,0,.12);border-left-color:#d4a825}
+    .card{background:var(--surface);border-radius:10px;padding:18px 20px;box-shadow:var(--card-shadow);border-left:5px solid var(--primary);cursor:pointer}
+    .card:hover{box-shadow:var(--card-shadow-hover);border-left-color:var(--accent)}
     .card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px}
-    .card-titulo{font-weight:600;font-size:.95rem;color:#1a3d2b}
-    .card-desc{font-size:.88rem;color:#333;margin-bottom:8px;line-height:1.4}
+    .card-titulo{font-weight:600;font-size:.95rem;color:var(--primary)}
+    [data-tema="escuro"] .card-titulo{color:var(--accent)}
+    .card-desc{font-size:.88rem;color:var(--text);margin-bottom:8px;line-height:1.4}
     .badge{font-size:.75rem;padding:3px 10px;border-radius:20px;white-space:nowrap;font-weight:600}
-    .badge-verde{background:#e6f4ec;color:#1a7a3c}
-    .badge-amarelo{background:#fff8e1;color:#b8860b}
-    .badge-cinza{background:#f0f0f0;color:#666}
-    .card-info{display:flex;flex-wrap:wrap;gap:14px;font-size:.82rem;color:#555;margin-bottom:4px}
-    .card-orgao{font-size:.8rem;color:#888}
+    .badge-verde{background:var(--badge-verde-bg);color:var(--badge-verde-txt)}
+    .badge-amarelo{background:var(--badge-amarelo-bg);color:var(--badge-amarelo-txt)}
+    .badge-cinza{background:var(--badge-cinza-bg);color:var(--badge-cinza-txt)}
+    .card-info{display:flex;flex-wrap:wrap;gap:14px;font-size:.82rem;color:var(--text2);margin-bottom:4px}
+    .card-orgao{font-size:.8rem;color:var(--text3)}
     .paginacao{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:24px}
-    .btn-pag{background:#1a3d2b;color:#fff;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:.9rem}
-    .btn-pag:disabled{background:#ccc;cursor:default}
-    .pagina-info{font-size:.9rem;color:#666}
-    .loading{text-align:center;padding:40px;color:#888}
-    .erro{background:#fff3f3;border:1px solid #f5c6c6;color:#c0392b;padding:16px;border-radius:8px;text-align:center}
-    .vazio{text-align:center;padding:40px;color:#999}
+    .btn-pag{background:var(--primary);color:#fff;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:.9rem}
+    .btn-pag:disabled{background:var(--border);color:var(--text3);cursor:default}
+    .pagina-info{font-size:.9rem;color:var(--text2)}
+    .loading{text-align:center;padding:40px;color:var(--text3)}
+    .erro{background:var(--erro-bg);border:1px solid var(--erro-border);color:var(--erro-txt);padding:16px;border-radius:8px;text-align:center}
+    .vazio{text-align:center;padding:40px;color:var(--text3)}
 
     /* DRAWER */
-    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s}
+    .overlay{position:fixed;inset:0;background:var(--overlay);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s}
     .overlay.ativo{opacity:1;pointer-events:all}
-    .drawer{position:fixed;top:0;right:-660px;width:640px;max-width:95vw;height:100vh;background:#fff;z-index:101;box-shadow:-4px 0 24px rgba(0,0,0,.15);transition:right .3s ease;overflow-y:auto;display:flex;flex-direction:column}
+    .drawer{position:fixed;top:0;right:-660px;width:640px;max-width:95vw;height:100vh;background:var(--drawer-bg);z-index:101;box-shadow:-4px 0 24px rgba(0,0,0,.3);transition:right .3s ease;overflow-y:auto;display:flex;flex-direction:column;border-left:1px solid var(--border)}
     .drawer.ativo{right:0}
-    .drawer-header{background:#1a3d2b;color:#d4a825;padding:20px 20px 16px;position:sticky;top:0;z-index:1}
+    .drawer-header{background:var(--primary);color:var(--accent);padding:20px 20px 16px;position:sticky;top:0;z-index:1}
     .drawer-header h2{font-size:1rem;font-weight:700;margin-bottom:4px}
-    .drawer-header .drawer-sub{font-size:.8rem;color:#aaa}
+    .drawer-sub{font-size:.8rem;color:#aaa}
     .drawer-fechar{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
     .drawer-fechar:hover{background:rgba(255,255,255,.3)}
     .drawer-body{padding:20px;flex:1}
     .drawer-section{margin-bottom:20px}
-    .drawer-section h3{font-size:.8rem;text-transform:uppercase;color:#999;letter-spacing:1px;margin-bottom:8px}
-    .drawer-desc{font-size:.9rem;color:#333;line-height:1.5}
+    .drawer-section h3{font-size:.8rem;text-transform:uppercase;color:var(--text3);letter-spacing:1px;margin-bottom:8px}
+    .drawer-desc{font-size:.9rem;color:var(--text);line-height:1.5}
     .drawer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .drawer-campo{background:#f8f9fa;border-radius:8px;padding:10px 12px}
-    .drawer-campo label{font-size:.72rem;color:#999;display:block;margin-bottom:3px;text-transform:uppercase}
-    .drawer-campo span{font-size:.9rem;color:#222;font-weight:600}
+    .drawer-campo{background:var(--surface2);border-radius:8px;padding:10px 12px;border:1px solid var(--border)}
+    .drawer-campo label{font-size:.72rem;color:var(--text3);display:block;margin-bottom:3px;text-transform:uppercase}
+    .drawer-campo span{font-size:.9rem;color:var(--text);font-weight:600}
     .drawer-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
-    .drawer-tag{background:#eef5f1;color:#1a3d2b;border:1px solid #c5ddd0;border-radius:20px;padding:3px 10px;font-size:.78rem;font-weight:600}
-    .drawer-btn{display:block;width:100%;padding:12px;background:#1a3d2b;color:#d4a825;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:10px;text-align:center}
-    .drawer-btn:hover{background:#245239}
-    .drawer-btn-sec{background:#f0f0f0;color:#444}
-    .drawer-btn-sec:hover{background:#e0e0e0}
+    .drawer-tag{background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:20px;padding:3px 10px;font-size:.78rem;font-weight:600}
+    [data-tema="escuro"] .drawer-tag{color:var(--accent)}
+    .drawer-btn{display:block;width:100%;padding:12px;background:var(--primary);color:var(--accent);border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:10px;text-align:center}
+    .drawer-btn:hover{background:var(--primary-hover)}
+    .drawer-btn-sec{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+    .drawer-btn-sec:hover{background:var(--border)}
 
     /* ITENS ACCORDION */
     .item-lista{display:flex;flex-direction:column;gap:6px}
-    .item-accordion{border:1px solid #e0e0e0;border-radius:8px;overflow:hidden}
-    .item-header{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:#f8f9fa;transition:background .15s}
-    .item-header:hover{background:#eef5f1}
-    .item-num-badge{background:#1a3d2b;color:#d4a825;border-radius:6px;padding:2px 8px;font-size:.75rem;font-weight:700;white-space:nowrap;min-width:56px;text-align:center}
+    .item-accordion{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+    .item-header{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:var(--surface2)}
+    .item-header:hover{filter:brightness(1.05)}
+    .item-num-badge{background:var(--primary);color:var(--accent);border-radius:6px;padding:2px 8px;font-size:.75rem;font-weight:700;white-space:nowrap;min-width:56px;text-align:center}
     .item-resumo{flex:1}
-    .item-nome{font-size:.88rem;font-weight:600;color:#222}
-    .item-qtd{font-size:.78rem;color:#666;margin-top:2px}
-    .item-chevron{color:#999;font-size:.85rem;transition:transform .2s;flex-shrink:0}
+    .item-nome{font-size:.88rem;font-weight:600;color:var(--text)}
+    .item-qtd{font-size:.78rem;color:var(--text2);margin-top:2px}
+    .item-chevron{color:var(--text3);font-size:.85rem;transition:transform .2s;flex-shrink:0}
     .item-chevron.aberto{transform:rotate(180deg)}
-    .item-detalhe{display:none;padding:14px;background:#fff;border-top:1px solid #eee}
+    .item-detalhe{display:none;padding:14px;background:var(--surface);border-top:1px solid var(--border)}
     .item-detalhe.aberto{display:block}
     .item-detalhe-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
-    .item-detalhe-campo{background:#f8f9fa;border-radius:6px;padding:8px 10px}
-    .item-detalhe-campo label{font-size:.7rem;color:#999;display:block;text-transform:uppercase;margin-bottom:2px}
-    .item-detalhe-campo span{font-size:.85rem;font-weight:600;color:#222}
-    .item-desc-full{font-size:.82rem;color:#555;line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid #eee}
-    .item-loading{text-align:center;padding:20px;color:#999;font-size:.9rem}
+    .item-detalhe-campo{background:var(--surface2);border-radius:6px;padding:8px 10px;border:1px solid var(--border)}
+    .item-detalhe-campo label{font-size:.7rem;color:var(--text3);display:block;text-transform:uppercase;margin-bottom:2px}
+    .item-detalhe-campo span{font-size:.85rem;font-weight:600;color:var(--text)}
+    .item-desc-full{font-size:.82rem;color:var(--text2);line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+    .item-loading{text-align:center;padding:20px;color:var(--text3);font-size:.9rem}
 
     @media(max-width:700px){.filtros{grid-template-columns:1fr}.filtros .campo-busca{flex-direction:column}.drawer{width:100%;right:-100%}.drawer-grid{grid-template-columns:1fr}.item-detalhe-grid{grid-template-columns:1fr 1fr}}
   </style>
 </head>
 <body>
 <header>
-  <h1>🔍 Busca de Licitações</h1>
-  <span>Arantes Papéis · Portal Nacional de Contratações Públicas</span>
+  <div>
+    <h1>🔍 Busca de Licitações</h1>
+    <span>Arantes Papéis · Portal Nacional de Contratações Públicas</span>
+  </div>
+  <button class="btn-tema" id="btnTema" onclick="alternarTema()" title="Alternar tema">🌙</button>
 </header>
 
 <div class="container">
@@ -163,12 +194,10 @@
   </div>
   <div class="drawer-body">
     <div class="drawer-tags" id="d-tags"></div>
-
     <div class="drawer-section">
       <h3>Objeto</h3>
       <div class="drawer-desc" id="d-objeto"></div>
     </div>
-
     <div class="drawer-section">
       <div class="drawer-grid">
         <div class="drawer-campo"><label>Órgão</label><span id="d-orgao"></span></div>
@@ -181,10 +210,8 @@
         <div class="drawer-campo"><label>Situação</label><span id="d-situacao"></span></div>
       </div>
     </div>
-
     <button class="drawer-btn" id="d-btn-acessar">📄 Acessar edital no PNCP</button>
     <button class="drawer-btn drawer-btn-sec" id="d-btn-busca">🔍 Buscar no PNCP</button>
-
     <div class="drawer-section">
       <h3>Itens do pregão</h3>
       <div id="d-itens"><div class="item-loading">⏳ Carregando itens...</div></div>
@@ -195,7 +222,24 @@
 <script>
   let paginaAtual=1,totalPaginas=1;
   const HIST_KEY='buscaLicitacoes_historico';
+  const TEMA_KEY='buscaLicitacoes_tema';
 
+  // TEMA
+  function alternarTema(){
+    const html=document.documentElement;
+    const atual=html.getAttribute('data-tema');
+    const novo=atual==='escuro'?'claro':'escuro';
+    html.setAttribute('data-tema',novo);
+    document.getElementById('btnTema').textContent=novo==='escuro'?'☀️':'🌙';
+    localStorage.setItem(TEMA_KEY,novo);
+  }
+  function carregarTema(){
+    const t=localStorage.getItem(TEMA_KEY)||'claro';
+    document.documentElement.setAttribute('data-tema',t);
+    document.getElementById('btnTema').textContent=t==='escuro'?'☀️':'🌙';
+  }
+
+  // HISTÓRICO
   function getHistorico(){try{return JSON.parse(localStorage.getItem(HIST_KEY)||'[]')}catch{return[]}}
   function salvarHistorico(kw,uf,mod,st){
     if(!kw)return;
@@ -237,7 +281,6 @@
     if(!m)return null;
     return{cnpj:m[1],seqOrgao:m[2],seq:parseInt(m[3]),ano:m[4]};
   }
-
   function buildLinks(item){
     const p=parseControle(item.numero_controle_pncp);
     if(!p)return{direto:'',busca:''};
@@ -248,14 +291,12 @@
   }
 
   function toggleItem(i){
-    const det=document.getElementById('det-'+i);
-    const chev=document.getElementById('chev-'+i);
-    det.classList.toggle('aberto');
-    chev.classList.toggle('aberto');
+    document.getElementById('det-'+i).classList.toggle('aberto');
+    document.getElementById('chev-'+i).classList.toggle('aberto');
   }
 
   function abrirDrawer(item){
-    const{direto,busca}=buildLinks(item);
+    const{direto}=buildLinks(item);
     const badge=statusBadge(item);
     document.getElementById('d-titulo').textContent=item.title||'Sem título';
     document.getElementById('d-numero').textContent=item.numero_controle_pncp||'';
@@ -272,11 +313,9 @@
       <span class="drawer-tag">${item.modalidade_licitacao_nome||'—'}</span>
       <span class="drawer-tag badge ${badge.cls}">${badge.texto}</span>
       ${item.esfera_nome?`<span class="drawer-tag">${item.esfera_nome}</span>`:''}`;
-    const btnAcessar=document.getElementById('d-btn-acessar');
-    const btnBusca=document.getElementById('d-btn-busca');
-    btnAcessar.onclick=()=>window.open(direto,'_blank');
-    btnBusca.onclick=()=>window.open(busca,'_blank');
-    btnAcessar.style.display=direto?'block':'none';
+    document.getElementById('d-btn-acessar').onclick=()=>window.open(direto,'_blank');
+    document.getElementById('d-btn-busca').onclick=()=>window.open(direto,'_blank');
+    document.getElementById('d-btn-acessar').style.display=direto?'block':'none';
     document.getElementById('d-itens').innerHTML='<div class="item-loading">⏳ Carregando itens...</div>';
     document.getElementById('drawer').classList.add('ativo');
     document.getElementById('overlay').classList.add('ativo');
@@ -389,6 +428,7 @@
     document.getElementById('paginacao').style.display='none';
   }
   document.getElementById('palavraChave').addEventListener('keydown',e=>{if(e.key==='Enter')buscar(1)});
+  carregarTema();
   renderHistorico();
 </script>
 </body>
