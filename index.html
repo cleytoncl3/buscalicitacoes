@@ -160,7 +160,14 @@
       const html = itens.map(item => {
         const badge = statusBadge(item);
         const valor = formatarValor(item.valor_global);
-        const link = item.item_url ? `https://pncp.gov.br${item.item_url}` : '';
+        function buildLink(item) {
+  const c = item.numero_controle_pncp;
+  if (!c) return '';
+  const m = c.match(/^(\d+)-(\d+)-(\d+)\/(\d+)$/);
+  if (!m) return '';
+  return `https://pncp.gov.br/app/editais/${m[1]}/${m[2]}/${m[4]}/${parseInt(m[3])}`;
+}
+const link = buildLink(item);
         return `
           <div class="card" onclick="${link ? `window.open('${link}','_blank')` : ''}">
             <div class="card-header">
