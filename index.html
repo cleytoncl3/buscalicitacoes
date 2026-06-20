@@ -30,8 +30,6 @@
     }
     *{box-sizing:border-box;margin:0;padding:0;transition:background-color .2s,color .2s,border-color .2s}
     body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text)}
-
-    /* HEADER */
     header{background:var(--primary);color:var(--accent);padding:0 32px;display:flex;justify-content:space-between;align-items:center;height:58px}
     .header-left{display:flex;align-items:center;gap:24px}
     .header-logo{font-size:1.2rem;font-weight:700;letter-spacing:1px;white-space:nowrap}
@@ -47,13 +45,9 @@
     .header-right{display:flex;align-items:center;gap:8px}
     .btn-tema{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:pointer}
     .btn-tema:hover{background:rgba(255,255,255,.25)}
-
-    /* CONTAINER */
     .container{max-width:1100px;margin:0 auto;padding:24px 16px}
     .view{display:none}
     .view.ativo{display:block}
-
-    /* FILTROS */
     .filtros{background:var(--surface);border-radius:10px;padding:20px;box-shadow:var(--card-shadow);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:8px;border:1px solid var(--border)}
     .filtros .campo-busca{grid-column:1/-1;display:flex;gap:10px}
     .filtros input,.filtros select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.95rem;background:var(--surface2);color:var(--text)}
@@ -62,8 +56,6 @@
     .btn-buscar:hover{background:var(--primary-hover)}
     .btn-buscar:disabled{background:var(--text3);cursor:wait}
     .btn-limpar{background:transparent;color:var(--text3);border:1px solid var(--border);padding:10px 16px;border-radius:8px;font-size:.9rem;cursor:pointer}
-
-    /* HISTÓRICO */
     .historico-box{background:var(--surface);border-radius:10px;padding:12px 16px;box-shadow:var(--card-shadow);margin-bottom:16px;display:none;border:1px solid var(--border)}
     .historico-label{font-size:.78rem;color:var(--text4);margin-bottom:8px;display:flex;justify-content:space-between}
     .historico-label button{background:none;border:none;color:#ef4444;font-size:.78rem;cursor:pointer}
@@ -71,8 +63,6 @@
     .chip{background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:20px;padding:4px 12px;font-size:.82rem;cursor:pointer;display:flex;align-items:center;gap:6px}
     [data-tema="escuro"] .chip{color:var(--accent)}
     .chip-x{color:var(--text3);font-size:.75rem;cursor:pointer}
-
-    /* RESUMO + CARDS */
     .resumo{font-size:.9rem;color:var(--text2);margin-bottom:14px}
     .resumo strong{color:var(--primary)}
     [data-tema="escuro"] .resumo strong{color:var(--accent)}
@@ -96,8 +86,6 @@
     .loading{text-align:center;padding:40px;color:var(--text3)}
     .erro{background:var(--erro-bg);border:1px solid var(--erro-border);color:var(--erro-txt);padding:16px;border-radius:8px;text-align:center}
     .vazio{text-align:center;padding:40px;color:var(--text3)}
-
-    /* DRAWER */
     .overlay{position:fixed;inset:0;background:var(--overlay);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s}
     .overlay.ativo{opacity:1;pointer-events:all}
     .drawer{position:fixed;top:0;right:-660px;width:640px;max-width:95vw;height:100vh;background:var(--drawer-bg);z-index:101;box-shadow:-4px 0 24px rgba(0,0,0,.3);transition:right .3s ease;overflow-y:auto;display:flex;flex-direction:column;border-left:1px solid var(--border)}
@@ -125,8 +113,8 @@
     .drawer-btn-destaque{background:#b45309;color:#fff}
     .drawer-btn-destaque:hover{background:#92400e}
     .drawer-btn-destaque.adicionado{background:#166534;color:#fff}
-
-    /* ITENS ACCORDION */
+    .item-busca{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:.88rem;background:var(--surface2);color:var(--text);margin-bottom:10px;outline:none}
+    .item-busca:focus{border-color:var(--primary)}
     .item-lista{display:flex;flex-direction:column;gap:6px}
     .item-accordion{border:1px solid var(--border);border-radius:8px;overflow:hidden}
     .item-header{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:var(--surface2)}
@@ -145,8 +133,6 @@
     .item-detalhe-campo span{font-size:.85rem;font-weight:600;color:var(--text)}
     .item-desc-full{font-size:.82rem;color:var(--text2);line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
     .item-loading{text-align:center;padding:20px;color:var(--text3);font-size:.9rem}
-
-    /* ===== NEGÓCIOS ===== */
     .negocios-tabs{display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0}
     .neg-tab{background:transparent;border:none;color:var(--text2);padding:10px 16px;font-size:.9rem;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}
     .neg-tab:hover{color:var(--text)}
@@ -154,10 +140,7 @@
     [data-tema="escuro"] .neg-tab.ativo{color:var(--accent);border-bottom-color:var(--accent)}
     .neg-view{display:none}
     .neg-view.ativo{display:block}
-
-    /* FUNIL */
     .funil{display:flex;flex-direction:column;gap:24px}
-    .fase-grupo{}
     .fase-titulo{display:flex;align-items:center;gap:10px;margin-bottom:12px}
     .fase-badge{padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:700}
     .fase-oportunidade{background:#fef3c7;color:#92400e}
@@ -180,17 +163,13 @@
     .neg-btn-danger{color:#ef4444;border-color:#fca5a5}
     .neg-btn-danger:hover{background:#fff3f3;color:#dc2626}
     .fase-vazio{color:var(--text3);font-size:.85rem;padding:10px 0}
-
-    /* QUADROS KANBAN */
     .kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;overflow-x:auto;padding-bottom:8px}
     .kanban-col{background:var(--surface2);border-radius:10px;padding:12px;border:1px solid var(--border);min-width:180px}
     .kanban-col-titulo{font-size:.82rem;font-weight:700;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-    .kanban-card{background:var(--surface);border-radius:8px;padding:10px 12px;box-shadow:var(--card-shadow);border:1px solid var(--border);margin-bottom:8px;cursor:grab}
+    .kanban-card{background:var(--surface);border-radius:8px;padding:10px 12px;box-shadow:var(--card-shadow);border:1px solid var(--border);margin-bottom:8px}
     .kanban-card-titulo{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:4px}
     .kanban-card-info{font-size:.72rem;color:var(--text2)}
     .kanban-vazio{font-size:.78rem;color:var(--text3);text-align:center;padding:16px 0}
-
-    /* AGENDA */
     .agenda-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
     .agenda-mes{font-size:1.1rem;font-weight:700;color:var(--text)}
     .agenda-nav{display:flex;gap:6px}
@@ -205,7 +184,6 @@
     .cal-evento{background:var(--primary);color:var(--accent);border-radius:3px;padding:1px 4px;font-size:.65rem;margin-bottom:1px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .cal-evento.encerramento{background:#7f1d1d;color:#fca5a5}
     [data-tema="escuro"] .cal-evento{background:#245239}
-
     @media(max-width:800px){.filtros{grid-template-columns:1fr}.filtros .campo-busca{flex-direction:column}.drawer{width:100%;right:-100%}.drawer-grid{grid-template-columns:1fr}.item-detalhe-grid{grid-template-columns:1fr 1fr}.kanban{grid-template-columns:repeat(3,1fr)}.header-logo span{display:none}}
   </style>
 </head>
@@ -229,7 +207,6 @@
   </div>
 </header>
 
-<!-- VIEW BUSCA -->
 <div class="view ativo" id="viewBusca">
   <div class="container">
     <div class="filtros">
@@ -278,7 +255,6 @@
   </div>
 </div>
 
-<!-- VIEW NEGÓCIOS -->
 <div class="view" id="viewNegocios">
   <div class="container">
     <div class="negocios-tabs">
@@ -286,18 +262,8 @@
       <button class="neg-tab" id="tabQuadros" onclick="mudarAbaNegocios('quadros')">🗂️ Quadros</button>
       <button class="neg-tab" id="tabAgenda" onclick="mudarAbaNegocios('agenda')">📅 Agenda</button>
     </div>
-
-    <!-- FUNIL -->
-    <div class="neg-view ativo" id="negFunil">
-      <div class="funil" id="funilConteudo"></div>
-    </div>
-
-    <!-- QUADROS -->
-    <div class="neg-view" id="negQuadros">
-      <div class="kanban" id="kanbanConteudo"></div>
-    </div>
-
-    <!-- AGENDA -->
+    <div class="neg-view ativo" id="negFunil"><div class="funil" id="funilConteudo"></div></div>
+    <div class="neg-view" id="negQuadros"><div class="kanban" id="kanbanConteudo"></div></div>
     <div class="neg-view" id="negAgenda">
       <div class="agenda-header">
         <div class="agenda-mes" id="agendaMes"></div>
@@ -312,7 +278,6 @@
   </div>
 </div>
 
-<!-- DRAWER -->
 <div class="overlay" id="overlay" onclick="fecharDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-header">
@@ -343,20 +308,20 @@
     <button class="drawer-btn drawer-btn-destaque" id="d-btn-negocio" onclick="adicionarAosNegocios()">💼 Adicionar aos meus negócios</button>
     <div class="drawer-section">
       <h3>Itens do pregão</h3>
+      <input type="text" class="item-busca" id="buscaItem" placeholder="🔍 Buscar item dentro desta licitação..." oninput="filtrarItens()"/>
       <div id="d-itens"><div class="item-loading">⏳ Carregando itens...</div></div>
     </div>
   </div>
 </div>
 
 <script>
-  // ===== STATE =====
   let paginaAtual=1,totalPaginas=1;
   let itemAtualDrawer=null;
   let mesAtual=new Date();
+  let todosItens=[];
   const HIST_KEY='buscaLicitacoes_historico';
   const TEMA_KEY='buscaLicitacoes_tema';
   const NEG_KEY='buscaLicitacoes_negocios';
-
   const FASES=[
     {id:'oportunidade',nome:'Oportunidade',cls:'fase-oportunidade',emoji:'🟡'},
     {id:'qualificacao',nome:'Qualificação',cls:'fase-qualificacao',emoji:'🔵'},
@@ -365,7 +330,6 @@
     {id:'contrato',nome:'Contrato',cls:'fase-contrato',emoji:'🟢'},
   ];
 
-  // ===== TEMA =====
   function alternarTema(){
     const html=document.documentElement,novo=html.getAttribute('data-tema')==='escuro'?'claro':'escuro';
     html.setAttribute('data-tema',novo);
@@ -378,7 +342,6 @@
     document.getElementById('btnTema').textContent=t==='escuro'?'☀️':'🌙';
   }
 
-  // ===== NAVEGAÇÃO =====
   function irParaView(view){
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('ativo'));
     document.getElementById('view'+view.charAt(0).toUpperCase()+view.slice(1)).classList.add('ativo');
@@ -386,16 +349,9 @@
     document.getElementById('nav'+view.charAt(0).toUpperCase()+view.slice(1)).classList.add('ativo');
     document.getElementById('dropdownNegocios').classList.remove('aberto');
   }
-  function irParaNegocios(aba){
-    irParaView('negocios');
-    mudarAbaNegocios(aba);
-  }
-  function toggleDropdown(){
-    document.getElementById('dropdownNegocios').classList.toggle('aberto');
-  }
-  document.addEventListener('click',e=>{
-    if(!e.target.closest('.nav-btn'))document.getElementById('dropdownNegocios').classList.remove('aberto');
-  });
+  function irParaNegocios(aba){irParaView('negocios');mudarAbaNegocios(aba)}
+  function toggleDropdown(){document.getElementById('dropdownNegocios').classList.toggle('aberto')}
+  document.addEventListener('click',e=>{if(!e.target.closest('.nav-btn'))document.getElementById('dropdownNegocios').classList.remove('aberto')});
   function mudarAbaNegocios(aba){
     document.querySelectorAll('.neg-tab').forEach(t=>t.classList.remove('ativo'));
     document.querySelectorAll('.neg-view').forEach(v=>v.classList.remove('ativo'));
@@ -406,7 +362,6 @@
     if(aba==='agenda')renderAgenda();
   }
 
-  // ===== NEGÓCIOS =====
   function getNegocios(){try{return JSON.parse(localStorage.getItem(NEG_KEY)||'[]')}catch{return[]}}
   function salvarNegocios(n){localStorage.setItem(NEG_KEY,JSON.stringify(n))}
 
@@ -416,7 +371,7 @@
     const ja=negs.find(n=>n.numero_controle===itemAtualDrawer.numero_controle_pncp);
     if(ja){alert('Esta licitação já está nos seus negócios!');return}
     const p=parseControle(itemAtualDrawer.numero_controle_pncp);
-    const neg={
+    negs.unshift({
       id:Date.now().toString(),
       titulo:itemAtualDrawer.title||'Sem título',
       objeto:itemAtualDrawer.description||'',
@@ -429,44 +384,31 @@
       link_pncp:p?`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`:'',
       fase:'oportunidade',
       adicionado_em:new Date().toISOString(),
-    };
-    negs.unshift(neg);
+    });
     salvarNegocios(negs);
     const btn=document.getElementById('d-btn-negocio');
-    btn.textContent='✅ Adicionado aos negócios!';
-    btn.classList.add('adicionado');
+    btn.textContent='✅ Adicionado aos negócios!';btn.classList.add('adicionado');
     setTimeout(()=>{btn.textContent='💼 Adicionar aos meus negócios';btn.classList.remove('adicionado')},2500);
   }
 
   function moverFase(id,fase){
-    const negs=getNegocios();
-    const n=negs.find(x=>x.id===id);
+    const negs=getNegocios(),n=negs.find(x=>x.id===id);
     if(n){n.fase=fase;salvarNegocios(negs);renderFunil();renderQuadros()}
   }
-
   function removerNegocio(id){
     if(!confirm('Remover esta licitação dos negócios?'))return;
     salvarNegocios(getNegocios().filter(n=>n.id!==id));
     renderFunil();renderQuadros();renderAgenda();
   }
-
   function renderFunil(){
     const negs=getNegocios();
     document.getElementById('funilConteudo').innerHTML=FASES.map(f=>{
       const itens=negs.filter(n=>n.fase===f.id);
       return`<div class="fase-grupo">
-        <div class="fase-titulo">
-          <span class="fase-badge ${f.cls}">${f.emoji} ${f.nome}</span>
-          <span class="fase-count">${itens.length} licitação(ões)</span>
-        </div>
-        ${itens.length===0?'<div class="fase-vazio">Nenhuma licitação nesta fase.</div>':
-        itens.map(n=>`<div class="neg-card">
+        <div class="fase-titulo"><span class="fase-badge ${f.cls}">${f.emoji} ${f.nome}</span><span class="fase-count">${itens.length} licitação(ões)</span></div>
+        ${itens.length===0?'<div class="fase-vazio">Nenhuma licitação nesta fase.</div>':itens.map(n=>`<div class="neg-card">
           <div class="neg-card-titulo">${n.titulo}</div>
-          <div class="neg-card-info">
-            <span>📍 ${n.uf}</span>
-            <span>📋 ${n.modalidade}</span>
-            <span>⏰ ${n.encerramento?new Date(n.encerramento).toLocaleDateString('pt-BR'):'—'}</span>
-          </div>
+          <div class="neg-card-info"><span>📍 ${n.uf}</span><span>📋 ${n.modalidade}</span><span>⏰ ${n.encerramento?new Date(n.encerramento).toLocaleDateString('pt-BR'):'—'}</span></div>
           <div class="neg-card-actions">
             <select onchange="moverFase('${n.id}',this.value)" style="font-size:.75rem;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);cursor:pointer">
               ${FASES.map(f2=>`<option value="${f2.id}"${f2.id===n.fase?' selected':''}>${f2.emoji} ${f2.nome}</option>`).join('')}
@@ -478,60 +420,45 @@
       </div>`;
     }).join('');
   }
-
   function renderQuadros(){
     const negs=getNegocios();
     document.getElementById('kanbanConteudo').innerHTML=FASES.map(f=>{
       const itens=negs.filter(n=>n.fase===f.id);
       return`<div class="kanban-col">
         <div class="kanban-col-titulo"><span class="fase-badge ${f.cls}">${f.emoji} ${f.nome}</span></div>
-        ${itens.length===0?'<div class="kanban-vazio">—</div>':
-        itens.map(n=>`<div class="kanban-card">
+        ${itens.length===0?'<div class="kanban-vazio">—</div>':itens.map(n=>`<div class="kanban-card">
           <div class="kanban-card-titulo">${n.titulo.substring(0,60)}${n.titulo.length>60?'...':''}</div>
           <div class="kanban-card-info">📍 ${n.uf} · ⏰ ${n.encerramento?new Date(n.encerramento).toLocaleDateString('pt-BR'):'—'}</div>
         </div>`).join('')}
       </div>`;
     }).join('');
   }
-
   function renderAgenda(){
-    const negs=getNegocios();
-    const ano=mesAtual.getFullYear(),mes=mesAtual.getMonth();
+    const negs=getNegocios(),ano=mesAtual.getFullYear(),mes=mesAtual.getMonth();
     document.getElementById('agendaMes').textContent=mesAtual.toLocaleString('pt-BR',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
-    const primeiroDia=new Date(ano,mes,1).getDay();
-    const diasNoMes=new Date(ano,mes+1,0).getDate();
-    const hoje=new Date();
+    const primeiroDia=new Date(ano,mes,1).getDay(),diasNoMes=new Date(ano,mes+1,0).getDate(),hoje=new Date();
     let grid='';
     ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(d=>{grid+=`<div class="cal-dia-semana">${d}</div>`});
     for(let i=0;i<primeiroDia;i++)grid+=`<div class="cal-dia outro-mes"></div>`;
     for(let d=1;d<=diasNoMes;d++){
-      const dataAtual=new Date(ano,mes,d);
-      const ehHoje=dataAtual.toDateString()===hoje.toDateString();
+      const ehHoje=new Date(ano,mes,d).toDateString()===hoje.toDateString();
       const eventos=negs.filter(n=>{
-        const ab=n.abertura?new Date(n.abertura):null;
-        const en=n.encerramento?new Date(n.encerramento):null;
-        return (ab&&ab.getDate()===d&&ab.getMonth()===mes&&ab.getFullYear()===ano)||
-               (en&&en.getDate()===d&&en.getMonth()===mes&&en.getFullYear()===ano);
+        const ab=n.abertura?new Date(n.abertura):null,en=n.encerramento?new Date(n.encerramento):null;
+        return(ab&&ab.getDate()===d&&ab.getMonth()===mes&&ab.getFullYear()===ano)||(en&&en.getDate()===d&&en.getMonth()===mes&&en.getFullYear()===ano);
       });
-      grid+=`<div class="cal-dia${ehHoje?' hoje':''}">
-        <div class="cal-dia-num">${d}</div>
-        ${eventos.map(n=>{
-          const ab=n.abertura?new Date(n.abertura):null;
-          const ehAbertura=ab&&ab.getDate()===d&&ab.getMonth()===mes&&ab.getFullYear()===ano;
-          return`<div class="cal-evento${ehAbertura?'':' encerramento'}" title="${ehAbertura?'Abertura':'Encerramento'}: ${n.titulo}">${ehAbertura?'📅':'⏰'} ${n.titulo.substring(0,20)}</div>`;
-        }).join('')}
-      </div>`;
+      grid+=`<div class="cal-dia${ehHoje?' hoje':''}"><div class="cal-dia-num">${d}</div>${eventos.map(n=>{
+        const ab=n.abertura?new Date(n.abertura):null,ehAb=ab&&ab.getDate()===d&&ab.getMonth()===mes&&ab.getFullYear()===ano;
+        return`<div class="cal-evento${ehAb?'':' encerramento'}" title="${ehAb?'Abertura':'Encerramento'}: ${n.titulo}">${ehAb?'📅':'⏰'} ${n.titulo.substring(0,20)}</div>`;
+      }).join('')}</div>`;
     }
     document.getElementById('calendarioGrid').innerHTML=grid;
   }
-
   function mudarMes(dir){
     if(dir===0)mesAtual=new Date();
     else mesAtual=new Date(mesAtual.getFullYear(),mesAtual.getMonth()+dir,1);
     renderAgenda();
   }
 
-  // ===== HISTÓRICO =====
   function getHistorico(){try{return JSON.parse(localStorage.getItem(HIST_KEY)||'[]')}catch{return[]}}
   function salvarHistorico(kw,uf,mod,st){
     if(!kw)return;
@@ -541,8 +468,7 @@
     renderHistorico();
   }
   function renderHistorico(){
-    const h=getHistorico();
-    const box=document.getElementById('historicoBox');
+    const h=getHistorico(),box=document.getElementById('historicoBox');
     if(!h.length){box.style.display='none';return}
     box.style.display='block';
     document.getElementById('historicoChips').innerHTML=h.map((x,i)=>`
@@ -554,7 +480,6 @@
   function removerHistorico(i){const h=getHistorico();h.splice(i,1);localStorage.setItem(HIST_KEY,JSON.stringify(h));renderHistorico()}
   function limparHistorico(){localStorage.removeItem(HIST_KEY);renderHistorico()}
 
-  // ===== UTILS =====
   function fmt(iso){if(!iso)return'—';return new Date(iso).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}
   function fmtVal(v){if(!v)return'Não informado';return Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
   function statusBadge(item){
@@ -576,11 +501,50 @@
     return{direto:`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`};
   }
 
-  // ===== DRAWER =====
   function toggleItem(i){
     document.getElementById('det-'+i).classList.toggle('aberto');
     document.getElementById('chev-'+i).classList.toggle('aberto');
   }
+
+  function renderItens(itens){
+    if(!itens.length){
+      document.getElementById('d-itens').innerHTML='<div class="item-loading">Nenhum item encontrado.</div>';
+      return;
+    }
+    document.getElementById('d-itens').innerHTML=`<div class="item-lista">${itens.map((it,i)=>{
+      const nomeResumido=(it.descricao||'Sem descrição').substring(0,70)+((it.descricao||'').length>70?'...':'');
+      const val=it.valorUnitarioEstimado?fmtVal(it.valorUnitarioEstimado):'Não informado';
+      const valTotal=it.valorTotal?fmtVal(it.valorTotal):'Não informado';
+      return`<div class="item-accordion">
+        <div class="item-header" onclick="toggleItem(${i})">
+          <span class="item-num-badge">Item ${it.numeroItem||i+1}</span>
+          <div class="item-resumo">
+            <div class="item-nome">${nomeResumido}</div>
+            <div class="item-qtd">Qtd: <strong>${it.quantidade||'—'} ${it.unidadeMedida||''}</strong></div>
+          </div>
+          <span class="item-chevron" id="chev-${i}">▼</span>
+        </div>
+        <div class="item-detalhe" id="det-${i}">
+          <div class="item-detalhe-grid">
+            <div class="item-detalhe-campo"><label>Quantidade</label><span>${it.quantidade||'—'} ${it.unidadeMedida||''}</span></div>
+            <div class="item-detalhe-campo"><label>Vlr. unitário</label><span>${val}</span></div>
+            <div class="item-detalhe-campo"><label>Vlr. total</label><span>${valTotal}</span></div>
+            <div class="item-detalhe-campo"><label>Tipo</label><span>${it.materialOuServicoNome||'—'}</span></div>
+            <div class="item-detalhe-campo"><label>Situação</label><span>${it.situacaoCompraItemNome||'—'}</span></div>
+            <div class="item-detalhe-campo"><label>Julgamento</label><span>${it.criterioJulgamentoNome||'—'}</span></div>
+          </div>
+          <div class="item-desc-full">${it.descricao||'Sem descrição'}</div>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  function filtrarItens(){
+    const termo=document.getElementById('buscaItem').value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    const filtrados=termo?todosItens.filter(it=>(it.descricao||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(termo)):todosItens;
+    renderItens(filtrados);
+  }
+
   function abrirDrawer(item){
     itemAtualDrawer=item;
     const{direto}=buildLinks(item);
@@ -607,6 +571,8 @@
     const btnNeg=document.getElementById('d-btn-negocio');
     btnNeg.textContent=jaAdicionado?'✅ Já nos seus negócios':'💼 Adicionar aos meus negócios';
     btnNeg.classList.toggle('adicionado',jaAdicionado);
+    document.getElementById('buscaItem').value='';
+    todosItens=[];
     document.getElementById('d-itens').innerHTML='<div class="item-loading">⏳ Carregando itens...</div>';
     document.getElementById('drawer').classList.add('ativo');
     document.getElementById('overlay').classList.add('ativo');
@@ -624,38 +590,11 @@
     try{
       const r=await fetch(`/api/itens?cnpj=${cnpj}&ano=${ano}&sequencial=${seq}`);
       const data=await r.json();
-      const itens=data.data||[];
-      if(!itens.length){document.getElementById('d-itens').innerHTML='<div class="item-loading">Nenhum item encontrado.</div>';return}
-      document.getElementById('d-itens').innerHTML=`<div class="item-lista">${itens.map((it,i)=>{
-        const nomeResumido=(it.descricao||'Sem descrição').substring(0,70)+((it.descricao||'').length>70?'...':'');
-        const val=it.valorUnitarioEstimado?fmtVal(it.valorUnitarioEstimado):'Não informado';
-        const valTotal=it.valorTotal?fmtVal(it.valorTotal):'Não informado';
-        return`<div class="item-accordion">
-          <div class="item-header" onclick="toggleItem(${i})">
-            <span class="item-num-badge">Item ${it.numeroItem||i+1}</span>
-            <div class="item-resumo">
-              <div class="item-nome">${nomeResumido}</div>
-              <div class="item-qtd">Qtd: <strong>${it.quantidade||'—'} ${it.unidadeMedida||''}</strong></div>
-            </div>
-            <span class="item-chevron" id="chev-${i}">▼</span>
-          </div>
-          <div class="item-detalhe" id="det-${i}">
-            <div class="item-detalhe-grid">
-              <div class="item-detalhe-campo"><label>Quantidade</label><span>${it.quantidade||'—'} ${it.unidadeMedida||''}</span></div>
-              <div class="item-detalhe-campo"><label>Vlr. unitário</label><span>${val}</span></div>
-              <div class="item-detalhe-campo"><label>Vlr. total</label><span>${valTotal}</span></div>
-              <div class="item-detalhe-campo"><label>Tipo</label><span>${it.materialOuServicoNome||'—'}</span></div>
-              <div class="item-detalhe-campo"><label>Situação</label><span>${it.situacaoCompraItemNome||'—'}</span></div>
-              <div class="item-detalhe-campo"><label>Julgamento</label><span>${it.criterioJulgamentoNome||'—'}</span></div>
-            </div>
-            <div class="item-desc-full">${it.descricao||'Sem descrição'}</div>
-          </div>
-        </div>`;
-      }).join('')}</div>`;
+      todosItens=data.data||[];
+      renderItens(todosItens);
     }catch(e){document.getElementById('d-itens').innerHTML='<div class="item-loading">Erro ao carregar itens.</div>'}
   }
 
-  // ===== BUSCA =====
   async function buscar(pagina){
     paginaAtual=pagina;
     const kw=document.getElementById('palavraChave').value.trim();
