@@ -11,7 +11,7 @@
     header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: 1px; }
     header span { font-size: 0.85rem; color: #aaa; }
     .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
-    .filtros { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .filtros { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 8px; }
     .filtros .campo-busca { grid-column: 1 / -1; display: flex; gap: 10px; }
     .filtros input, .filtros select { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; background: #fafafa; }
     .filtros input:focus, .filtros select:focus { outline: none; border-color: #1a3d2b; }
@@ -19,10 +19,20 @@
     .btn-buscar:hover { background: #245239; }
     .btn-buscar:disabled { background: #888; cursor: wait; }
     .btn-limpar { background: transparent; color: #888; border: 1px solid #ddd; padding: 10px 16px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; }
+
+    .historico-box { background: #fff; border-radius: 10px; padding: 12px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 16px; display: none; }
+    .historico-label { font-size: 0.78rem; color: #999; margin-bottom: 8px; display: flex; justify-content: space-between; }
+    .historico-label button { background: none; border: none; color: #c0392b; font-size: 0.78rem; cursor: pointer; }
+    .historico-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { background: #eef5f1; color: #1a3d2b; border: 1px solid #c5ddd0; border-radius: 20px; padding: 4px 12px; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.15s; }
+    .chip:hover { background: #d4ebe0; }
+    .chip-x { color: #999; font-size: 0.75rem; cursor: pointer; }
+    .chip-x:hover { color: #c0392b; }
+
     .resumo { font-size: 0.9rem; color: #555; margin-bottom: 14px; }
     .resumo strong { color: #1a3d2b; }
     .cards { display: flex; flex-direction: column; gap: 12px; }
-    .card { background: #fff; border-radius: 10px; padding: 18px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border-left: 5px solid #1a3d2b; cursor: pointer; transition: box-shadow 0.2s; }
+    .card { background: #fff; border-radius: 10px; padding: 18px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border-left: 5px solid #1a3d2b; transition: box-shadow 0.2s; }
     .card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
     .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
     .card-titulo { font-weight: 600; font-size: 0.95rem; color: #1a3d2b; }
@@ -34,11 +44,15 @@
     .card-info { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.82rem; color: #555; margin-bottom: 6px; }
     .card-orgao { font-size: 0.8rem; color: #888; }
     .card-valor { font-size: 0.95rem; font-weight: 700; color: #1a3d2b; margin-top: 4px; }
+    .card-links { display: flex; gap: 10px; margin-top: 10px; }
+    .btn-link { font-size: 0.8rem; padding: 5px 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+    .btn-link-pncp { background: #1a3d2b; color: #d4a825; }
+    .btn-link-busca { background: #eee; color: #444; }
     .paginacao { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 24px; }
     .btn-pag { background: #1a3d2b; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
     .btn-pag:disabled { background: #ccc; cursor: default; }
     .pagina-info { font-size: 0.9rem; color: #666; }
-    .loading { text-align: center; padding: 40px; color: #888; font-size: 1rem; }
+    .loading { text-align: center; padding: 40px; color: #888; }
     .erro { background: #fff3f3; border: 1px solid #f5c6c6; color: #c0392b; padding: 16px; border-radius: 8px; text-align: center; }
     .vazio { text-align: center; padding: 40px; color: #999; }
     @media (max-width: 700px) { .filtros { grid-template-columns: 1fr; } .filtros .campo-busca { flex-direction: column; } }
@@ -83,6 +97,14 @@
     </select>
   </div>
 
+  <div class="historico-box" id="historicoBox">
+    <div class="historico-label">
+      <span>🕒 Buscas recentes</span>
+      <button onclick="limparHistorico()">Limpar tudo</button>
+    </div>
+    <div class="historico-chips" id="historicoChips"></div>
+  </div>
+
   <div id="resumo" class="resumo"></div>
   <div id="resultado"></div>
   <div class="paginacao" id="paginacao" style="display:none">
@@ -95,7 +117,57 @@
 <script>
   let paginaAtual = 1;
   let totalPaginas = 1;
+  const HIST_KEY = 'buscaLicitacoes_historico';
 
+  // --- HISTÓRICO ---
+  function getHistorico() {
+    try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); } catch { return []; }
+  }
+
+  function salvarHistorico(kw, uf, modalidade, status) {
+    if (!kw) return;
+    const hist = getHistorico().filter(h => h.kw !== kw);
+    hist.unshift({ kw, uf, modalidade, status });
+    localStorage.setItem(HIST_KEY, JSON.stringify(hist.slice(0, 15)));
+    renderHistorico();
+  }
+
+  function renderHistorico() {
+    const hist = getHistorico();
+    const box = document.getElementById('historicoBox');
+    const chips = document.getElementById('historicoChips');
+    if (!hist.length) { box.style.display = 'none'; return; }
+    box.style.display = 'block';
+    chips.innerHTML = hist.map((h, i) => `
+      <span class="chip" onclick="aplicarHistorico(${i})">
+        ${h.kw}${h.uf ? ' · ' + h.uf : ''}${h.modalidade ? ' · mod.' + h.modalidade : ''}
+        <span class="chip-x" onclick="event.stopPropagation(); removerHistorico(${i})">✕</span>
+      </span>`).join('');
+  }
+
+  function aplicarHistorico(i) {
+    const h = getHistorico()[i];
+    if (!h) return;
+    document.getElementById('palavraChave').value = h.kw;
+    document.getElementById('uf').value = h.uf || '';
+    document.getElementById('modalidade').value = h.modalidade || '';
+    document.getElementById('status').value = h.status || 'recebendo_proposta';
+    buscar(1);
+  }
+
+  function removerHistorico(i) {
+    const hist = getHistorico();
+    hist.splice(i, 1);
+    localStorage.setItem(HIST_KEY, JSON.stringify(hist));
+    renderHistorico();
+  }
+
+  function limparHistorico() {
+    localStorage.removeItem(HIST_KEY);
+    renderHistorico();
+  }
+
+  // --- UTILS ---
   function formatarData(iso) {
     if (!iso) return '—';
     return new Date(iso).toLocaleDateString('pt-BR');
@@ -116,6 +188,17 @@
     return { texto: 'Aguardando abertura', classe: 'badge-amarelo' };
   }
 
+  function buildLink(item) {
+    const c = item.numero_controle_pncp;
+    if (!c) return { direto: '', busca: '' };
+    const m = c.match(/^(\d+)-(\d+)-(\d+)\/(\d+)$/);
+    if (!m) return { direto: '', busca: '' };
+    const direto = `https://pncp.gov.br/app/editais/${m[1]}/${m[2]}/${m[4]}/${parseInt(m[3])}`;
+    const busca = `https://pncp.gov.br/app/editais?q=${encodeURIComponent(c)}`;
+    return { direto, busca };
+  }
+
+  // --- BUSCA ---
   async function buscar(pagina) {
     paginaAtual = pagina;
     const palavraChave = document.getElementById('palavraChave').value.trim();
@@ -145,6 +228,8 @@
         return;
       }
 
+      salvarHistorico(palavraChave, uf, modalidade, status);
+
       const itens = data.data || [];
       const total = data.totalRegistros || 0;
       totalPaginas = data.totalPaginas || 1;
@@ -160,16 +245,9 @@
       const html = itens.map(item => {
         const badge = statusBadge(item);
         const valor = formatarValor(item.valor_global);
-        function buildLink(item) {
-  const c = item.numero_controle_pncp;
-  if (!c) return '';
-  const m = c.match(/^(\d+)-(\d+)-(\d+)\/(\d+)$/);
-  if (!m) return '';
-  return `https://pncp.gov.br/app/editais/${m[1]}/${m[2]}/${m[4]}/${parseInt(m[3])}`;
-}
-const link = buildLink(item);
+        const { direto, busca } = buildLink(item);
         return `
-          <div class="card" onclick="${link ? `window.open('${link}','_blank')` : ''}">
+          <div class="card">
             <div class="card-header">
               <div class="card-titulo">${item.title || 'Sem título'}</div>
               <span class="badge ${badge.classe}">${badge.texto}</span>
@@ -183,6 +261,10 @@ const link = buildLink(item);
             </div>
             <div class="card-orgao">🏛️ ${item.orgao_nome || '—'} · ${item.unidade_nome || ''}</div>
             ${valor ? `<div class="card-valor">💰 ${valor}</div>` : ''}
+            <div class="card-links">
+              ${direto ? `<button class="btn-link btn-link-pncp" onclick="window.open('${direto}','_blank')">📄 Abrir edital</button>` : ''}
+              ${busca ? `<button class="btn-link btn-link-busca" onclick="window.open('${busca}','_blank')">🔍 Buscar no PNCP</button>` : ''}
+            </div>
           </div>`;
       }).join('');
 
@@ -218,6 +300,8 @@ const link = buildLink(item);
   document.getElementById('palavraChave').addEventListener('keydown', e => {
     if (e.key === 'Enter') buscar(1);
   });
+
+  renderHistorico();
 </script>
 </body>
 </html>
