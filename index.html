@@ -1,61 +1,85 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Busca Licitações – Arantes Papéis</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', sans-serif; background: #f4f6f8; color: #222; }
-    header { background: #1a3d2b; color: #d4a825; padding: 18px 32px; }
-    header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: 1px; }
-    header span { font-size: 0.85rem; color: #aaa; }
-    .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
-    .filtros { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 8px; }
-    .filtros .campo-busca { grid-column: 1 / -1; display: flex; gap: 10px; }
-    .filtros input, .filtros select { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; background: #fafafa; }
-    .filtros input:focus, .filtros select:focus { outline: none; border-color: #1a3d2b; }
-    .btn-buscar { background: #1a3d2b; color: #d4a825; border: none; padding: 10px 28px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
-    .btn-buscar:hover { background: #245239; }
-    .btn-buscar:disabled { background: #888; cursor: wait; }
-    .btn-limpar { background: transparent; color: #888; border: 1px solid #ddd; padding: 10px 16px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;color:#222}
+    header{background:#1a3d2b;color:#d4a825;padding:18px 32px}
+    header h1{font-size:1.4rem;font-weight:700;letter-spacing:1px}
+    header span{font-size:.85rem;color:#aaa}
+    .container{max-width:1100px;margin:0 auto;padding:24px 16px}
+    .filtros{background:#fff;border-radius:10px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.07);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:8px}
+    .filtros .campo-busca{grid-column:1/-1;display:flex;gap:10px}
+    .filtros input,.filtros select{width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:.95rem;background:#fafafa}
+    .filtros input:focus,.filtros select:focus{outline:none;border-color:#1a3d2b}
+    .btn-buscar{background:#1a3d2b;color:#d4a825;border:none;padding:10px 28px;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .2s}
+    .btn-buscar:hover{background:#245239}
+    .btn-buscar:disabled{background:#888;cursor:wait}
+    .btn-limpar{background:transparent;color:#888;border:1px solid #ddd;padding:10px 16px;border-radius:8px;font-size:.9rem;cursor:pointer}
+    .historico-box{background:#fff;border-radius:10px;padding:12px 16px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:16px;display:none}
+    .historico-label{font-size:.78rem;color:#999;margin-bottom:8px;display:flex;justify-content:space-between}
+    .historico-label button{background:none;border:none;color:#c0392b;font-size:.78rem;cursor:pointer}
+    .historico-chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{background:#eef5f1;color:#1a3d2b;border:1px solid #c5ddd0;border-radius:20px;padding:4px 12px;font-size:.82rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s}
+    .chip:hover{background:#d4ebe0}
+    .chip-x{color:#999;font-size:.75rem;cursor:pointer}
+    .chip-x:hover{color:#c0392b}
+    .resumo{font-size:.9rem;color:#555;margin-bottom:14px}
+    .resumo strong{color:#1a3d2b}
+    .cards{display:flex;flex-direction:column;gap:12px}
+    .card{background:#fff;border-radius:10px;padding:18px 20px;box-shadow:0 2px 6px rgba(0,0,0,.06);border-left:5px solid #1a3d2b;cursor:pointer;transition:box-shadow .2s}
+    .card:hover{box-shadow:0 4px 14px rgba(0,0,0,.12);border-left-color:#d4a825}
+    .card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px}
+    .card-titulo{font-weight:600;font-size:.95rem;color:#1a3d2b}
+    .card-desc{font-size:.88rem;color:#333;margin-bottom:8px;line-height:1.4}
+    .badge{font-size:.75rem;padding:3px 10px;border-radius:20px;white-space:nowrap;font-weight:600}
+    .badge-verde{background:#e6f4ec;color:#1a7a3c}
+    .badge-amarelo{background:#fff8e1;color:#b8860b}
+    .badge-cinza{background:#f0f0f0;color:#666}
+    .card-info{display:flex;flex-wrap:wrap;gap:14px;font-size:.82rem;color:#555;margin-bottom:4px}
+    .card-orgao{font-size:.8rem;color:#888}
+    .paginacao{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:24px}
+    .btn-pag{background:#1a3d2b;color:#fff;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:.9rem}
+    .btn-pag:disabled{background:#ccc;cursor:default}
+    .pagina-info{font-size:.9rem;color:#666}
+    .loading{text-align:center;padding:40px;color:#888}
+    .erro{background:#fff3f3;border:1px solid #f5c6c6;color:#c0392b;padding:16px;border-radius:8px;text-align:center}
+    .vazio{text-align:center;padding:40px;color:#999}
 
-    .historico-box { background: #fff; border-radius: 10px; padding: 12px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 16px; display: none; }
-    .historico-label { font-size: 0.78rem; color: #999; margin-bottom: 8px; display: flex; justify-content: space-between; }
-    .historico-label button { background: none; border: none; color: #c0392b; font-size: 0.78rem; cursor: pointer; }
-    .historico-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-    .chip { background: #eef5f1; color: #1a3d2b; border: 1px solid #c5ddd0; border-radius: 20px; padding: 4px 12px; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.15s; }
-    .chip:hover { background: #d4ebe0; }
-    .chip-x { color: #999; font-size: 0.75rem; cursor: pointer; }
-    .chip-x:hover { color: #c0392b; }
-
-    .resumo { font-size: 0.9rem; color: #555; margin-bottom: 14px; }
-    .resumo strong { color: #1a3d2b; }
-    .cards { display: flex; flex-direction: column; gap: 12px; }
-    .card { background: #fff; border-radius: 10px; padding: 18px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border-left: 5px solid #1a3d2b; transition: box-shadow 0.2s; }
-    .card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
-    .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
-    .card-titulo { font-weight: 600; font-size: 0.95rem; color: #1a3d2b; }
-    .card-desc { font-size: 0.88rem; color: #333; margin-bottom: 8px; line-height: 1.4; }
-    .badge { font-size: 0.75rem; padding: 3px 10px; border-radius: 20px; white-space: nowrap; font-weight: 600; }
-    .badge-verde { background: #e6f4ec; color: #1a7a3c; }
-    .badge-amarelo { background: #fff8e1; color: #b8860b; }
-    .badge-cinza { background: #f0f0f0; color: #666; }
-    .card-info { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.82rem; color: #555; margin-bottom: 6px; }
-    .card-orgao { font-size: 0.8rem; color: #888; }
-    .card-valor { font-size: 0.95rem; font-weight: 700; color: #1a3d2b; margin-top: 4px; }
-    .card-links { display: flex; gap: 10px; margin-top: 10px; }
-    .btn-link { font-size: 0.8rem; padding: 5px 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
-    .btn-link-pncp { background: #1a3d2b; color: #d4a825; }
-    .btn-link-busca { background: #eee; color: #444; }
-    .paginacao { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 24px; }
-    .btn-pag { background: #1a3d2b; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
-    .btn-pag:disabled { background: #ccc; cursor: default; }
-    .pagina-info { font-size: 0.9rem; color: #666; }
-    .loading { text-align: center; padding: 40px; color: #888; }
-    .erro { background: #fff3f3; border: 1px solid #f5c6c6; color: #c0392b; padding: 16px; border-radius: 8px; text-align: center; }
-    .vazio { text-align: center; padding: 40px; color: #999; }
-    @media (max-width: 700px) { .filtros { grid-template-columns: 1fr; } .filtros .campo-busca { flex-direction: column; } }
+    /* DRAWER */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s}
+    .overlay.ativo{opacity:1;pointer-events:all}
+    .drawer{position:fixed;top:0;right:-520px;width:500px;max-width:95vw;height:100vh;background:#fff;z-index:101;box-shadow:-4px 0 24px rgba(0,0,0,.15);transition:right .3s ease;overflow-y:auto;display:flex;flex-direction:column}
+    .drawer.ativo{right:0}
+    .drawer-header{background:#1a3d2b;color:#d4a825;padding:20px 20px 16px;position:sticky;top:0;z-index:1}
+    .drawer-header h2{font-size:1rem;font-weight:700;margin-bottom:4px}
+    .drawer-header .drawer-sub{font-size:.8rem;color:#aaa}
+    .drawer-fechar{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .drawer-fechar:hover{background:rgba(255,255,255,.3)}
+    .drawer-body{padding:20px;flex:1}
+    .drawer-section{margin-bottom:20px}
+    .drawer-section h3{font-size:.8rem;text-transform:uppercase;color:#999;letter-spacing:1px;margin-bottom:8px}
+    .drawer-desc{font-size:.9rem;color:#333;line-height:1.5}
+    .drawer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .drawer-campo{background:#f8f9fa;border-radius:8px;padding:10px 12px}
+    .drawer-campo label{font-size:.72rem;color:#999;display:block;margin-bottom:3px;text-transform:uppercase}
+    .drawer-campo span{font-size:.9rem;color:#222;font-weight:600}
+    .drawer-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+    .drawer-tag{background:#eef5f1;color:#1a3d2b;border:1px solid #c5ddd0;border-radius:20px;padding:3px 10px;font-size:.78rem;font-weight:600}
+    .drawer-btn{display:block;width:100%;padding:12px;background:#1a3d2b;color:#d4a825;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:10px;text-align:center}
+    .drawer-btn:hover{background:#245239}
+    .drawer-btn-sec{background:#f0f0f0;color:#444}
+    .drawer-btn-sec:hover{background:#e0e0e0}
+    .item-lista{display:flex;flex-direction:column;gap:8px}
+    .item-card{background:#f8f9fa;border-radius:8px;padding:12px;border-left:3px solid #1a3d2b}
+    .item-card .item-num{font-size:.75rem;color:#999;margin-bottom:3px}
+    .item-card .item-desc{font-size:.88rem;color:#222;font-weight:500;margin-bottom:4px}
+    .item-card .item-info{font-size:.78rem;color:#666;display:flex;gap:12px;flex-wrap:wrap}
+    .item-loading{text-align:center;padding:20px;color:#999;font-size:.9rem}
+    @media(max-width:700px){.filtros{grid-template-columns:1fr}.filtros .campo-busca{flex-direction:column}.drawer{width:100%;right:-100%}.drawer-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -63,10 +87,11 @@
   <h1>🔍 Busca de Licitações</h1>
   <span>Arantes Papéis · Portal Nacional de Contratações Públicas</span>
 </header>
+
 <div class="container">
   <div class="filtros">
     <div class="campo-busca">
-      <input type="text" id="palavraChave" placeholder="Palavra-chave (ex: papel, bobina, kraft, embalagem...)" />
+      <input type="text" id="palavraChave" placeholder="Palavra-chave (ex: papel, bobina, kraft, embalagem...)"/>
       <button class="btn-buscar" id="btnBuscar" onclick="buscar(1)">Buscar</button>
       <button class="btn-limpar" onclick="limpar()">Limpar</button>
     </div>
@@ -114,193 +139,225 @@
   </div>
 </div>
 
+<!-- OVERLAY + DRAWER -->
+<div class="overlay" id="overlay" onclick="fecharDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <button class="drawer-fechar" onclick="fecharDrawer()">✕</button>
+    <h2 id="d-titulo">Carregando...</h2>
+    <div class="drawer-sub" id="d-numero"></div>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-tags" id="d-tags"></div>
+
+    <div class="drawer-section">
+      <h3>Objeto</h3>
+      <div class="drawer-desc" id="d-objeto"></div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-grid">
+        <div class="drawer-campo"><label>Órgão</label><span id="d-orgao"></span></div>
+        <div class="drawer-campo"><label>Unidade</label><span id="d-unidade"></span></div>
+        <div class="drawer-campo"><label>Estado</label><span id="d-uf"></span></div>
+        <div class="drawer-campo"><label>Modalidade</label><span id="d-modalidade"></span></div>
+        <div class="drawer-campo"><label>Abertura</label><span id="d-abertura"></span></div>
+        <div class="drawer-campo"><label>Encerramento</label><span id="d-encerramento"></span></div>
+        <div class="drawer-campo"><label>Valor estimado</label><span id="d-valor"></span></div>
+        <div class="drawer-campo"><label>Situação</label><span id="d-situacao"></span></div>
+      </div>
+    </div>
+
+    <button class="drawer-btn" id="d-btn-acessar" onclick="">📄 Acessar edital no PNCP</button>
+    <button class="drawer-btn drawer-btn-sec" id="d-btn-busca" onclick="">🔍 Buscar no PNCP</button>
+
+    <div class="drawer-section">
+      <h3>Itens do pregão</h3>
+      <div id="d-itens"><div class="item-loading">⏳ Carregando itens...</div></div>
+    </div>
+  </div>
+</div>
+
 <script>
-  let paginaAtual = 1;
-  let totalPaginas = 1;
-  const HIST_KEY = 'buscaLicitacoes_historico';
+  let paginaAtual=1, totalPaginas=1;
+  const HIST_KEY='buscaLicitacoes_historico';
 
-  // --- HISTÓRICO ---
-  function getHistorico() {
-    try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); } catch { return []; }
-  }
-
-  function salvarHistorico(kw, uf, modalidade, status) {
-    if (!kw) return;
-    const hist = getHistorico().filter(h => h.kw !== kw);
-    hist.unshift({ kw, uf, modalidade, status });
-    localStorage.setItem(HIST_KEY, JSON.stringify(hist.slice(0, 15)));
+  function getHistorico(){try{return JSON.parse(localStorage.getItem(HIST_KEY)||'[]')}catch{return[]}}
+  function salvarHistorico(kw,uf,mod,st){
+    if(!kw)return;
+    const h=getHistorico().filter(x=>x.kw!==kw);
+    h.unshift({kw,uf,mod,st});
+    localStorage.setItem(HIST_KEY,JSON.stringify(h.slice(0,15)));
     renderHistorico();
   }
-
-  function renderHistorico() {
-    const hist = getHistorico();
-    const box = document.getElementById('historicoBox');
-    const chips = document.getElementById('historicoChips');
-    if (!hist.length) { box.style.display = 'none'; return; }
-    box.style.display = 'block';
-    chips.innerHTML = hist.map((h, i) => `
+  function renderHistorico(){
+    const h=getHistorico();
+    const box=document.getElementById('historicoBox');
+    const chips=document.getElementById('historicoChips');
+    if(!h.length){box.style.display='none';return}
+    box.style.display='block';
+    chips.innerHTML=h.map((x,i)=>`
       <span class="chip" onclick="aplicarHistorico(${i})">
-        ${h.kw}${h.uf ? ' · ' + h.uf : ''}${h.modalidade ? ' · mod.' + h.modalidade : ''}
-        <span class="chip-x" onclick="event.stopPropagation(); removerHistorico(${i})">✕</span>
+        ${x.kw}${x.uf?' · '+x.uf:''}
+        <span class="chip-x" onclick="event.stopPropagation();removerHistorico(${i})">✕</span>
       </span>`).join('');
   }
+  function aplicarHistorico(i){const h=getHistorico()[i];if(!h)return;document.getElementById('palavraChave').value=h.kw;document.getElementById('uf').value=h.uf||'';document.getElementById('modalidade').value=h.mod||'';document.getElementById('status').value=h.st||'recebendo_proposta';buscar(1)}
+  function removerHistorico(i){const h=getHistorico();h.splice(i,1);localStorage.setItem(HIST_KEY,JSON.stringify(h));renderHistorico()}
+  function limparHistorico(){localStorage.removeItem(HIST_KEY);renderHistorico()}
 
-  function aplicarHistorico(i) {
-    const h = getHistorico()[i];
-    if (!h) return;
-    document.getElementById('palavraChave').value = h.kw;
-    document.getElementById('uf').value = h.uf || '';
-    document.getElementById('modalidade').value = h.modalidade || '';
-    document.getElementById('status').value = h.status || 'recebendo_proposta';
-    buscar(1);
+  function fmt(iso){if(!iso)return'—';return new Date(iso).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}
+  function fmtVal(v){if(!v)return'Não informado';return Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+
+  function statusBadge(item){
+    if(item.cancelado)return{texto:'Cancelado',cls:'badge-cinza'};
+    const agora=new Date(),fim=item.data_fim_vigencia?new Date(item.data_fim_vigencia):null,ini=item.data_inicio_vigencia?new Date(item.data_inicio_vigencia):null;
+    if(fim&&agora>fim)return{texto:'Encerrado',cls:'badge-cinza'};
+    if(ini&&agora>=ini)return{texto:'Recebendo proposta',cls:'badge-verde'};
+    return{texto:'Aguardando abertura',cls:'badge-amarelo'};
   }
 
-  function removerHistorico(i) {
-    const hist = getHistorico();
-    hist.splice(i, 1);
-    localStorage.setItem(HIST_KEY, JSON.stringify(hist));
-    renderHistorico();
+  function parseControle(c){
+    if(!c)return null;
+    const m=c.match(/^(\d+)-(\d+)-(\d+)\/(\d+)$/);
+    if(!m)return null;
+    return{cnpj:m[1],seqOrgao:m[2],seq:parseInt(m[3]),ano:m[4]};
+  }
+  function buildLinks(item){
+    const p=parseControle(item.numero_controle_pncp);
+    if(!p)return{direto:'',busca:''};
+    return{
+      direto:`https://pncp.gov.br/app/editais/${p.cnpj}/${p.seqOrgao}/${p.ano}/${p.seq}`,
+      busca:`https://pncp.gov.br/app/editais?q=${encodeURIComponent(item.numero_controle_pncp||'')}`
+    };
   }
 
-  function limparHistorico() {
-    localStorage.removeItem(HIST_KEY);
-    renderHistorico();
+  // DRAWER
+  function abrirDrawer(item){
+    const{direto,busca}=buildLinks(item);
+    const badge=statusBadge(item);
+
+    document.getElementById('d-titulo').textContent=item.title||'Sem título';
+    document.getElementById('d-numero').textContent=item.numero_controle_pncp||'';
+    document.getElementById('d-objeto').textContent=item.description||'—';
+    document.getElementById('d-orgao').textContent=item.orgao_nome||'—';
+    document.getElementById('d-unidade').textContent=item.unidade_nome||'—';
+    document.getElementById('d-uf').textContent=(item.uf||'—')+' · '+(item.municipio_nome||'');
+    document.getElementById('d-modalidade').textContent=item.modalidade_licitacao_nome||'—';
+    document.getElementById('d-abertura').textContent=fmt(item.data_inicio_vigencia);
+    document.getElementById('d-encerramento').textContent=fmt(item.data_fim_vigencia);
+    document.getElementById('d-valor').textContent=fmtVal(item.valor_global);
+    document.getElementById('d-situacao').textContent=badge.texto;
+
+    document.getElementById('d-tags').innerHTML=`
+      <span class="drawer-tag">${item.modalidade_licitacao_nome||'—'}</span>
+      <span class="drawer-tag badge ${badge.cls}">${badge.texto}</span>
+      ${item.esfera_nome?`<span class="drawer-tag">${item.esfera_nome}</span>`:''}
+    `;
+
+    const btnAcessar=document.getElementById('d-btn-acessar');
+    const btnBusca=document.getElementById('d-btn-busca');
+    btnAcessar.onclick=()=>window.open(direto,'_blank');
+    btnBusca.onclick=()=>window.open(busca,'_blank');
+    btnAcessar.style.display=direto?'block':'none';
+
+    document.getElementById('d-itens').innerHTML='<div class="item-loading">⏳ Carregando itens...</div>';
+    document.getElementById('drawer').classList.add('ativo');
+    document.getElementById('overlay').classList.add('ativo');
+    document.body.style.overflow='hidden';
+
+    const p=parseControle(item.numero_controle_pncp);
+    if(p) carregarItens(p.cnpj,p.ano,p.seq);
   }
 
-  // --- UTILS ---
-  function formatarData(iso) {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleDateString('pt-BR');
+  function fecharDrawer(){
+    document.getElementById('drawer').classList.remove('ativo');
+    document.getElementById('overlay').classList.remove('ativo');
+    document.body.style.overflow='';
   }
 
-  function formatarValor(v) {
-    if (!v) return null;
-    return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  async function carregarItens(cnpj,ano,seq){
+    try{
+      const r=await fetch(`/api/itens?cnpj=${cnpj}&ano=${ano}&sequencial=${seq}`);
+      const data=await r.json();
+      const itens=data.data||[];
+      if(!itens.length){document.getElementById('d-itens').innerHTML='<div class="item-loading">Nenhum item encontrado.</div>';return}
+      document.getElementById('d-itens').innerHTML=`<div class="item-lista">${itens.map(it=>`
+        <div class="item-card">
+          <div class="item-num">Item ${it.numeroItem||'—'}</div>
+          <div class="item-desc">${it.descricao||it.materialServico||'Sem descrição'}</div>
+          <div class="item-info">
+            <span>Qtd: ${it.quantidade||'—'} ${it.unidadeMedida||''}</span>
+            ${it.valorUnitarioEstimado?`<span>Vlr unit.: ${Number(it.valorUnitarioEstimado).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span>`:''}
+          </div>
+        </div>`).join('')}</div>`;
+    }catch(e){document.getElementById('d-itens').innerHTML=`<div class="item-loading">Erro ao carregar itens.</div>`}
   }
 
-  function statusBadge(item) {
-    if (item.cancelado) return { texto: 'Cancelado', classe: 'badge-cinza' };
-    const agora = new Date();
-    const fim = item.data_fim_vigencia ? new Date(item.data_fim_vigencia) : null;
-    const ini = item.data_inicio_vigencia ? new Date(item.data_inicio_vigencia) : null;
-    if (fim && agora > fim) return { texto: 'Encerrado', classe: 'badge-cinza' };
-    if (ini && agora >= ini) return { texto: 'Recebendo proposta', classe: 'badge-verde' };
-    return { texto: 'Aguardando abertura', classe: 'badge-amarelo' };
-  }
-
-  function buildLink(item) {
-    const c = item.numero_controle_pncp;
-    if (!c) return { direto: '', busca: '' };
-    const m = c.match(/^(\d+)-(\d+)-(\d+)\/(\d+)$/);
-    if (!m) return { direto: '', busca: '' };
-    const direto = `https://pncp.gov.br/app/editais/${m[1]}/${m[2]}/${m[4]}/${parseInt(m[3])}`;
-    const busca = `https://pncp.gov.br/app/editais?q=${encodeURIComponent(c)}`;
-    return { direto, busca };
-  }
-
-  // --- BUSCA ---
-  async function buscar(pagina) {
-    paginaAtual = pagina;
-    const palavraChave = document.getElementById('palavraChave').value.trim();
-    const uf = document.getElementById('uf').value;
-    const modalidade = document.getElementById('modalidade').value;
-    const status = document.getElementById('status').value;
-
-    const params = new URLSearchParams({ pagina });
-    if (palavraChave) params.append('palavraChave', palavraChave);
-    if (uf) params.append('uf', uf);
-    if (modalidade) params.append('modalidade', modalidade);
-    if (status) params.append('status', status);
-
-    const btn = document.getElementById('btnBuscar');
-    btn.disabled = true;
-    btn.textContent = 'Buscando...';
-    document.getElementById('resultado').innerHTML = '<div class="loading">⏳ Buscando licitações...</div>';
-    document.getElementById('paginacao').style.display = 'none';
-    document.getElementById('resumo').innerHTML = '';
-
-    try {
-      const resp = await fetch(`/api/buscar?${params}`);
-      const data = await resp.json();
-
-      if (data.erro) {
-        document.getElementById('resultado').innerHTML = `<div class="erro">Erro: ${data.erro}</div>`;
-        return;
-      }
-
-      salvarHistorico(palavraChave, uf, modalidade, status);
-
-      const itens = data.data || [];
-      const total = data.totalRegistros || 0;
-      totalPaginas = data.totalPaginas || 1;
-
-      document.getElementById('resumo').innerHTML =
-        `<strong>${total.toLocaleString('pt-BR')}</strong> licitações encontradas · Página ${paginaAtual} de ${totalPaginas}`;
-
-      if (!itens.length) {
-        document.getElementById('resultado').innerHTML = '<div class="vazio">Nenhuma licitação encontrada.</div>';
-        return;
-      }
-
-      const html = itens.map(item => {
-        const badge = statusBadge(item);
-        const valor = formatarValor(item.valor_global);
-        const { direto, busca } = buildLink(item);
-        return `
-          <div class="card">
-            <div class="card-header">
-              <div class="card-titulo">${item.title || 'Sem título'}</div>
-              <span class="badge ${badge.classe}">${badge.texto}</span>
-            </div>
-            <div class="card-desc">${item.description || '—'}</div>
-            <div class="card-info">
-              <span>📍 ${item.uf || '—'} · ${item.municipio_nome || ''}</span>
-              <span>📋 ${item.modalidade_licitacao_nome || '—'}</span>
-              <span>📅 Abertura: ${formatarData(item.data_inicio_vigencia)}</span>
-              <span>⏰ Encerramento: ${formatarData(item.data_fim_vigencia)}</span>
-            </div>
-            <div class="card-orgao">🏛️ ${item.orgao_nome || '—'} · ${item.unidade_nome || ''}</div>
-            ${valor ? `<div class="card-valor">💰 ${valor}</div>` : ''}
-            <div class="card-links">
-              ${direto ? `<button class="btn-link btn-link-pncp" onclick="window.open('${direto}','_blank')">📄 Abrir edital</button>` : ''}
-              ${busca ? `<button class="btn-link btn-link-busca" onclick="window.open('${busca}','_blank')">🔍 Buscar no PNCP</button>` : ''}
-            </div>
-          </div>`;
+  async function buscar(pagina){
+    paginaAtual=pagina;
+    const kw=document.getElementById('palavraChave').value.trim();
+    const uf=document.getElementById('uf').value;
+    const mod=document.getElementById('modalidade').value;
+    const st=document.getElementById('status').value;
+    const params=new URLSearchParams({pagina});
+    if(kw)params.append('palavraChave',kw);
+    if(uf)params.append('uf',uf);
+    if(mod)params.append('modalidade',mod);
+    if(st)params.append('status',st);
+    const btn=document.getElementById('btnBuscar');
+    btn.disabled=true;btn.textContent='Buscando...';
+    document.getElementById('resultado').innerHTML='<div class="loading">⏳ Buscando licitações...</div>';
+    document.getElementById('paginacao').style.display='none';
+    document.getElementById('resumo').innerHTML='';
+    try{
+      const resp=await fetch(`/api/buscar?${params}`);
+      const data=await resp.json();
+      if(data.erro){document.getElementById('resultado').innerHTML=`<div class="erro">Erro: ${data.erro}</div>`;return}
+      salvarHistorico(kw,uf,mod,st);
+      const itens=data.data||[];
+      const total=data.totalRegistros||0;
+      totalPaginas=data.totalPaginas||1;
+      document.getElementById('resumo').innerHTML=`<strong>${total.toLocaleString('pt-BR')}</strong> licitações encontradas · Página ${paginaAtual} de ${totalPaginas}`;
+      if(!itens.length){document.getElementById('resultado').innerHTML='<div class="vazio">Nenhuma licitação encontrada.</div>';return}
+      const html=itens.map(item=>{
+        const badge=statusBadge(item);
+        return`<div class="card" onclick='abrirDrawer(${JSON.stringify(item)})'>
+          <div class="card-header">
+            <div class="card-titulo">${item.title||'Sem título'}</div>
+            <span class="badge ${badge.cls}">${badge.texto}</span>
+          </div>
+          <div class="card-desc">${item.description||'—'}</div>
+          <div class="card-info">
+            <span>📍 ${item.uf||'—'} · ${item.municipio_nome||''}</span>
+            <span>📋 ${item.modalidade_licitacao_nome||'—'}</span>
+            <span>📅 Abertura: ${fmt(item.data_inicio_vigencia)}</span>
+            <span>⏰ Encerra: ${fmt(item.data_fim_vigencia)}</span>
+          </div>
+          <div class="card-orgao">🏛️ ${item.orgao_nome||'—'}</div>
+        </div>`;
       }).join('');
-
-      document.getElementById('resultado').innerHTML = `<div class="cards">${html}</div>`;
-      document.getElementById('paginacao').style.display = 'flex';
-      document.getElementById('paginaInfo').textContent = `Página ${paginaAtual} de ${totalPaginas}`;
-      document.getElementById('btnAnterior').disabled = paginaAtual <= 1;
-      document.getElementById('btnProxima').disabled = paginaAtual >= totalPaginas;
-
-    } catch (err) {
-      document.getElementById('resultado').innerHTML = `<div class="erro">Erro de conexão: ${err.message}</div>`;
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Buscar';
-    }
+      document.getElementById('resultado').innerHTML=`<div class="cards">${html}</div>`;
+      document.getElementById('paginacao').style.display='flex';
+      document.getElementById('paginaInfo').textContent=`Página ${paginaAtual} de ${totalPaginas}`;
+      document.getElementById('btnAnterior').disabled=paginaAtual<=1;
+      document.getElementById('btnProxima').disabled=paginaAtual>=totalPaginas;
+    }catch(e){
+      document.getElementById('resultado').innerHTML=`<div class="erro">Erro de conexão: ${e.message}</div>`;
+    }finally{btn.disabled=false;btn.textContent='Buscar'}
   }
 
-  function mudarPagina(dir) {
-    const nova = paginaAtual + dir;
-    if (nova >= 1 && nova <= totalPaginas) buscar(nova);
+  function mudarPagina(d){const n=paginaAtual+d;if(n>=1&&n<=totalPaginas)buscar(n)}
+  function limpar(){
+    ['palavraChave'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('uf').value='';
+    document.getElementById('modalidade').value='';
+    document.getElementById('status').value='recebendo_proposta';
+    document.getElementById('resultado').innerHTML='';
+    document.getElementById('resumo').innerHTML='';
+    document.getElementById('paginacao').style.display='none';
   }
-
-  function limpar() {
-    document.getElementById('palavraChave').value = '';
-    document.getElementById('uf').value = '';
-    document.getElementById('modalidade').value = '';
-    document.getElementById('status').value = 'recebendo_proposta';
-    document.getElementById('resultado').innerHTML = '';
-    document.getElementById('resumo').innerHTML = '';
-    document.getElementById('paginacao').style.display = 'none';
-  }
-
-  document.getElementById('palavraChave').addEventListener('keydown', e => {
-    if (e.key === 'Enter') buscar(1);
-  });
-
+  document.getElementById('palavraChave').addEventListener('keydown',e=>{if(e.key==='Enter')buscar(1)});
   renderHistorico();
 </script>
 </body>
