@@ -337,7 +337,7 @@
     localStorage.setItem(TEMA_KEY,novo);
   }
   function carregarTema(){
-    const t=localStorage.getItem(TEMA_KEY)||'claro';
+    const t=localStorage.getItem(TEMA_KEY)||'escuro';
     document.documentElement.setAttribute('data-tema',t);
     document.getElementById('btnTema').textContent=t==='escuro'?'☀️':'🌙';
   }
