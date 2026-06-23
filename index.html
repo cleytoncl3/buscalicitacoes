@@ -73,7 +73,7 @@
     .filtros{background:var(--surface);border-radius:10px;padding:20px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:12px;margin-bottom:8px;border:1px solid var(--border)}
     .filtros-linha{display:grid;gap:10px}
     .filtros-linha-busca{grid-template-columns:1fr auto auto}
-    .filtros-linha-selects{grid-template-columns:1fr 1fr}
+    .filtros-linha-selects{grid-template-columns:1fr 1fr 1fr}
     .filtros input,.filtros select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.95rem;background:var(--surface2);color:var(--text)}
     .filtros input:focus{outline:none;border-color:var(--primary)}
     .btn-buscar{background:var(--primary);color:var(--accent);border:none;padding:10px 28px;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;white-space:nowrap}
@@ -407,6 +407,29 @@
   </div>
 </div>
 
+<!-- MODAL PORTAIS -->
+<div class="modal-uf-overlay" id="modalPortalOverlay" onclick="fecharModalPortal(event)">
+  <div class="modal-uf">
+    <div class="modal-uf-header">
+      <h3>🏛️ Portais de Compras</h3>
+      <button class="modal-uf-fechar" onclick="fecharModalPortalDireto()">✕</button>
+    </div>
+    <div class="modal-uf-body" style="padding:0">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);font-size:.82rem;color:var(--text2)">
+        Selecione os portais onde deseja buscar licitações. Comprasnet é gratuito e do governo federal.
+      </div>
+      <div class="mod-pills" id="portalPills"></div>
+    </div>
+    <div class="modal-uf-footer">
+      <div class="modal-uf-footer-left">
+        <button class="uf-footer-btn" onclick="portalSelecionarTodos()">Todos</button>
+        <button class="uf-footer-btn" onclick="portalLimpar()">Limpar</button>
+      </div>
+      <button class="btn-confirmar-modal" onclick="confirmarPortais()">Confirmar ✓</button>
+    </div>
+  </div>
+</div>
+
 <header>
   <div class="header-left">
     <div class="header-logo">📋 Arantes Licitações<span>Arantes Papéis · PNCP</span></div>
@@ -462,6 +485,10 @@
         </button>
         <button class="select-trigger" id="modTrigger" onclick="abrirModalMod()" type="button">
           <span class="select-trigger-txt" id="modTriggerTxt">📋 Pregão Eletrônico, Dispensa</span>
+          <span style="color:var(--text3);font-size:.75rem;flex-shrink:0">▼</span>
+        </button>
+        <button class="select-trigger" id="portalTrigger" onclick="abrirModalPortal()" type="button">
+          <span class="select-trigger-txt" id="portalTriggerTxt">🏛️ Comprasnet</span>
           <span style="color:var(--text3);font-size:.75rem;flex-shrink:0">▼</span>
         </button>
       </div>
@@ -696,6 +723,42 @@
       const nomes=selectedMods.map(id=>MODALIDADES.find(m=>m.id===id)?.nome||id);
       if(nomes.length<=2)txt.textContent='📋 '+nomes.join(', ');
       else txt.textContent=`📋 ${nomes.slice(0,2).join(', ')} (+${nomes.length-2})`;
+    }
+  }
+
+
+  // ===== PORTAIS =====
+  const PORTAIS = [
+    { id: 'F', nome: 'Comprasnet', desc: 'Gov Federal — gratuito' },
+    { id: 'E', nome: 'Portais Estaduais', desc: 'BLL, ComprasRJ, etc.' },
+    { id: 'M', nome: 'Portais Municipais', desc: 'Licitanet, BBMNET, etc.' },
+  ];
+  let selectedPortais = ['F']; // Comprasnet por padrão
+
+  function renderModalPortal() {
+    document.getElementById('portalPills').innerHTML = PORTAIS.map(p => `
+      <button class="mod-pill${selectedPortais.includes(p.id) ? ' selecionado' : ''}" onclick="togglePortal('${p.id}')" id="portalpill-${p.id}">
+        ${p.nome}<br><small style="font-weight:400;opacity:.7">${p.desc}</small>
+      </button>`).join('');
+  }
+  function togglePortal(id) {
+    if (selectedPortais.includes(id)) selectedPortais = selectedPortais.filter(p => p !== id);
+    else selectedPortais.push(id);
+    const p = document.getElementById('portalpill-' + id);
+    if (p) p.classList.toggle('selecionado', selectedPortais.includes(id));
+  }
+  function portalSelecionarTodos() { selectedPortais = PORTAIS.map(p => p.id); renderModalPortal(); }
+  function portalLimpar() { selectedPortais = []; renderModalPortal(); }
+  function abrirModalPortal() { renderModalPortal(); document.getElementById('modalPortalOverlay').classList.add('aberto'); }
+  function fecharModalPortal(e) { if (e.target === document.getElementById('modalPortalOverlay')) fecharModalPortalDireto(); }
+  function fecharModalPortalDireto() { document.getElementById('modalPortalOverlay').classList.remove('aberto'); }
+  function confirmarPortais() { atualizarBotaoPortal(); fecharModalPortalDireto(); }
+  function atualizarBotaoPortal() {
+    const txt = document.getElementById('portalTriggerTxt');
+    if (!selectedPortais.length) txt.textContent = '🏛️ Todos os portais';
+    else {
+      const nomes = selectedPortais.map(id => PORTAIS.find(p => p.id === id)?.nome || id);
+      txt.textContent = '🏛️ ' + nomes.join(', ');
     }
   }
 
@@ -1038,6 +1101,8 @@
     if(kw)params.append('palavraChave',kw);
     if(ufParam)params.append('uf',ufParam);
     if(modParam)params.append('modalidade',modParam);
+    const portalParam=selectedPortais.join(',');
+    if(portalParam)params.append('portal',portalParam);
     if(dataInicial)params.append('dataInicial',dataInicial);
     if(dataFinal)params.append('dataFinal',dataFinal);
     const btn=document.getElementById('btnBuscar');
@@ -1082,6 +1147,7 @@
     document.getElementById('palavraChave').value='';
     selectedUFs=[];atualizarBotaoUF();
     selectedMods=['6','8'];atualizarBotaoMod();
+    selectedPortais=['F'];atualizarBotaoPortal();
     limparDatas();
     document.getElementById('resultado').innerHTML='';
     document.getElementById('resumo').innerHTML='';
@@ -1092,6 +1158,7 @@
   // ===== INIT =====
   carregarTema();
   atualizarBotaoMod(); // mostra padrão
+  atualizarBotaoPortal(); // mostra padrão
   renderHistorico();
   renderNotificacoes();
   setTimeout(()=>verificarTodosJornais(),2000);
