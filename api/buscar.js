@@ -1,36 +1,44 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
-  const {
-    palavraChave = '', uf = '', pagina = 1, modalidade = '',
-    status = '', dataInicial = '', dataFinal = ''
-  } = req.query;
+  const { palavraChave = '', uf = '', pagina = 1, modalidade = '', status = '', dataInicial = '', dataFinal = '' } = req.query;
 
-  const keywords = palavraChave ? palavraChave.split(';').map(k => k.trim()).filter(Boolean) : [''];
+  // Parse inputs
+  const baseKeywords = palavraChave ? palavraChave.split(';').map(k => k.trim()).filter(Boolean) : [''];
   const ufs = uf ? uf.split(',').map(u => u.trim()).filter(Boolean) : [];
-  const isMulti = keywords.length > 1 || ufs.length > 1;
+  const modalidades = modalidade ? modalidade.split(',').map(m => m.trim()).filter(Boolean) : [];
+
+  // Expansão de palavras-chave: "papel kraft" → busca "papel kraft" (prioridade 1) + "kraft" (prioridade 2)
+  const keywords = [];
+  const seenKw = new Set();
+  for (const kw of baseKeywords) {
+    if (kw && !seenKw.has(kw.toLowerCase())) {
+      keywords.push({ q: kw, priority: 1 });
+      seenKw.add(kw.toLowerCase());
+    }
+    // Palavras individuais de keyword multi-palavra como busca secundária
+    const words = kw.trim().split(/\s+/).filter(w => w.length > 3);
+    if (words.length > 1) {
+      for (const word of words) {
+        if (!seenKw.has(word.toLowerCase())) {
+          keywords.push({ q: word, priority: 2 });
+          seenKw.add(word.toLowerCase());
+        }
+      }
+    }
+  }
 
   const buildUrl = (kw, ufItem) => {
     const params = new URLSearchParams({
       tipos_documento: 'edital',
       ordenacao: '-data',
-      pagina: isMulti ? 1 : pagina,
-      tam_pagina: isMulti ? 50 : 20,
+      pagina: 1,
+      tam_pagina: 20,
     });
-
-    // Só passa status=recebendo_proposta para o PNCP (único que funciona na API deles)
-    // Para encerrada/em_julgamento/todos, buscamos sem filtro e filtramos client-side
-    if (status === 'recebendo_proposta') {
-      params.append('status', 'recebendo_proposta');
-    }
-    // Se vazio (todos) ou outros status — não passa status para o PNCP
-    // pois o PNCP ignora valores desconhecidos e retorna recebendo_proposta por padrão
-
+    // Só passa status para o PNCP quando é recebendo_proposta (único reconhecido)
+    if (status === 'recebendo_proposta') params.append('status', 'recebendo_proposta');
     if (kw) params.append('q', kw);
     if (ufItem) params.append('ufs', ufItem);
-    if (modalidade) params.append('modalidade', modalidade);
-    if (dataInicial) params.append('dataInicial', dataInicial.replace(/-/g, ''));
-    if (dataFinal) params.append('dataFinal', dataFinal.replace(/-/g, ''));
     return `https://pncp.gov.br/api/search/?${params}`;
   };
 
@@ -53,30 +61,41 @@ export default async function handler(req, res) {
     const combinations = [];
     for (const kw of keywords) {
       for (const ufItem of ufList) {
-        combinations.push({ kw, uf: ufItem });
+        combinations.push({ q: kw.q, priority: kw.priority, uf: ufItem });
       }
     }
+    // Limita a 15 combinações para não sobrecarregar
+    const limited = combinations.slice(0, 15);
 
-    const results = await Promise.all(combinations.map(({ kw, uf: ufItem }) =>
-      fetchComRetry(buildUrl(kw, ufItem))
-    ));
+    const results = await Promise.all(
+      limited.map(c => fetchComRetry(buildUrl(c.q, c.uf)).then(data => ({ data, priority: c.priority })).catch(() => ({ data: null, priority: c.priority })))
+    );
 
+    // Merge com prioridade: frases completas primeiro, palavras individuais depois
     const seen = new Set();
     let items = [];
-    let totalBase = 0;
-
-    results.forEach((data, i) => {
-      if (!data) return;
-      if (i === 0) totalBase = data.total || 0;
-      (data.items || []).forEach(item => {
-        const key = item.id || item.numero_controle_pncp;
-        if (!seen.has(key)) { seen.add(key); items.push(item); }
+    for (const priority of [1, 2]) {
+      results.filter(r => r.priority === priority).forEach(r => {
+        if (!r.data) return;
+        (r.data.items || []).forEach(item => {
+          const key = item.id || item.numero_controle_pncp;
+          if (!seen.has(key)) { seen.add(key); items.push(item); }
+        });
       });
-    });
+    }
 
+    const totalBase = results.find(r => r.priority === 1)?.data?.total || 0;
+
+    // Filtro por MODALIDADE (client-side)
+    if (modalidades.length > 0) {
+      items = items.filter(item => {
+        const mid = String(item.modalidade_licitacao_id || '');
+        return modalidades.includes(mid);
+      });
+    }
+
+    // Filtro por STATUS (client-side garantido)
     const agora = new Date();
-
-    // Filtro de STATUS — feito no servidor para garantir
     if (status === 'encerrada') {
       items = items.filter(item => {
         const fim = item.data_fim_vigencia ? new Date(item.data_fim_vigencia) : null;
@@ -86,21 +105,17 @@ export default async function handler(req, res) {
       items = items.filter(item => {
         const fim = item.data_fim_vigencia ? new Date(item.data_fim_vigencia) : null;
         const ini = item.data_inicio_vigencia ? new Date(item.data_inicio_vigencia) : null;
-        // Proposta encerrada mas resultado ainda não divulgado
-        return fim && agora > fim && ini;
+        return fim && ini && agora > fim;
       });
     } else if (status === 'recebendo_proposta') {
-      // Já filtrado pelo PNCP, mas garantimos client-side também
       items = items.filter(item => {
         const fim = item.data_fim_vigencia ? new Date(item.data_fim_vigencia) : null;
-        const ini = item.data_inicio_vigencia ? new Date(item.data_inicio_vigencia) : null;
-        if (fim && agora > fim) return false;
-        return true;
+        return !fim || agora <= fim;
       });
     }
-    // status vazio = todos, sem filtro adicional
+    // status vazio = todos
 
-    // Filtro de DATA por abertura
+    // Filtro por DATA de abertura
     if (dataInicial || dataFinal) {
       const dIni = dataInicial ? new Date(dataInicial) : null;
       const dFim = dataFinal ? new Date(dataFinal + 'T23:59:59') : null;
@@ -113,11 +128,12 @@ export default async function handler(req, res) {
       });
     }
 
-    const hasExtraFilter = isMulti || dataInicial || dataFinal || (status && status !== 'recebendo_proposta');
+    const hasClientFilter = modalidades.length > 0 || (status && status !== 'recebendo_proposta') || dataInicial || dataFinal || keywords.some(k => k.priority === 2) || ufs.length > 1;
+
     return res.status(200).json({
       data: items,
-      totalRegistros: hasExtraFilter ? items.length : totalBase,
-      totalPaginas: hasExtraFilter ? Math.ceil(items.length / 20) : Math.ceil(totalBase / 20)
+      totalRegistros: hasClientFilter ? items.length : totalBase,
+      totalPaginas: hasClientFilter ? Math.ceil(items.length / 20) : Math.ceil(totalBase / 20)
     });
 
   } catch (error) {
