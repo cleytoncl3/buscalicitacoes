@@ -311,33 +311,30 @@
 
     .card-exp{background:var(--surface);border-radius:10px;box-shadow:var(--card-shadow);border:1px solid var(--border);border-left:4px solid var(--primary);cursor:pointer;overflow:hidden;transition:box-shadow .2s}
     .card-exp:hover{box-shadow:var(--card-shadow-hover);border-left-color:var(--accent)}
-    .card-exp-main{display:grid;grid-template-columns:1fr 320px;min-height:140px}
+    .card-exp-main{display:grid;grid-template-columns:1fr 280px;min-height:120px}
     .card-exp-left{padding:14px 16px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:6px}
     .card-exp-titulo{font-weight:700;font-size:.88rem;color:var(--accent);line-height:1.3}
     [data-tema="claro"] .card-exp-titulo{color:var(--primary)}
-    .card-exp-desc{font-size:.82rem;color:var(--text2);line-height:1.4;flex:1}
-    .card-exp-tags{display:flex;flex-wrap:wrap;gap:5px}
-    .card-exp-tag{background:var(--surface2);color:var(--text3);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:.72rem}
+    .card-exp-desc{font-size:.82rem;color:var(--text);line-height:1.4;flex:1}
     .card-exp-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:2px}
     .card-exp-meta span{font-size:.78rem;color:var(--text2)}
     .card-exp-badge{font-size:.72rem;padding:2px 8px;border-radius:4px;font-weight:600}
-    .card-exp-badge-portal{background:#0d2b1a;color:#4ade80;border:1px solid #2d4a38}
-    [data-tema="claro"] .card-exp-badge-portal{background:#e6f4ec;color:#1a7a3c;border-color:#c5ddd0}
+    .card-exp-badge-portal{background:var(--badge-verde-bg);color:var(--badge-verde-txt)}
     .card-exp-badge-mod{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
 
-    .card-exp-items{padding:10px 12px;background:var(--surface2);display:flex;flex-direction:column;gap:0}
-    .card-exp-items-titulo{font-size:.7rem;text-transform:uppercase;color:var(--text3);letter-spacing:.5px;margin-bottom:6px;font-weight:600}
-    .card-exp-items-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px}
-    .card-item-prev{background:var(--surface);border-radius:5px;padding:5px 8px;border:1px solid var(--border)}
-    .card-item-prev-num{font-size:.68rem;color:var(--primary);font-weight:700}
+    .card-exp-items{padding:10px 12px;background:var(--surface);display:flex;flex-direction:column;gap:4px;border-left:1px solid var(--border)}
+    .card-exp-items-titulo{font-size:.68rem;text-transform:uppercase;color:var(--text3);letter-spacing:.5px;font-weight:600;margin-bottom:2px}
+    .card-item-prev{display:flex;align-items:baseline;gap:6px;padding:3px 0;border-bottom:1px solid var(--border)}
+    .card-item-prev:last-child{border-bottom:none}
+    .card-item-prev-num{font-size:.68rem;color:var(--primary);font-weight:700;white-space:nowrap;flex-shrink:0}
     [data-tema="escuro"] .card-item-prev-num{color:var(--accent)}
-    .card-item-prev-nome{font-size:.72rem;color:var(--text);font-weight:500;line-height:1.2;margin:1px 0}
-    .card-item-prev-qtd{font-size:.68rem;color:var(--text3)}
-    .card-item-prev-qtd strong{color:var(--text2)}
-    .card-items-loading{text-align:center;padding:20px;color:var(--text3);font-size:.8rem}
-    .card-items-vazio{text-align:center;padding:20px;color:var(--text3);font-size:.78rem}
+    .card-item-prev-nome{font-size:.75rem;color:var(--text);flex:1;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .card-item-prev-qtd{font-size:.68rem;color:var(--text3);white-space:nowrap;flex-shrink:0}
+    .card-item-prev-qtd strong{color:var(--text2);font-weight:600}
+    .card-items-loading{padding:12px;color:var(--text3);font-size:.75rem;text-align:center}
+    .card-items-vazio{padding:12px;color:var(--text3);font-size:.75rem;text-align:center}
 
-    .card-exp-footer{background:var(--surface2);border-top:1px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+    .card-exp-footer{background:var(--surface);border-top:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
     .card-exp-footer span{font-size:.78rem;color:var(--text2)}
 
     @media(max-width:900px){.card-exp-main{grid-template-columns:1fr}.card-exp-items{border-top:1px solid var(--border);border-right:none}}
@@ -1026,8 +1023,8 @@
             ${esferaNome ? `<span class="card-exp-badge card-exp-badge-portal">${esferaNome}</span>` : ''}
           </div>
         </div>
-        <div class="card-exp-items" id="card-items-${cardId}">
-          <div class="card-items-loading">⏳ Carregando itens...</div>
+        <div class="card-exp-items" id="card-items-${cardId}" onclick="event.stopPropagation()">
+          <div class="card-items-loading">⏳ Carregando...</div>
         </div>
       </div>
       <div class="card-exp-footer">
@@ -1045,21 +1042,34 @@
     try {
       const r = await fetch(`/api/itens?cnpj=${cnpj}&ano=${ano}&sequencial=${seq}`);
       const data = await r.json();
-      const itens = (data.data || []).slice(0, 8);
-      if (!itens.length) {
-        el.innerHTML = '<div class="card-items-vazio">Sem itens encontrados</div>';
+      const todos = data.data || [];
+
+      // Filtra itens que contêm a palavra-chave buscada
+      const kwRaw = document.getElementById('palavraChave').value.trim();
+      const termos = kwRaw
+        ? kwRaw.split(';').map(k => k.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''))
+        : [];
+
+      const filtrados = termos.length
+        ? todos.filter(it => {
+            const desc = (it.descricao || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+            return termos.some(t => desc.includes(t));
+          })
+        : todos.slice(0, 6);
+
+      if (!filtrados.length) {
+        el.innerHTML = '<div class="card-items-vazio">Nenhum item encontrado para a busca</div>';
         return;
       }
+
       el.innerHTML = `
-        <div class="card-exp-items-titulo">Itens da licitação</div>
-        <div class="card-exp-items-grid">
-          ${itens.map(it => `
-            <div class="card-item-prev">
-              <div class="card-item-prev-num">Item ${it.numeroItem || '—'}</div>
-              <div class="card-item-prev-nome">${(it.descricao || 'Sem descrição').substring(0, 45)}${(it.descricao || '').length > 45 ? '...' : ''}</div>
-              <div class="card-item-prev-qtd">Qtd: <strong>${it.quantidade || '—'} ${it.unidadeMedida || ''}</strong></div>
-            </div>`).join('')}
-        </div>`;
+        <div class="card-exp-items-titulo">Itens encontrados (${filtrados.length})</div>
+        ${filtrados.slice(0, 8).map(it => `
+          <div class="card-item-prev">
+            <span class="card-item-prev-num">#${it.numeroItem||'—'}</span>
+            <span class="card-item-prev-nome">${(it.descricao||'').substring(0,38)}${(it.descricao||'').length>38?'…':''}</span>
+            <span class="card-item-prev-qtd"><strong>${it.quantidade||'—'}</strong> ${it.unidadeMedida||''}</span>
+          </div>`).join('')}`;
     } catch {
       el.innerHTML = '<div class="card-items-vazio">—</div>';
     }
