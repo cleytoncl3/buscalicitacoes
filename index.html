@@ -1038,21 +1038,28 @@
         ? normalizar(kwRaw).split(/[;\s]+/).map(t => t.trim()).filter(Boolean)
         : [];
 
-      const filtrados = termos.length
-        ? todos.filter(it => {
+      // Sem busca ativa -> mostra os primeiros itens só como amostra.
+      // Com busca ativa -> mostra SOMENTE os itens que realmente batem.
+      // Não há fallback para "primeiros itens" aqui: mostrar itens que
+      // não casam com a busca é o que gerava resultados sem sentido
+      // (ex: buscar "papel kraft" e a licitação devolver "concreto usinado").
+      const semBusca = termos.length === 0;
+      const filtrados = semBusca
+        ? todos.slice(0, 6)
+        : todos.filter(it => {
             const desc = normalizar(it.descricao || '');
             return termos.some(t => desc.includes(t));
-          })
-        : todos.slice(0, 6);
+          });
 
-      // Se nenhum item matchou, mostra os primeiros como fallback
-      const toShow = filtrados.length > 0 ? filtrados.slice(0, 8) : todos.slice(0, 6);
-      const label = filtrados.length > 0
-        ? `Itens encontrados (${filtrados.length})`
-        : `Itens da licitação`;
+      const toShow = filtrados.slice(0, 8);
+      const label = semBusca
+        ? 'Itens da licitação'
+        : `Itens encontrados (${filtrados.length})`;
 
       if (!toShow.length) {
-        el.innerHTML = '<div class="card-items-vazio">Sem itens</div>';
+        el.innerHTML = semBusca
+          ? '<div class="card-items-vazio">Sem itens</div>'
+          : '<div class="card-items-vazio">Nenhum item desta licitação corresponde à busca</div>';
         return;
       }
 
