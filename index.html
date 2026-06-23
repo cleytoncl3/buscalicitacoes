@@ -11,7 +11,7 @@
       --primary:#1a3d2b;--primary-hover:#245239;--accent:#d4a825;
       --chip-bg:#eef5f1;--chip-border:#c5ddd0;
       --card-shadow:0 2px 6px rgba(0,0,0,.06);--card-shadow-hover:0 4px 14px rgba(0,0,0,.12);
-      --drawer-bg:#fff;--overlay:rgba(0,0,0,.4);
+      --drawer-bg:#fff;--overlay-color:rgba(0,0,0,.4);
       --badge-verde-bg:#e6f4ec;--badge-verde-txt:#1a7a3c;
       --badge-amarelo-bg:#fff8e1;--badge-amarelo-txt:#b8860b;
       --badge-cinza-bg:#f0f0f0;--badge-cinza-txt:#666;
@@ -22,7 +22,7 @@
       --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--text4:#475569;
       --chip-bg:#1e2d24;--chip-border:#2d4a38;
       --card-shadow:0 2px 6px rgba(0,0,0,.3);--card-shadow-hover:0 4px 14px rgba(0,0,0,.5);
-      --drawer-bg:#161b27;--overlay:rgba(0,0,0,.6);
+      --drawer-bg:#161b27;--overlay-color:rgba(0,0,0,.6);
       --badge-verde-bg:#0d2b1a;--badge-verde-txt:#4ade80;
       --badge-amarelo-bg:#2b2000;--badge-amarelo-txt:#fbbf24;
       --badge-cinza-bg:#1e2538;--badge-cinza-txt:#94a3b8;
@@ -30,6 +30,8 @@
     }
     *{box-sizing:border-box;margin:0;padding:0;transition:background-color .2s,color .2s,border-color .2s}
     body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text)}
+
+    /* HEADER */
     header{background:var(--primary);color:var(--accent);padding:0 32px;display:flex;justify-content:space-between;align-items:center;height:58px;position:sticky;top:0;z-index:300}
     .header-left{display:flex;align-items:center;gap:24px}
     .header-logo{font-size:1.2rem;font-weight:700;letter-spacing:1px;white-space:nowrap;color:var(--accent)}
@@ -63,38 +65,55 @@
     .notif-data{font-size:.72rem;color:var(--text3);margin-top:3px}
     .notif-vazia{padding:24px;text-align:center;color:var(--text3);font-size:.88rem}
     .notif-wrapper{position:relative}
+
+    /* LAYOUT */
     .container{max-width:1100px;margin:0 auto;padding:24px 16px}
     .view{display:none}.view.ativo{display:block}
 
     /* FILTROS */
     .filtros{background:var(--surface);border-radius:10px;padding:20px;box-shadow:var(--card-shadow);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:8px;border:1px solid var(--border)}
     .filtros .campo-busca{grid-column:1/-1;display:flex;gap:10px}
+    .filtros .kw-hint{grid-column:1/-1;font-size:.75rem;color:var(--text3);margin-top:-4px}
+    .filtros .linha-data{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px}
     .filtros input,.filtros select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.95rem;background:var(--surface2);color:var(--text)}
     .filtros input:focus,.filtros select:focus{outline:none;border-color:var(--primary)}
     .btn-buscar{background:var(--primary);color:var(--accent);border:none;padding:10px 28px;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;white-space:nowrap}
     .btn-buscar:hover{background:var(--primary-hover)}
     .btn-buscar:disabled{background:var(--text3);cursor:wait}
     .btn-limpar{background:transparent;color:var(--text3);border:1px solid var(--border);padding:10px 16px;border-radius:8px;font-size:.9rem;cursor:pointer}
-    .kw-hint{font-size:.75rem;color:var(--text3);margin-top:4px;grid-column:1/-1}
+    .campo-label{font-size:.75rem;color:var(--text3);margin-bottom:3px;display:block}
 
-    /* MULTI-SELECT UF */
-    .uf-multiselect{position:relative;width:100%}
-    .uf-btn{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.95rem;background:var(--surface2);color:var(--text);text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px}
-    .uf-btn:focus{outline:none;border-color:var(--primary)}
-    .uf-btn-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-    .uf-chevron{flex-shrink:0;font-size:.75rem;color:var(--text3)}
-    .uf-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:250;display:none}
-    .uf-dropdown.aberto{display:block}
-    .uf-search-wrap{padding:10px 12px;border-bottom:1px solid var(--border)}
-    .uf-search-wrap input{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;background:var(--surface2);color:var(--text);outline:none}
-    .uf-opts{max-height:220px;overflow-y:auto;padding:6px}
-    .uf-opt{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.88rem;color:var(--text)}
-    .uf-opt:hover{background:var(--chip-bg)}
-    .uf-opt input[type=checkbox]{cursor:pointer;accent-color:var(--primary);width:14px;height:14px}
-    .uf-footer{padding:8px 12px;border-top:1px solid var(--border);display:flex;gap:8px}
-    .uf-footer button{font-size:.78rem;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer}
-    .uf-footer button:hover{background:var(--chip-bg);color:var(--primary)}
-    .uf-count-badge{background:var(--primary);color:var(--accent);font-size:.7rem;padding:1px 7px;border-radius:20px;font-weight:700;flex-shrink:0}
+    /* BOTÃO UF */
+    .uf-trigger{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.95rem;background:var(--surface2);color:var(--text);text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .uf-trigger-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+
+    /* MODAL UF */
+    .modal-uf-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:600;display:none;align-items:center;justify-content:center}
+    .modal-uf-overlay.aberto{display:flex}
+    .modal-uf{background:var(--surface);border-radius:16px;width:580px;max-width:95vw;max-height:90vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);display:flex;flex-direction:column}
+    .modal-uf-header{background:var(--primary);padding:18px 20px;display:flex;justify-content:space-between;align-items:center}
+    .modal-uf-header h3{color:var(--accent);font-size:1rem;font-weight:700}
+    .modal-uf-fechar{background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center}
+    .modal-uf-fechar:hover{background:rgba(255,255,255,.3)}
+    .modal-uf-body{padding:20px;overflow-y:auto;flex:1}
+    .uf-regioes{display:flex;flex-direction:column;gap:16px}
+    .uf-regiao{border:1px solid var(--border);border-radius:10px;overflow:hidden}
+    .uf-regiao-header{padding:8px 14px;background:var(--surface2);font-size:.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:center}
+    .uf-regiao-link{font-size:.72rem;color:var(--primary);cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0}
+    [data-tema="escuro"] .uf-regiao-link{color:var(--accent)}
+    .uf-regiao-link:hover{text-decoration:underline}
+    .uf-pills{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px}
+    .uf-pill{padding:5px 14px;border-radius:20px;font-size:.82rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);transition:all .15s}
+    .uf-pill:hover{border-color:var(--primary);color:var(--primary)}
+    .uf-pill.selecionado{background:var(--primary);color:var(--accent);border-color:var(--primary)}
+    [data-tema="escuro"] .uf-pill:hover{color:var(--accent);border-color:var(--accent)}
+    .modal-uf-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .modal-uf-footer-left{display:flex;gap:8px}
+    .uf-footer-btn{padding:7px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:.82rem;cursor:pointer}
+    .uf-footer-btn:hover{background:var(--chip-bg);color:var(--primary)}
+    .btn-confirmar-uf{background:var(--primary);color:var(--accent);border:none;padding:9px 22px;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer}
+    .btn-confirmar-uf:hover{background:var(--primary-hover)}
+    .uf-selecionadas-preview{font-size:.8rem;color:var(--text3)}
 
     /* HISTÓRICO */
     .historico-box{background:var(--surface);border-radius:10px;padding:12px 16px;box-shadow:var(--card-shadow);margin-bottom:16px;display:none;border:1px solid var(--border)}
@@ -104,6 +123,8 @@
     .chip{background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:20px;padding:4px 12px;font-size:.82rem;cursor:pointer;display:flex;align-items:center;gap:6px}
     [data-tema="escuro"] .chip{color:var(--accent)}
     .chip-x{color:var(--text3);font-size:.75rem;cursor:pointer}
+
+    /* RESULTADOS */
     .resumo{font-size:.9rem;color:var(--text2);margin-bottom:14px}
     .resumo strong{color:var(--primary)}
     [data-tema="escuro"] .resumo strong{color:var(--accent)}
@@ -128,7 +149,7 @@
     .erro{background:var(--erro-bg);border:1px solid var(--erro-border);color:var(--erro-txt);padding:16px;border-radius:8px;text-align:center}
     .vazio{text-align:center;padding:40px;color:var(--text3)}
 
-    /* MEUS JORNAIS */
+    /* JORNAIS */
     .jornais-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
     .jornais-header h2{font-size:1.1rem;font-weight:700}
     .btn-novo-jornal{background:var(--primary);color:var(--accent);border:none;padding:10px 18px;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer}
@@ -145,20 +166,18 @@
     .jornal-btn{font-size:.8rem;padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer}
     .jornal-btn:hover{background:var(--chip-bg);color:var(--primary)}
     .jornal-btn-danger{color:#ef4444;border-color:#fca5a5}
-    .jornal-btn-danger:hover{background:var(--erro-bg);color:#dc2626}
     .jornal-btn-primary{background:var(--primary);color:var(--accent);border-color:var(--primary)}
     .jornal-btn-primary:hover{background:var(--primary-hover)}
     .jornal-resultado{font-size:.82rem;font-weight:600;color:var(--badge-verde-txt);background:var(--badge-verde-bg);border-radius:20px;padding:3px 10px}
 
-    /* MODAL */
+    /* MODAL JORNAL */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:none;align-items:center;justify-content:center}
     .modal-overlay.aberto{display:flex}
     .modal{background:var(--surface);border-radius:14px;padding:28px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.4)}
     .modal h3{font-size:1.1rem;font-weight:700;margin-bottom:20px}
     .modal-campo{margin-bottom:16px}
     .modal-campo label{display:block;font-size:.82rem;color:var(--text2);margin-bottom:6px;font-weight:600}
-    .modal-campo input,.modal-campo select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.9rem;background:var(--surface2);color:var(--text)}
-    .modal-campo input:focus,.modal-campo select:focus{outline:none;border-color:var(--primary)}
+    .modal-campo input,.modal-campo select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.9rem;background:var(--surface2);color:var(--text);outline:none}
     .kw-lista{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:32px}
     .kw-chip{background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:20px;padding:4px 10px;font-size:.82rem;display:flex;align-items:center;gap:6px}
     [data-tema="escuro"] .kw-chip{color:var(--accent)}
@@ -173,7 +192,7 @@
     .btn-add-kw{background:var(--primary);color:var(--accent);border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:.85rem;white-space:nowrap}
 
     /* DRAWER */
-    .overlay{position:fixed;inset:0;background:var(--overlay);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s}
+    .overlay{position:fixed;inset:0;background:var(--overlay-color);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s}
     .overlay.ativo{opacity:1;pointer-events:all}
     .drawer{position:fixed;top:0;right:-660px;width:640px;max-width:95vw;height:100vh;background:var(--drawer-bg);z-index:101;box-shadow:-4px 0 24px rgba(0,0,0,.3);transition:right .3s ease;overflow-y:auto;display:flex;flex-direction:column;border-left:1px solid var(--border)}
     .drawer.ativo{right:0}
@@ -271,10 +290,33 @@
     .cal-evento{background:var(--primary);color:var(--accent);border-radius:3px;padding:1px 4px;font-size:.65rem;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .cal-evento.encerramento{background:#7f1d1d;color:#fca5a5}
     [data-tema="escuro"] .cal-evento{background:#245239}
-    @media(max-width:800px){.filtros{grid-template-columns:1fr}.filtros .campo-busca{flex-direction:column}.drawer{width:100%;right:-100%}.drawer-grid{grid-template-columns:1fr}.item-detalhe-grid{grid-template-columns:1fr 1fr}.kanban{grid-template-columns:repeat(3,1fr)}.header-logo span{display:none}.nav-btn{padding:6px 10px;font-size:.82rem}}
+
+    @media(max-width:800px){.filtros{grid-template-columns:1fr}.filtros .campo-busca{flex-direction:column}.filtros .linha-data{grid-template-columns:1fr}.drawer{width:100%;right:-100%}.drawer-grid{grid-template-columns:1fr}.item-detalhe-grid{grid-template-columns:1fr 1fr}.kanban{grid-template-columns:repeat(3,1fr)}.header-logo span{display:none}.nav-btn{padding:6px 10px;font-size:.82rem}}
   </style>
 </head>
 <body>
+
+<!-- MODAL UF -->
+<div class="modal-uf-overlay" id="modalUFOverlay" onclick="fecharModalUF(event)">
+  <div class="modal-uf">
+    <div class="modal-uf-header">
+      <h3>📍 Escolha os Estados</h3>
+      <button class="modal-uf-fechar" onclick="fecharModalUFDireto()">✕</button>
+    </div>
+    <div class="modal-uf-body">
+      <div class="uf-regioes" id="ufRegioes"></div>
+    </div>
+    <div class="modal-uf-footer">
+      <div class="modal-uf-footer-left">
+        <button class="uf-footer-btn" onclick="ufSelecionarRegiao('sudeste')">Sudeste</button>
+        <button class="uf-footer-btn" onclick="ufSelecionarRegiao('sul')">Sul</button>
+        <button class="uf-footer-btn" onclick="ufSelecionarTodos()">Todos</button>
+        <button class="uf-footer-btn" onclick="ufLimpar()">Limpar</button>
+      </div>
+      <button class="btn-confirmar-uf" onclick="confirmarUFs()">Confirmar ✓</button>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL JORNAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="fecharModal(event)">
@@ -357,7 +399,7 @@
   </div>
 </header>
 
-<!-- VIEW BUSCAR LICITAÇÕES -->
+<!-- VIEW BUSCA -->
 <div class="view ativo" id="viewBusca">
   <div class="container">
     <div class="filtros">
@@ -368,24 +410,10 @@
       </div>
       <div class="kw-hint">💡 Separe múltiplas palavras com ponto e vírgula: <strong>papel kraft; bobina; embalagem parda</strong></div>
 
-      <!-- MULTI-SELECT UF -->
-      <div class="uf-multiselect" id="ufMultiselect">
-        <button class="uf-btn" onclick="toggleUFDropdown(event)" type="button">
-          <span class="uf-btn-txt" id="ufBtnTxt">Todos os estados</span>
-          <span class="uf-chevron">▼</span>
-        </button>
-        <div class="uf-dropdown" id="ufDropdown">
-          <div class="uf-search-wrap">
-            <input type="text" id="ufSearch" placeholder="Buscar estado..." oninput="filtrarUFOpts()"/>
-          </div>
-          <div class="uf-opts" id="ufOpts"></div>
-          <div class="uf-footer">
-            <button onclick="selecionarSudeste()">Sudeste</button>
-            <button onclick="selecionarTodos()">Todos</button>
-            <button onclick="limparUFs()">Limpar</button>
-          </div>
-        </div>
-      </div>
+      <button class="uf-trigger" id="ufTrigger" onclick="abrirModalUF()" type="button">
+        <span class="uf-trigger-txt" id="ufTriggerTxt">📍 Todos os estados</span>
+        <span style="color:var(--text3);font-size:.75rem">▼</span>
+      </button>
 
       <select id="modalidade">
         <option value="">Todas as modalidades</option>
@@ -396,13 +424,26 @@
         <option value="7">Pregão Presencial</option>
         <option value="5">Concorrência Presencial</option>
       </select>
+
       <select id="status">
         <option value="recebendo_proposta">Recebendo proposta</option>
         <option value="em_julgamento">Em julgamento</option>
         <option value="encerrada">Encerrada</option>
-        <option value="">Todos</option>
+        <option value="">Todos os status</option>
       </select>
+
+      <div class="linha-data">
+        <div>
+          <span class="campo-label">📅 Abertura a partir de</span>
+          <input type="date" id="dataInicial"/>
+        </div>
+        <div>
+          <span class="campo-label">📅 Abertura até</span>
+          <input type="date" id="dataFinal"/>
+        </div>
+      </div>
     </div>
+
     <div class="historico-box" id="historicoBox">
       <div class="historico-label"><span>🕒 Buscas recentes</span><button onclick="limparHistorico()">Limpar tudo</button></div>
       <div class="historico-chips" id="historicoChips"></div>
@@ -417,7 +458,7 @@
   </div>
 </div>
 
-<!-- VIEW MEUS JORNAIS -->
+<!-- VIEW JORNAIS -->
 <div class="view" id="viewJornais">
   <div class="container">
     <div class="jornais-header">
@@ -490,10 +531,16 @@
 </div>
 
 <script>
-  // ===== STATE =====
+  // ===== ESTADO =====
   let paginaAtual=1,totalPaginas=1,itemAtualDrawer=null,mesAtual=new Date(),todosItens=[],kwAtual=[];
   let selectedUFs=[];
-  const ESTADOS=['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+  const REGIOES=[
+    {nome:'Norte',ufs:['AC','AM','AP','PA','RO','RR','TO']},
+    {nome:'Nordeste',ufs:['AL','BA','CE','MA','PB','PE','PI','RN','SE']},
+    {nome:'Centro-Oeste',ufs:['DF','GO','MS','MT']},
+    {nome:'Sudeste',ufs:['ES','MG','RJ','SP']},
+    {nome:'Sul',ufs:['PR','RS','SC']},
+  ];
   const HIST_KEY='arantesBusca_historico';
   const TEMA_KEY='arantesBusca_tema';
   const NEG_KEY='arantesBusca_negocios';
@@ -507,7 +554,7 @@
     {id:'contrato',nome:'Contrato',cls:'fase-contrato',emoji:'🟢'},
   ];
 
-  // ===== TEMA — padrão escuro =====
+  // ===== TEMA =====
   function alternarTema(){
     const html=document.documentElement,novo=html.getAttribute('data-tema')==='escuro'?'claro':'escuro';
     html.setAttribute('data-tema',novo);
@@ -515,55 +562,74 @@
     localStorage.setItem(TEMA_KEY,novo);
   }
   function carregarTema(){
-    const salvo=localStorage.getItem(TEMA_KEY);
-    const t=salvo||'escuro'; // padrão escuro
+    const t=localStorage.getItem(TEMA_KEY)||'escuro';
     document.documentElement.setAttribute('data-tema',t);
     document.getElementById('btnTema').textContent=t==='escuro'?'☀️':'🌙';
   }
 
-  // ===== MULTI-SELECT UF =====
-  function renderUFOpts(filtro=''){
-    const div=document.getElementById('ufOpts');
-    div.innerHTML=ESTADOS.filter(e=>!filtro||e.toLowerCase().includes(filtro.toLowerCase())).map(e=>`
-      <div class="uf-opt" onclick="toggleUF('${e}')">
-        <input type="checkbox" value="${e}" ${selectedUFs.includes(e)?'checked':''} onclick="event.stopPropagation();toggleUF('${e}')"/>
-        ${e}
+  // ===== MODAL UF =====
+  function renderModalUF(){
+    document.getElementById('ufRegioes').innerHTML=REGIOES.map(r=>`
+      <div class="uf-regiao">
+        <div class="uf-regiao-header">
+          ${r.nome}
+          <span class="uf-regiao-link" onclick="ufSelecionarRegiao('${r.nome.toLowerCase()}')">Selecionar todos</span>
+        </div>
+        <div class="uf-pills">
+          ${r.ufs.map(uf=>`<button class="uf-pill${selectedUFs.includes(uf)?' selecionado':''}" onclick="toggleUF('${uf}')" id="pill-${uf}">${uf}</button>`).join('')}
+        </div>
       </div>`).join('');
-  }
-  function filtrarUFOpts(){renderUFOpts(document.getElementById('ufSearch').value)}
-  function toggleUFDropdown(e){
-    e.stopPropagation();
-    document.getElementById('ufDropdown').classList.toggle('aberto');
-    document.getElementById('ufSearch').value='';
-    renderUFOpts();
   }
   function toggleUF(uf){
     if(selectedUFs.includes(uf))selectedUFs=selectedUFs.filter(u=>u!==uf);
     else selectedUFs.push(uf);
-    updateUFBtn();
-    renderUFOpts(document.getElementById('ufSearch').value);
+    const pill=document.getElementById('pill-'+uf);
+    if(pill)pill.classList.toggle('selecionado',selectedUFs.includes(uf));
+    updateUFPreview();
   }
-  function updateUFBtn(){
-    const txt=document.getElementById('ufBtnTxt');
-    const badge=document.querySelector('.uf-count-badge');
-    if(!selectedUFs.length){txt.textContent='Todos os estados';if(badge)badge.remove();}
-    else if(selectedUFs.length<=4){txt.textContent=selectedUFs.join(', ');}
-    else{txt.textContent=selectedUFs.slice(0,4).join(', ')+` (+${selectedUFs.length-4})`;}
+  function updateUFPreview(){
+    const preview=document.querySelector('.uf-selecionadas-preview');
+    if(preview)preview.textContent=selectedUFs.length?selectedUFs.join(', '):'Nenhum selecionado';
   }
-  function limparUFs(){selectedUFs=[];updateUFBtn();renderUFOpts()}
-  function selecionarSudeste(){selectedUFs=['RJ','SP','MG','ES'];updateUFBtn();renderUFOpts()}
-  function selecionarTodos(){selectedUFs=[...ESTADOS];updateUFBtn();renderUFOpts()}
-  document.addEventListener('click',e=>{
-    if(!e.target.closest('#ufMultiselect'))document.getElementById('ufDropdown').classList.remove('aberto');
-    if(!e.target.closest('.nav-btn')&&!e.target.closest('.notif-wrapper'))
-      document.querySelectorAll('.dropdown,.notif-panel').forEach(d=>d.classList.remove('aberto'));
-  });
+  function ufSelecionarRegiao(nome){
+    const regiao=REGIOES.find(r=>r.nome.toLowerCase()===nome.toLowerCase());
+    if(!regiao)return;
+    const todas=regiao.ufs.every(u=>selectedUFs.includes(u));
+    if(todas)selectedUFs=selectedUFs.filter(u=>!regiao.ufs.includes(u));
+    else{regiao.ufs.forEach(u=>{if(!selectedUFs.includes(u))selectedUFs.push(u)});}
+    renderModalUF();updateUFPreview();
+  }
+  function ufSelecionarTodos(){
+    selectedUFs=REGIOES.flatMap(r=>r.ufs);
+    renderModalUF();updateUFPreview();
+  }
+  function ufLimpar(){selectedUFs=[];renderModalUF();updateUFPreview()}
+  function abrirModalUF(){
+    renderModalUF();
+    document.getElementById('modalUFOverlay').classList.add('aberto');
+  }
+  function fecharModalUF(e){if(e.target===document.getElementById('modalUFOverlay'))fecharModalUFDireto()}
+  function fecharModalUFDireto(){document.getElementById('modalUFOverlay').classList.remove('aberto')}
+  function confirmarUFs(){
+    atualizarBotaoUF();
+    fecharModalUFDireto();
+  }
+  function atualizarBotaoUF(){
+    const txt=document.getElementById('ufTriggerTxt');
+    if(!selectedUFs.length)txt.textContent='📍 Todos os estados';
+    else if(selectedUFs.length<=5)txt.textContent='📍 '+selectedUFs.join(', ');
+    else txt.textContent=`📍 ${selectedUFs.slice(0,5).join(', ')} (+${selectedUFs.length-5})`;
+  }
 
   // ===== NAVEGAÇÃO =====
   function toggleDropdown(id){
     document.querySelectorAll('.dropdown').forEach(d=>{if(d.id!==id)d.classList.remove('aberto')});
     document.getElementById(id).classList.toggle('aberto');
   }
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.nav-btn')&&!e.target.closest('.notif-wrapper'))
+      document.querySelectorAll('.dropdown,.notif-panel').forEach(d=>d.classList.remove('aberto'));
+  });
   function irParaView(view){
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('ativo'));
     document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('ativo'));
@@ -591,12 +657,10 @@
   function adicionarNotificacao(titulo,desc){
     const notifs=getNotificacoes();
     notifs.unshift({id:Date.now().toString(),titulo,desc,data:new Date().toISOString(),lida:false});
-    salvarNotificacoes(notifs.slice(0,50));
-    renderNotificacoes();
+    salvarNotificacoes(notifs.slice(0,50));renderNotificacoes();
   }
   function renderNotificacoes(){
-    const notifs=getNotificacoes();
-    const naoLidas=notifs.filter(n=>!n.lida).length;
+    const notifs=getNotificacoes(),naoLidas=notifs.filter(n=>!n.lida).length;
     const badge=document.getElementById('sinoBadge');
     badge.textContent=naoLidas>99?'99+':naoLidas;
     badge.classList.toggle('visivel',naoLidas>0);
@@ -614,10 +678,7 @@
   function toggleNotificacoes(){
     const panel=document.getElementById('notifPanel');
     panel.classList.toggle('aberto');
-    if(panel.classList.contains('aberto')){
-      salvarNotificacoes(getNotificacoes().map(n=>({...n,lida:true})));
-      renderNotificacoes();
-    }
+    if(panel.classList.contains('aberto')){salvarNotificacoes(getNotificacoes().map(n=>({...n,lida:true})));renderNotificacoes()}
   }
 
   // ===== JORNAIS =====
@@ -653,18 +714,15 @@
     const nome=document.getElementById('jornalNome').value.trim();
     if(!nome){alert('Dê um nome ao jornal');return}
     if(!kwAtual.length){alert('Adicione ao menos uma palavra-chave');return}
-    const jornais=getJornais();
-    const id=document.getElementById('modalJornalId').value;
+    const jornais=getJornais(),id=document.getElementById('modalJornalId').value;
     const jornal={id:id||Date.now().toString(),nome,palavrasChave:[...kwAtual],uf:document.getElementById('jornalUF').value,modalidade:document.getElementById('jornalModalidade').value,criadoEm:id?jornais.find(j=>j.id===id)?.criadoEm:new Date().toISOString(),ultimaVerificacao:null,ultimoTotal:0};
-    if(id){const idx=jornais.findIndex(j=>j.id===id);if(idx>=0)jornais[idx]=jornal;else jornais.unshift(jornal)}
-    else jornais.unshift(jornal);
+    if(id){const idx=jornais.findIndex(j=>j.id===id);if(idx>=0)jornais[idx]=jornal;else jornais.unshift(jornal)}else jornais.unshift(jornal);
     salvarJornaisLS(jornais);fecharModalDireto();renderJornais();
   }
   function removerJornal(id){if(!confirm('Remover este jornal?'))return;salvarJornaisLS(getJornais().filter(j=>j.id!==id));renderJornais()}
   async function verificarJornal(id){
     const jornais=getJornais(),j=jornais.find(x=>x.id===id);if(!j)return;
-    const el=document.getElementById('jornal-resultado-'+id);
-    if(el)el.textContent='⏳ Verificando...';
+    const el=document.getElementById('jornal-resultado-'+id);if(el)el.textContent='⏳ Verificando...';
     let totalNovos=0;
     for(const kw of j.palavrasChave){
       try{
@@ -686,7 +744,7 @@
   function executarBuscaJornal(kws,uf,mod){
     irParaView('busca');
     document.getElementById('palavraChave').value=kws;
-    if(uf){selectedUFs=[uf];updateUFBtn();}
+    if(uf){selectedUFs=[uf];atualizarBotaoUF();}
     document.getElementById('modalidade').value=mod||'';
     buscar(1);
   }
@@ -760,10 +818,10 @@
   function renderAgenda(){
     const negs=getNegocios(),ano=mesAtual.getFullYear(),mes=mesAtual.getMonth();
     document.getElementById('agendaMes').textContent=mesAtual.toLocaleString('pt-BR',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
-    const p=new Date(ano,mes,1).getDay(),dias=new Date(ano,mes+1,0).getDate(),hoje=new Date();
+    const pd=new Date(ano,mes,1).getDay(),dias=new Date(ano,mes+1,0).getDate(),hoje=new Date();
     let g='';
     ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(d=>{g+=`<div class="cal-dia-semana">${d}</div>`});
-    for(let i=0;i<p;i++)g+=`<div class="cal-dia outro-mes"></div>`;
+    for(let i=0;i<pd;i++)g+=`<div class="cal-dia outro-mes"></div>`;
     for(let d=1;d<=dias;d++){
       const ehH=new Date(ano,mes,d).toDateString()===hoje.toDateString();
       const ev=negs.filter(n=>{const ab=n.abertura?new Date(n.abertura):null,en=n.encerramento?new Date(n.encerramento):null;return(ab&&ab.getDate()===d&&ab.getMonth()===mes&&ab.getFullYear()===ano)||(en&&en.getDate()===d&&en.getMonth()===mes&&en.getFullYear()===ano)});
@@ -778,9 +836,8 @@
   function salvarHistorico(kw,ufs,mod,st){
     if(!kw)return;
     const h=getHistorico().filter(x=>x.kw!==kw);
-    h.unshift({kw,ufs,mod,st});
-    localStorage.setItem(HIST_KEY,JSON.stringify(h.slice(0,15)));
-    renderHistorico();
+    h.unshift({kw,ufs:[...ufs],mod,st});
+    localStorage.setItem(HIST_KEY,JSON.stringify(h.slice(0,15)));renderHistorico();
   }
   function renderHistorico(){
     const h=getHistorico(),box=document.getElementById('historicoBox');
@@ -794,7 +851,7 @@
   function aplicarHistorico(i){
     const h=getHistorico()[i];if(!h)return;
     document.getElementById('palavraChave').value=h.kw;
-    selectedUFs=h.ufs||[];updateUFBtn();
+    selectedUFs=h.ufs||[];atualizarBotaoUF();
     document.getElementById('modalidade').value=h.mod||'';
     document.getElementById('status').value=h.st||'recebendo_proposta';
     buscar(1);
@@ -846,8 +903,7 @@
   }
   function abrirDrawer(item){
     itemAtualDrawer=item;
-    const{direto}=buildLinks(item);
-    const badge=statusBadge(item);
+    const{direto}=buildLinks(item);const badge=statusBadge(item);
     document.getElementById('d-titulo').textContent=item.title||'Sem título';
     document.getElementById('d-numero').textContent=item.numero_controle_pncp||'';
     document.getElementById('d-objeto').textContent=item.description||'—';
@@ -877,39 +933,32 @@
   }
   function fecharDrawer(){document.getElementById('drawer').classList.remove('ativo');document.getElementById('overlay').classList.remove('ativo');document.body.style.overflow='';itemAtualDrawer=null}
   async function carregarItens(cnpj,ano,seq){
-    try{
-      const r=await fetch(`/api/itens?cnpj=${cnpj}&ano=${ano}&sequencial=${seq}`);
-      const data=await r.json();
-      todosItens=data.data||[];renderItens(todosItens);
-    }catch(e){document.getElementById('d-itens').innerHTML='<div class="item-loading">Erro ao carregar itens.</div>'}
+    try{const r=await fetch(`/api/itens?cnpj=${cnpj}&ano=${ano}&sequencial=${seq}`);const data=await r.json();todosItens=data.data||[];renderItens(todosItens)}
+    catch(e){document.getElementById('d-itens').innerHTML='<div class="item-loading">Erro ao carregar itens.</div>'}
   }
 
-  // ===== BUSCA COM RETRY =====
+  // ===== BUSCA =====
   async function fetchComRetry(url,tentativas=3){
     for(let i=0;i<tentativas;i++){
-      try{
-        const r=await fetch(url);
-        if(r.ok)return r;
-        if(i===tentativas-1)return r;
-        await new Promise(r=>setTimeout(r,800));
-      }catch(e){
-        if(i===tentativas-1)throw e;
-        await new Promise(r=>setTimeout(r,800));
-      }
+      try{const r=await fetch(url);if(r.ok)return r;if(i===tentativas-1)return r;await new Promise(r=>setTimeout(r,800))}
+      catch(e){if(i===tentativas-1)throw e;await new Promise(r=>setTimeout(r,800))}
     }
   }
-
   async function buscar(pagina){
     paginaAtual=pagina;
     const kw=document.getElementById('palavraChave').value.trim();
     const mod=document.getElementById('modalidade').value;
     const st=document.getElementById('status').value;
+    const dataInicial=document.getElementById('dataInicial').value;
+    const dataFinal=document.getElementById('dataFinal').value;
     const ufParam=selectedUFs.join(',');
     const params=new URLSearchParams({pagina});
     if(kw)params.append('palavraChave',kw);
     if(ufParam)params.append('uf',ufParam);
     if(mod)params.append('modalidade',mod);
     if(st)params.append('status',st);
+    if(dataInicial)params.append('dataInicial',dataInicial);
+    if(dataFinal)params.append('dataFinal',dataFinal);
     const btn=document.getElementById('btnBuscar');
     btn.disabled=true;btn.textContent='Buscando...';
     document.getElementById('resultado').innerHTML='<div class="loading">⏳ Buscando licitações...</div>';
@@ -921,8 +970,11 @@
       salvarHistorico(kw,selectedUFs,mod,st);
       const itens=data.data||[],total=data.totalRegistros||0;
       totalPaginas=data.totalPaginas||1;
-      document.getElementById('resumo').innerHTML=`<strong>${total.toLocaleString('pt-BR')}</strong> licitações encontradas · Página ${paginaAtual} de ${totalPaginas}`;
-      if(!itens.length){document.getElementById('resultado').innerHTML='<div class="vazio">Nenhuma licitação encontrada.</div>';return}
+      let resumoTxt=`<strong>${total.toLocaleString('pt-BR')}</strong> licitações encontradas`;
+      if(dataInicial||dataFinal)resumoTxt+=` · ${dataInicial?'De '+new Date(dataInicial+'T12:00:00').toLocaleDateString('pt-BR'):''}${dataFinal?' até '+new Date(dataFinal+'T12:00:00').toLocaleDateString('pt-BR'):''}`;
+      resumoTxt+=` · Página ${paginaAtual} de ${totalPaginas}`;
+      document.getElementById('resumo').innerHTML=resumoTxt;
+      if(!itens.length){document.getElementById('resultado').innerHTML='<div class="vazio">Nenhuma licitação encontrada para esses filtros.</div>';return}
       document.getElementById('resultado').innerHTML=`<div class="cards">${itens.map(item=>{
         const badge=statusBadge(item);
         return`<div class="card" onclick='abrirDrawer(${JSON.stringify(item)})'>
@@ -942,16 +994,20 @@
   }
   function mudarPagina(d){const n=paginaAtual+d;if(n>=1&&n<=totalPaginas)buscar(n)}
   function limpar(){
-    document.getElementById('palavraChave').value='';selectedUFs=[];updateUFBtn();
-    document.getElementById('modalidade').value='';document.getElementById('status').value='recebendo_proposta';
-    document.getElementById('resultado').innerHTML='';document.getElementById('resumo').innerHTML='';
+    document.getElementById('palavraChave').value='';
+    selectedUFs=[];atualizarBotaoUF();
+    document.getElementById('modalidade').value='';
+    document.getElementById('status').value='recebendo_proposta';
+    document.getElementById('dataInicial').value='';
+    document.getElementById('dataFinal').value='';
+    document.getElementById('resultado').innerHTML='';
+    document.getElementById('resumo').innerHTML='';
     document.getElementById('paginacao').style.display='none';
   }
   document.getElementById('palavraChave').addEventListener('keydown',e=>{if(e.key==='Enter')buscar(1)});
 
   // ===== INIT =====
   carregarTema();
-  renderUFOpts();
   renderHistorico();
   renderNotificacoes();
   setTimeout(()=>verificarTodosJornais(),2000);
