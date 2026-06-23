@@ -43,8 +43,8 @@ export default async function handler(req, res) {
       tam_pagina: TAM,
     });
     if (kw) p.append('q', kw);
-    ufs.forEach(u   => p.append('ufs',      u));   // PNCP aceita múltiplos
-    mods.forEach(m  => p.append('modalidade', m));  // tenta server-side
+    if (ufs.length)  p.append('ufs', ufs.join('|'));    // PNCP espera um único param com '|' (ex: ufs=ES|MG|PR)
+    if (mods.length) p.append('modalidade', mods.join('|'));
       return `https://pncp.gov.br/api/search/?${p}`;
   };
 
