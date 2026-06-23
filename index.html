@@ -30,24 +30,51 @@
     }
     *{box-sizing:border-box;margin:0;padding:0;transition:background-color .2s,color .2s,border-color .2s}
     body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text)}
-    header{background:var(--primary);color:var(--accent);padding:0 32px;display:flex;justify-content:space-between;align-items:center;height:58px}
+
+    /* HEADER */
+    header{background:var(--primary);color:var(--accent);padding:0 32px;display:flex;justify-content:space-between;align-items:center;height:58px;position:sticky;top:0;z-index:300}
     .header-left{display:flex;align-items:center;gap:24px}
-    .header-logo{font-size:1.2rem;font-weight:700;letter-spacing:1px;white-space:nowrap}
+    .header-logo{font-size:1.2rem;font-weight:700;letter-spacing:1px;white-space:nowrap;color:var(--accent)}
     .header-logo span{font-size:.75rem;color:#aaa;display:block;font-weight:400;letter-spacing:0}
     .nav{display:flex;gap:4px}
-    .nav-btn{background:transparent;border:none;color:rgba(255,255,255,.7);padding:8px 14px;border-radius:8px;font-size:.9rem;cursor:pointer;display:flex;align-items:center;gap:6px;position:relative}
+    .nav-btn{background:transparent;border:none;color:rgba(255,255,255,.7);padding:8px 14px;border-radius:8px;font-size:.9rem;cursor:pointer;display:flex;align-items:center;gap:6px;position:relative;white-space:nowrap}
     .nav-btn:hover,.nav-btn.ativo{background:rgba(255,255,255,.15);color:#fff}
     .nav-btn.ativo{color:var(--accent)}
-    .dropdown{position:absolute;top:calc(100% + 4px);left:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);min-width:180px;z-index:200;display:none}
+    .dropdown{position:absolute;top:calc(100% + 6px);left:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);min-width:200px;z-index:400;display:none;padding:4px}
     .dropdown.aberto{display:block}
-    .dropdown-item{display:block;padding:10px 16px;font-size:.9rem;color:var(--text);cursor:pointer;border-radius:6px;margin:4px}
+    .dropdown-item{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:.88rem;color:var(--text);cursor:pointer;border-radius:7px}
     .dropdown-item:hover{background:var(--chip-bg);color:var(--primary)}
-    .header-right{display:flex;align-items:center;gap:8px}
+    [data-tema="escuro"] .dropdown-item:hover{color:var(--accent)}
+    .dropdown-sep{height:1px;background:var(--border);margin:4px 0}
+    .header-right{display:flex;align-items:center;gap:10px}
     .btn-tema{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:pointer}
     .btn-tema:hover{background:rgba(255,255,255,.25)}
+
+    /* SININHO */
+    .btn-sino{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1rem;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center}
+    .btn-sino:hover{background:rgba(255,255,255,.25)}
+    .sino-badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:.6rem;font-weight:700;border-radius:20px;padding:1px 5px;min-width:16px;text-align:center;display:none}
+    .sino-badge.visivel{display:block}
+    .notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:360px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:400;display:none;max-height:500px;overflow-y:auto}
+    .notif-panel.aberto{display:block}
+    .notif-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+    .notif-header span{font-weight:600;font-size:.9rem}
+    .notif-header button{background:none;border:none;color:#ef4444;font-size:.78rem;cursor:pointer}
+    .notif-item{padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer}
+    .notif-item:hover{background:var(--surface2)}
+    .notif-item:last-child{border-bottom:none}
+    .notif-titulo{font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:3px}
+    .notif-desc{font-size:.78rem;color:var(--text2)}
+    .notif-data{font-size:.72rem;color:var(--text3);margin-top:3px}
+    .notif-vazia{padding:24px;text-align:center;color:var(--text3);font-size:.88rem}
+    .notif-wrapper{position:relative}
+
+    /* CONTAINER / VIEWS */
     .container{max-width:1100px;margin:0 auto;padding:24px 16px}
     .view{display:none}
     .view.ativo{display:block}
+
+    /* FILTROS */
     .filtros{background:var(--surface);border-radius:10px;padding:20px;box-shadow:var(--card-shadow);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:8px;border:1px solid var(--border)}
     .filtros .campo-busca{grid-column:1/-1;display:flex;gap:10px}
     .filtros input,.filtros select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.95rem;background:var(--surface2);color:var(--text)}
@@ -56,6 +83,8 @@
     .btn-buscar:hover{background:var(--primary-hover)}
     .btn-buscar:disabled{background:var(--text3);cursor:wait}
     .btn-limpar{background:transparent;color:var(--text3);border:1px solid var(--border);padding:10px 16px;border-radius:8px;font-size:.9rem;cursor:pointer}
+
+    /* HISTÓRICO */
     .historico-box{background:var(--surface);border-radius:10px;padding:12px 16px;box-shadow:var(--card-shadow);margin-bottom:16px;display:none;border:1px solid var(--border)}
     .historico-label{font-size:.78rem;color:var(--text4);margin-bottom:8px;display:flex;justify-content:space-between}
     .historico-label button{background:none;border:none;color:#ef4444;font-size:.78rem;cursor:pointer}
@@ -86,6 +115,52 @@
     .loading{text-align:center;padding:40px;color:var(--text3)}
     .erro{background:var(--erro-bg);border:1px solid var(--erro-border);color:var(--erro-txt);padding:16px;border-radius:8px;text-align:center}
     .vazio{text-align:center;padding:40px;color:var(--text3)}
+
+    /* MEUS JORNAIS */
+    .jornais-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+    .jornais-header h2{font-size:1.1rem;font-weight:700}
+    .btn-novo-jornal{background:var(--primary);color:var(--accent);border:none;padding:10px 18px;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer}
+    .btn-novo-jornal:hover{background:var(--primary-hover)}
+    .jornais-lista{display:flex;flex-direction:column;gap:12px}
+    .jornal-card{background:var(--surface);border-radius:10px;padding:18px 20px;box-shadow:var(--card-shadow);border:1px solid var(--border);border-left:5px solid var(--accent)}
+    .jornal-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+    .jornal-nome{font-weight:700;font-size:1rem;color:var(--text)}
+    .jornal-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+    .jornal-chip{background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:20px;padding:3px 10px;font-size:.78rem;font-weight:600}
+    [data-tema="escuro"] .jornal-chip{color:var(--accent)}
+    .jornal-meta{font-size:.78rem;color:var(--text3);margin-bottom:10px}
+    .jornal-actions{display:flex;gap:8px}
+    .jornal-btn{font-size:.8rem;padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer}
+    .jornal-btn:hover{background:var(--chip-bg);color:var(--primary)}
+    .jornal-btn-danger{color:#ef4444;border-color:#fca5a5}
+    .jornal-btn-danger:hover{background:#fff3f3;color:#dc2626}
+    .jornal-btn-primary{background:var(--primary);color:var(--accent);border-color:var(--primary)}
+    .jornal-btn-primary:hover{background:var(--primary-hover)}
+    .jornal-resultado{font-size:.82rem;font-weight:600;color:var(--badge-verde-txt);background:var(--badge-verde-bg);border-radius:20px;padding:3px 10px}
+
+    /* MODAL JORNAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center}
+    .modal-overlay.aberto{display:flex}
+    .modal{background:var(--surface);border-radius:14px;padding:28px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+    .modal h3{font-size:1.1rem;font-weight:700;margin-bottom:20px}
+    .modal-campo{margin-bottom:16px}
+    .modal-campo label{display:block;font-size:.82rem;color:var(--text2);margin-bottom:6px;font-weight:600}
+    .modal-campo input,.modal-campo select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.9rem;background:var(--surface2);color:var(--text)}
+    .modal-campo input:focus,.modal-campo select:focus{outline:none;border-color:var(--primary)}
+    .kw-lista{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:32px}
+    .kw-chip{background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:20px;padding:4px 10px;font-size:.82rem;display:flex;align-items:center;gap:6px}
+    [data-tema="escuro"] .kw-chip{color:var(--accent)}
+    .kw-chip span{cursor:pointer;color:var(--text3)}
+    .kw-chip span:hover{color:#ef4444}
+    .modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+    .modal-btn{padding:10px 20px;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text)}
+    .modal-btn-primary{background:var(--primary);color:var(--accent);border-color:var(--primary)}
+    .modal-btn-primary:hover{background:var(--primary-hover)}
+    .kw-input-row{display:flex;gap:8px}
+    .kw-input-row input{flex:1}
+    .btn-add-kw{background:var(--primary);color:var(--accent);border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:.85rem;white-space:nowrap}
+
+    /* DRAWER */
     .overlay{position:fixed;inset:0;background:var(--overlay);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s}
     .overlay.ativo{opacity:1;pointer-events:all}
     .drawer{position:fixed;top:0;right:-660px;width:640px;max-width:95vw;height:100vh;background:var(--drawer-bg);z-index:101;box-shadow:-4px 0 24px rgba(0,0,0,.3);transition:right .3s ease;overflow-y:auto;display:flex;flex-direction:column;border-left:1px solid var(--border)}
@@ -133,7 +208,9 @@
     .item-detalhe-campo span{font-size:.85rem;font-weight:600;color:var(--text)}
     .item-desc-full{font-size:.82rem;color:var(--text2);line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
     .item-loading{text-align:center;padding:20px;color:var(--text3);font-size:.9rem}
-    .negocios-tabs{display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0}
+
+    /* NEGÓCIOS */
+    .negocios-tabs{display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--border)}
     .neg-tab{background:transparent;border:none;color:var(--text2);padding:10px 16px;font-size:.9rem;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}
     .neg-tab:hover{color:var(--text)}
     .neg-tab.ativo{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
@@ -174,27 +251,83 @@
     .agenda-mes{font-size:1.1rem;font-weight:700;color:var(--text)}
     .agenda-nav{display:flex;gap:6px}
     .agenda-nav button{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:.85rem}
-    .agenda-nav button:hover{background:var(--chip-bg)}
     .calendario{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
     .cal-dia-semana{text-align:center;font-size:.72rem;font-weight:600;color:var(--text3);padding:4px 0}
     .cal-dia{min-height:70px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-size:.75rem}
     .cal-dia.hoje{border-color:var(--primary);background:var(--chip-bg)}
     .cal-dia.outro-mes{opacity:.4}
     .cal-dia-num{font-weight:600;color:var(--text2);margin-bottom:2px}
-    .cal-evento{background:var(--primary);color:var(--accent);border-radius:3px;padding:1px 4px;font-size:.65rem;margin-bottom:1px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cal-evento{background:var(--primary);color:var(--accent);border-radius:3px;padding:1px 4px;font-size:.65rem;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .cal-evento.encerramento{background:#7f1d1d;color:#fca5a5}
     [data-tema="escuro"] .cal-evento{background:#245239}
-    @media(max-width:800px){.filtros{grid-template-columns:1fr}.filtros .campo-busca{flex-direction:column}.drawer{width:100%;right:-100%}.drawer-grid{grid-template-columns:1fr}.item-detalhe-grid{grid-template-columns:1fr 1fr}.kanban{grid-template-columns:repeat(3,1fr)}.header-logo span{display:none}}
+
+    @media(max-width:800px){.filtros{grid-template-columns:1fr}.filtros .campo-busca{flex-direction:column}.drawer{width:100%;right:-100%}.drawer-grid{grid-template-columns:1fr}.item-detalhe-grid{grid-template-columns:1fr 1fr}.kanban{grid-template-columns:repeat(3,1fr)}.header-logo span{display:none}.nav-btn{padding:6px 10px;font-size:.82rem}}
   </style>
 </head>
 <body>
+
+<!-- MODAL JORNAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="fecharModal(event)">
+  <div class="modal">
+    <h3 id="modalTitulo">Novo Jornal</h3>
+    <input type="hidden" id="modalJornalId"/>
+    <div class="modal-campo">
+      <label>Nome do jornal</label>
+      <input type="text" id="jornalNome" placeholder="ex: Papel Kraft, Embalagem"/>
+    </div>
+    <div class="modal-campo">
+      <label>Palavras-chave (pressione Enter ou clique em +)</label>
+      <div class="kw-input-row">
+        <input type="text" id="kwInput" placeholder="ex: papel kraft" onkeydown="kwKeydown(event)"/>
+        <button class="btn-add-kw" onclick="adicionarKw()">+ Adicionar</button>
+      </div>
+      <div class="kw-lista" id="kwLista"></div>
+    </div>
+    <div class="modal-campo">
+      <label>Estado (opcional)</label>
+      <select id="jornalUF">
+        <option value="">Todos os estados</option>
+        <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+        <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+        <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+        <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+        <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+        <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+        <option>SP</option><option>SE</option><option>TO</option>
+      </select>
+    </div>
+    <div class="modal-campo">
+      <label>Modalidade (opcional)</label>
+      <select id="jornalModalidade">
+        <option value="">Todas</option>
+        <option value="6">Pregão Eletrônico</option>
+        <option value="8">Dispensa de Licitação</option>
+        <option value="4">Concorrência Eletrônica</option>
+        <option value="9">Inexigibilidade</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="fecharModalDireto()">Cancelar</button>
+      <button class="modal-btn modal-btn-primary" onclick="salvarJornal()">💾 Salvar jornal</button>
+    </div>
+  </div>
+</div>
+
 <header>
   <div class="header-left">
-    <div class="header-logo">🔍 Busca Licitações<span>Arantes Papéis · PNCP</span></div>
+    <div class="header-logo">📋 Arantes Licitações<span>Arantes Papéis · PNCP</span></div>
     <nav class="nav">
-      <button class="nav-btn ativo" id="navBusca" onclick="irParaView('busca')">🔍 Busca</button>
-      <button class="nav-btn" id="navNegocios" onclick="toggleDropdown()">💼 Negócios ▾
-        <div class="dropdown" id="dropdownNegocios">
+      <button class="nav-btn ativo" id="navOportunidades" onclick="toggleDropdown('dropOportunidades')">
+        🔍 Oportunidades ▾
+        <div class="dropdown" id="dropOportunidades">
+          <div class="dropdown-item" onclick="irParaView('busca')">🔍 Buscar Licitações</div>
+          <div class="dropdown-sep"></div>
+          <div class="dropdown-item" onclick="irParaView('jornais')">📰 Meus Jornais</div>
+        </div>
+      </button>
+      <button class="nav-btn" id="navNegocios" onclick="toggleDropdown('dropNegocios')">
+        💼 Negócios ▾
+        <div class="dropdown" id="dropNegocios">
           <div class="dropdown-item" onclick="irParaNegocios('funil')">📊 Funil de Licitações</div>
           <div class="dropdown-item" onclick="irParaNegocios('quadros')">🗂️ Quadros</div>
           <div class="dropdown-item" onclick="irParaNegocios('agenda')">📅 Agenda</div>
@@ -203,10 +336,24 @@
     </nav>
   </div>
   <div class="header-right">
+    <div class="notif-wrapper">
+      <button class="btn-sino" onclick="toggleNotificacoes()" title="Notificações">
+        🔔
+        <span class="sino-badge" id="sinoBadge">0</span>
+      </button>
+      <div class="notif-panel" id="notifPanel">
+        <div class="notif-header">
+          <span>🔔 Notificações</span>
+          <button onclick="limparNotificacoes()">Limpar todas</button>
+        </div>
+        <div id="notifLista"><div class="notif-vazia">Nenhuma notificação</div></div>
+      </div>
+    </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">🌙</button>
   </div>
 </header>
 
+<!-- VIEW BUSCAR LICITAÇÕES -->
 <div class="view ativo" id="viewBusca">
   <div class="container">
     <div class="filtros">
@@ -255,6 +402,21 @@
   </div>
 </div>
 
+<!-- VIEW MEUS JORNAIS -->
+<div class="view" id="viewJornais">
+  <div class="container">
+    <div class="jornais-header">
+      <div>
+        <h2>📰 Meus Jornais</h2>
+        <p style="font-size:.85rem;color:var(--text3);margin-top:4px">Palavras-chave monitoradas automaticamente. Verificado toda vez que você abre o site.</p>
+      </div>
+      <button class="btn-novo-jornal" onclick="abrirModalNovo()">+ Novo jornal</button>
+    </div>
+    <div class="jornais-lista" id="jornaisLista"></div>
+  </div>
+</div>
+
+<!-- VIEW NEGÓCIOS -->
 <div class="view" id="viewNegocios">
   <div class="container">
     <div class="negocios-tabs">
@@ -278,6 +440,7 @@
   </div>
 </div>
 
+<!-- DRAWER -->
 <div class="overlay" id="overlay" onclick="fecharDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-header">
@@ -287,10 +450,7 @@
   </div>
   <div class="drawer-body">
     <div class="drawer-tags" id="d-tags"></div>
-    <div class="drawer-section">
-      <h3>Objeto</h3>
-      <div class="drawer-desc" id="d-objeto"></div>
-    </div>
+    <div class="drawer-section"><h3>Objeto</h3><div class="drawer-desc" id="d-objeto"></div></div>
     <div class="drawer-section">
       <div class="drawer-grid">
         <div class="drawer-campo"><label>Órgão</label><span id="d-orgao"></span></div>
@@ -315,13 +475,14 @@
 </div>
 
 <script>
-  let paginaAtual=1,totalPaginas=1;
-  let itemAtualDrawer=null;
-  let mesAtual=new Date();
-  let todosItens=[];
-  const HIST_KEY='buscaLicitacoes_historico';
-  const TEMA_KEY='buscaLicitacoes_tema';
-  const NEG_KEY='buscaLicitacoes_negocios';
+  // ===== STATE =====
+  let paginaAtual=1,totalPaginas=1,itemAtualDrawer=null,mesAtual=new Date(),todosItens=[];
+  let kwAtual=[];
+  const HIST_KEY='arantesBusca_historico';
+  const TEMA_KEY='arantesBusca_tema';
+  const NEG_KEY='arantesBusca_negocios';
+  const JORNAIS_KEY='arantesBusca_jornais';
+  const NOTIF_KEY='arantesBusca_notificacoes';
   const FASES=[
     {id:'oportunidade',nome:'Oportunidade',cls:'fase-oportunidade',emoji:'🟡'},
     {id:'qualificacao',nome:'Qualificação',cls:'fase-qualificacao',emoji:'🔵'},
@@ -330,6 +491,7 @@
     {id:'contrato',nome:'Contrato',cls:'fase-contrato',emoji:'🟢'},
   ];
 
+  // ===== TEMA =====
   function alternarTema(){
     const html=document.documentElement,novo=html.getAttribute('data-tema')==='escuro'?'claro':'escuro';
     html.setAttribute('data-tema',novo);
@@ -342,16 +504,30 @@
     document.getElementById('btnTema').textContent=t==='escuro'?'☀️':'🌙';
   }
 
+  // ===== NAVEGAÇÃO =====
+  function toggleDropdown(id){
+    document.querySelectorAll('.dropdown').forEach(d=>{if(d.id!==id)d.classList.remove('aberto')});
+    document.getElementById(id).classList.toggle('aberto');
+  }
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.nav-btn')&&!e.target.closest('.notif-wrapper'))
+      document.querySelectorAll('.dropdown,.notif-panel').forEach(d=>d.classList.remove('aberto'));
+  });
+
   function irParaView(view){
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('ativo'));
-    document.getElementById('view'+view.charAt(0).toUpperCase()+view.slice(1)).classList.add('ativo');
     document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('ativo'));
-    document.getElementById('nav'+view.charAt(0).toUpperCase()+view.slice(1)).classList.add('ativo');
-    document.getElementById('dropdownNegocios').classList.remove('aberto');
+    document.querySelectorAll('.dropdown').forEach(d=>d.classList.remove('aberto'));
+    const viewEl=document.getElementById('view'+view.charAt(0).toUpperCase()+view.slice(1));
+    if(viewEl)viewEl.classList.add('ativo');
+    if(view==='busca'||view==='jornais')document.getElementById('navOportunidades').classList.add('ativo');
+    if(view==='negocios')document.getElementById('navNegocios').classList.add('ativo');
+    if(view==='jornais')renderJornais();
   }
-  function irParaNegocios(aba){irParaView('negocios');mudarAbaNegocios(aba)}
-  function toggleDropdown(){document.getElementById('dropdownNegocios').classList.toggle('aberto')}
-  document.addEventListener('click',e=>{if(!e.target.closest('.nav-btn'))document.getElementById('dropdownNegocios').classList.remove('aberto')});
+  function irParaNegocios(aba){
+    irParaView('negocios');
+    mudarAbaNegocios(aba);
+  }
   function mudarAbaNegocios(aba){
     document.querySelectorAll('.neg-tab').forEach(t=>t.classList.remove('ativo'));
     document.querySelectorAll('.neg-view').forEach(v=>v.classList.remove('ativo'));
@@ -362,50 +538,230 @@
     if(aba==='agenda')renderAgenda();
   }
 
+  // ===== NOTIFICAÇÕES =====
+  function getNotificacoes(){try{return JSON.parse(localStorage.getItem(NOTIF_KEY)||'[]')}catch{return[]}}
+  function salvarNotificacoes(n){localStorage.setItem(NOTIF_KEY,JSON.stringify(n))}
+  function adicionarNotificacao(titulo,desc,jornal){
+    const notifs=getNotificacoes();
+    notifs.unshift({id:Date.now().toString(),titulo,desc,jornal,data:new Date().toISOString(),lida:false});
+    salvarNotificacoes(notifs.slice(0,50));
+    renderNotificacoes();
+  }
+  function renderNotificacoes(){
+    const notifs=getNotificacoes();
+    const naoLidas=notifs.filter(n=>!n.lida).length;
+    const badge=document.getElementById('sinoBadge');
+    badge.textContent=naoLidas>99?'99+':naoLidas;
+    badge.classList.toggle('visivel',naoLidas>0);
+    const lista=document.getElementById('notifLista');
+    if(!notifs.length){lista.innerHTML='<div class="notif-vazia">Nenhuma notificação</div>';return}
+    lista.innerHTML=notifs.slice(0,20).map(n=>`
+      <div class="notif-item" onclick="marcarLida('${n.id}')">
+        <div class="notif-titulo">${n.lida?'':'🔵 '}${n.titulo}</div>
+        <div class="notif-desc">${n.desc}</div>
+        <div class="notif-data">${new Date(n.data).toLocaleString('pt-BR')}</div>
+      </div>`).join('');
+  }
+  function marcarLida(id){
+    const notifs=getNotificacoes();
+    const n=notifs.find(x=>x.id===id);
+    if(n)n.lida=true;
+    salvarNotificacoes(notifs);
+    renderNotificacoes();
+  }
+  function limparNotificacoes(){
+    salvarNotificacoes([]);
+    renderNotificacoes();
+    document.getElementById('notifPanel').classList.remove('aberto');
+  }
+  function toggleNotificacoes(){
+    const panel=document.getElementById('notifPanel');
+    panel.classList.toggle('aberto');
+    if(panel.classList.contains('aberto')){
+      const notifs=getNotificacoes().map(n=>({...n,lida:true}));
+      salvarNotificacoes(notifs);
+      renderNotificacoes();
+    }
+  }
+
+  // ===== JORNAIS =====
+  function getJornais(){try{return JSON.parse(localStorage.getItem(JORNAIS_KEY)||'[]')}catch{return[]}}
+  function salvarJornaisLS(j){localStorage.setItem(JORNAIS_KEY,JSON.stringify(j))}
+
+  function abrirModalNovo(){
+    document.getElementById('modalTitulo').textContent='Novo Jornal';
+    document.getElementById('modalJornalId').value='';
+    document.getElementById('jornalNome').value='';
+    document.getElementById('jornalUF').value='';
+    document.getElementById('jornalModalidade').value='';
+    kwAtual=[];
+    renderKwLista();
+    document.getElementById('modalOverlay').classList.add('aberto');
+    document.getElementById('kwInput').focus();
+  }
+  function editarJornal(id){
+    const j=getJornais().find(x=>x.id===id);
+    if(!j)return;
+    document.getElementById('modalTitulo').textContent='Editar Jornal';
+    document.getElementById('modalJornalId').value=id;
+    document.getElementById('jornalNome').value=j.nome;
+    document.getElementById('jornalUF').value=j.uf||'';
+    document.getElementById('jornalModalidade').value=j.modalidade||'';
+    kwAtual=[...j.palavrasChave];
+    renderKwLista();
+    document.getElementById('modalOverlay').classList.add('aberto');
+  }
+  function fecharModal(e){if(e.target===document.getElementById('modalOverlay'))fecharModalDireto()}
+  function fecharModalDireto(){document.getElementById('modalOverlay').classList.remove('aberto')}
+
+  function kwKeydown(e){if(e.key==='Enter'){e.preventDefault();adicionarKw()}}
+  function adicionarKw(){
+    const input=document.getElementById('kwInput');
+    const val=input.value.trim();
+    if(val&&!kwAtual.includes(val)){kwAtual.push(val);renderKwLista()}
+    input.value='';input.focus();
+  }
+  function removerKw(i){kwAtual.splice(i,1);renderKwLista()}
+  function renderKwLista(){
+    document.getElementById('kwLista').innerHTML=kwAtual.map((k,i)=>
+      `<span class="kw-chip">${k}<span onclick="removerKw(${i})">✕</span></span>`).join('');
+  }
+
+  function salvarJornal(){
+    const nome=document.getElementById('jornalNome').value.trim();
+    if(!nome){alert('Dê um nome ao jornal');return}
+    if(!kwAtual.length){alert('Adicione ao menos uma palavra-chave');return}
+    const jornais=getJornais();
+    const id=document.getElementById('modalJornalId').value;
+    const jornal={
+      id:id||Date.now().toString(),
+      nome,
+      palavrasChave:[...kwAtual],
+      uf:document.getElementById('jornalUF').value,
+      modalidade:document.getElementById('jornalModalidade').value,
+      criadoEm:id?jornais.find(j=>j.id===id)?.criadoEm:new Date().toISOString(),
+      ultimaVerificacao:null,
+      ultimoTotal:0,
+    };
+    if(id){const idx=jornais.findIndex(j=>j.id===id);if(idx>=0)jornais[idx]=jornal;else jornais.unshift(jornal);}
+    else jornais.unshift(jornal);
+    salvarJornaisLS(jornais);
+    fecharModalDireto();
+    renderJornais();
+  }
+
+  function removerJornal(id){
+    if(!confirm('Remover este jornal?'))return;
+    salvarJornaisLS(getJornais().filter(j=>j.id!==id));
+    renderJornais();
+  }
+
+  async function verificarJornal(id){
+    const jornais=getJornais();
+    const j=jornais.find(x=>x.id===id);
+    if(!j)return;
+    const el=document.getElementById('jornal-resultado-'+id);
+    if(el)el.textContent='⏳ Verificando...';
+    let totalNovos=0;
+    for(const kw of j.palavrasChave){
+      try{
+        const params=new URLSearchParams({palavraChave:kw,pagina:1,status:'recebendo_proposta'});
+        if(j.uf)params.append('uf',j.uf);
+        if(j.modalidade)params.append('modalidade',j.modalidade);
+        const r=await fetch(`/api/buscar?${params}`);
+        const data=await r.json();
+        totalNovos+=data.totalRegistros||0;
+      }catch(e){}
+    }
+    const anteriorTotal=j.ultimoTotal||0;
+    j.ultimaVerificacao=new Date().toISOString();
+    j.ultimoTotal=totalNovos;
+    salvarJornaisLS(jornais);
+    if(totalNovos>anteriorTotal&&anteriorTotal>0){
+      const diff=totalNovos-anteriorTotal;
+      adicionarNotificacao(
+        `📰 ${j.nome}`,
+        `${diff} nova(s) licitação(ões) encontrada(s) para "${j.palavrasChave.join(', ')}"`,
+        j.nome
+      );
+    }
+    renderJornais();
+  }
+
+  async function verificarTodosJornais(){
+    const jornais=getJornais();
+    if(!jornais.length)return;
+    for(const j of jornais)await verificarJornal(j.id);
+  }
+
+  function executarBuscaJornal(j){
+    irParaView('busca');
+    document.getElementById('palavraChave').value=j.palavrasChave[0]||'';
+    document.getElementById('uf').value=j.uf||'';
+    document.getElementById('modalidade').value=j.modalidade||'';
+    buscar(1);
+  }
+
+  function renderJornais(){
+    const jornais=getJornais();
+    const lista=document.getElementById('jornaisLista');
+    if(!jornais.length){
+      lista.innerHTML=`<div class="vazio">Nenhum jornal criado ainda.<br><br>
+        <button class="btn-novo-jornal" onclick="abrirModalNovo()">+ Criar primeiro jornal</button></div>`;
+      return;
+    }
+    lista.innerHTML=jornais.map(j=>`
+      <div class="jornal-card">
+        <div class="jornal-card-header">
+          <div class="jornal-nome">📰 ${j.nome}</div>
+          ${j.ultimoTotal?`<span class="jornal-resultado" id="jornal-resultado-${j.id}">${j.ultimoTotal.toLocaleString('pt-BR')} licitações</span>`:`<span id="jornal-resultado-${j.id}" style="font-size:.78rem;color:var(--text3)">Não verificado</span>`}
+        </div>
+        <div class="jornal-chips">
+          ${j.palavrasChave.map(k=>`<span class="jornal-chip">🔍 ${k}</span>`).join('')}
+          ${j.uf?`<span class="jornal-chip">📍 ${j.uf}</span>`:''}
+          ${j.modalidade?`<span class="jornal-chip">📋 ${['','','','','Concorrência','Concorrência Presencial','Pregão Eletrônico','Pregão Presencial','Dispensa','Inexigibilidade'][j.modalidade]||j.modalidade}</span>`:''}
+        </div>
+        <div class="jornal-meta">
+          ${j.ultimaVerificacao?`Última verificação: ${new Date(j.ultimaVerificacao).toLocaleString('pt-BR')}`:'Ainda não verificado'}
+        </div>
+        <div class="jornal-actions">
+          <button class="jornal-btn jornal-btn-primary" onclick="executarBuscaJornal(${JSON.stringify(j).replace(/"/g,'&quot;')})">🔍 Ver licitações</button>
+          <button class="jornal-btn" onclick="verificarJornal('${j.id}')">↻ Verificar agora</button>
+          <button class="jornal-btn" onclick="editarJornal('${j.id}')">✎ Editar</button>
+          <button class="jornal-btn jornal-btn-danger" onclick="removerJornal('${j.id}')">✕ Remover</button>
+        </div>
+      </div>`).join('');
+  }
+
+  // ===== NEGÓCIOS =====
   function getNegocios(){try{return JSON.parse(localStorage.getItem(NEG_KEY)||'[]')}catch{return[]}}
   function salvarNegocios(n){localStorage.setItem(NEG_KEY,JSON.stringify(n))}
-
   function adicionarAosNegocios(){
     if(!itemAtualDrawer)return;
     const negs=getNegocios();
-    const ja=negs.find(n=>n.numero_controle===itemAtualDrawer.numero_controle_pncp);
-    if(ja){alert('Esta licitação já está nos seus negócios!');return}
+    if(negs.find(n=>n.numero_controle===itemAtualDrawer.numero_controle_pncp)){alert('Já está nos seus negócios!');return}
     const p=parseControle(itemAtualDrawer.numero_controle_pncp);
     negs.unshift({
-      id:Date.now().toString(),
-      titulo:itemAtualDrawer.title||'Sem título',
-      objeto:itemAtualDrawer.description||'',
-      orgao:itemAtualDrawer.orgao_nome||'',
-      uf:itemAtualDrawer.uf||'',
-      modalidade:itemAtualDrawer.modalidade_licitacao_nome||'',
-      abertura:itemAtualDrawer.data_inicio_vigencia||'',
-      encerramento:itemAtualDrawer.data_fim_vigencia||'',
+      id:Date.now().toString(),titulo:itemAtualDrawer.title||'Sem título',
+      objeto:itemAtualDrawer.description||'',orgao:itemAtualDrawer.orgao_nome||'',
+      uf:itemAtualDrawer.uf||'',modalidade:itemAtualDrawer.modalidade_licitacao_nome||'',
+      abertura:itemAtualDrawer.data_inicio_vigencia||'',encerramento:itemAtualDrawer.data_fim_vigencia||'',
       numero_controle:itemAtualDrawer.numero_controle_pncp||'',
       link_pncp:p?`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`:'',
-      fase:'oportunidade',
-      adicionado_em:new Date().toISOString(),
+      fase:'oportunidade',adicionado_em:new Date().toISOString(),
     });
     salvarNegocios(negs);
     const btn=document.getElementById('d-btn-negocio');
-    btn.textContent='✅ Adicionado aos negócios!';btn.classList.add('adicionado');
+    btn.textContent='✅ Adicionado!';btn.classList.add('adicionado');
     setTimeout(()=>{btn.textContent='💼 Adicionar aos meus negócios';btn.classList.remove('adicionado')},2500);
   }
-
-  function moverFase(id,fase){
-    const negs=getNegocios(),n=negs.find(x=>x.id===id);
-    if(n){n.fase=fase;salvarNegocios(negs);renderFunil();renderQuadros()}
-  }
-  function removerNegocio(id){
-    if(!confirm('Remover esta licitação dos negócios?'))return;
-    salvarNegocios(getNegocios().filter(n=>n.id!==id));
-    renderFunil();renderQuadros();renderAgenda();
-  }
+  function moverFase(id,fase){const negs=getNegocios(),n=negs.find(x=>x.id===id);if(n){n.fase=fase;salvarNegocios(negs);renderFunil();renderQuadros()}}
+  function removerNegocio(id){if(!confirm('Remover?'))return;salvarNegocios(getNegocios().filter(n=>n.id!==id));renderFunil();renderQuadros();renderAgenda()}
   function renderFunil(){
     const negs=getNegocios();
     document.getElementById('funilConteudo').innerHTML=FASES.map(f=>{
       const itens=negs.filter(n=>n.fase===f.id);
-      return`<div class="fase-grupo">
-        <div class="fase-titulo"><span class="fase-badge ${f.cls}">${f.emoji} ${f.nome}</span><span class="fase-count">${itens.length} licitação(ões)</span></div>
+      return`<div class="fase-grupo"><div class="fase-titulo"><span class="fase-badge ${f.cls}">${f.emoji} ${f.nome}</span><span class="fase-count">${itens.length} licitação(ões)</span></div>
         ${itens.length===0?'<div class="fase-vazio">Nenhuma licitação nesta fase.</div>':itens.map(n=>`<div class="neg-card">
           <div class="neg-card-titulo">${n.titulo}</div>
           <div class="neg-card-info"><span>📍 ${n.uf}</span><span>📋 ${n.modalidade}</span><span>⏰ ${n.encerramento?new Date(n.encerramento).toLocaleDateString('pt-BR'):'—'}</span></div>
@@ -414,23 +770,19 @@
               ${FASES.map(f2=>`<option value="${f2.id}"${f2.id===n.fase?' selected':''}>${f2.emoji} ${f2.nome}</option>`).join('')}
             </select>
             ${n.link_pncp?`<button class="neg-btn" onclick="window.open('${n.link_pncp}','_blank')">📄 PNCP</button>`:''}
-            <button class="neg-btn neg-btn-danger" onclick="removerNegocio('${n.id}')">✕ Remover</button>
-          </div>
-        </div>`).join('')}
-      </div>`;
+            <button class="neg-btn neg-btn-danger" onclick="removerNegocio('${n.id}')">✕</button>
+          </div></div>`).join('')}</div>`;
     }).join('');
   }
   function renderQuadros(){
     const negs=getNegocios();
     document.getElementById('kanbanConteudo').innerHTML=FASES.map(f=>{
       const itens=negs.filter(n=>n.fase===f.id);
-      return`<div class="kanban-col">
-        <div class="kanban-col-titulo"><span class="fase-badge ${f.cls}">${f.emoji} ${f.nome}</span></div>
+      return`<div class="kanban-col"><div class="kanban-col-titulo"><span class="fase-badge ${f.cls}">${f.emoji} ${f.nome}</span></div>
         ${itens.length===0?'<div class="kanban-vazio">—</div>':itens.map(n=>`<div class="kanban-card">
           <div class="kanban-card-titulo">${n.titulo.substring(0,60)}${n.titulo.length>60?'...':''}</div>
           <div class="kanban-card-info">📍 ${n.uf} · ⏰ ${n.encerramento?new Date(n.encerramento).toLocaleDateString('pt-BR'):'—'}</div>
-        </div>`).join('')}
-      </div>`;
+        </div>`).join('')}</div>`;
     }).join('');
   }
   function renderAgenda(){
@@ -448,17 +800,14 @@
       });
       grid+=`<div class="cal-dia${ehHoje?' hoje':''}"><div class="cal-dia-num">${d}</div>${eventos.map(n=>{
         const ab=n.abertura?new Date(n.abertura):null,ehAb=ab&&ab.getDate()===d&&ab.getMonth()===mes&&ab.getFullYear()===ano;
-        return`<div class="cal-evento${ehAb?'':' encerramento'}" title="${ehAb?'Abertura':'Encerramento'}: ${n.titulo}">${ehAb?'📅':'⏰'} ${n.titulo.substring(0,20)}</div>`;
+        return`<div class="cal-evento${ehAb?'':' encerramento'}">${ehAb?'📅':'⏰'} ${n.titulo.substring(0,20)}</div>`;
       }).join('')}</div>`;
     }
     document.getElementById('calendarioGrid').innerHTML=grid;
   }
-  function mudarMes(dir){
-    if(dir===0)mesAtual=new Date();
-    else mesAtual=new Date(mesAtual.getFullYear(),mesAtual.getMonth()+dir,1);
-    renderAgenda();
-  }
+  function mudarMes(dir){if(dir===0)mesAtual=new Date();else mesAtual=new Date(mesAtual.getFullYear(),mesAtual.getMonth()+dir,1);renderAgenda()}
 
+  // ===== HISTÓRICO =====
   function getHistorico(){try{return JSON.parse(localStorage.getItem(HIST_KEY)||'[]')}catch{return[]}}
   function salvarHistorico(kw,uf,mod,st){
     if(!kw)return;
@@ -480,6 +829,7 @@
   function removerHistorico(i){const h=getHistorico();h.splice(i,1);localStorage.setItem(HIST_KEY,JSON.stringify(h));renderHistorico()}
   function limparHistorico(){localStorage.removeItem(HIST_KEY);renderHistorico()}
 
+  // ===== UTILS =====
   function fmt(iso){if(!iso)return'—';return new Date(iso).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}
   function fmtVal(v){if(!v)return'Não informado';return Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
   function statusBadge(item){
@@ -501,50 +851,35 @@
     return{direto:`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`};
   }
 
-  function toggleItem(i){
-    document.getElementById('det-'+i).classList.toggle('aberto');
-    document.getElementById('chev-'+i).classList.toggle('aberto');
-  }
-
+  // ===== DRAWER =====
+  function toggleItem(i){document.getElementById('det-'+i).classList.toggle('aberto');document.getElementById('chev-'+i).classList.toggle('aberto')}
   function renderItens(itens){
-    if(!itens.length){
-      document.getElementById('d-itens').innerHTML='<div class="item-loading">Nenhum item encontrado.</div>';
-      return;
-    }
+    if(!itens.length){document.getElementById('d-itens').innerHTML='<div class="item-loading">Nenhum item encontrado.</div>';return}
     document.getElementById('d-itens').innerHTML=`<div class="item-lista">${itens.map((it,i)=>{
-      const nomeResumido=(it.descricao||'Sem descrição').substring(0,70)+((it.descricao||'').length>70?'...':'');
+      const nome=(it.descricao||'Sem descrição').substring(0,70)+((it.descricao||'').length>70?'...':'');
       const val=it.valorUnitarioEstimado?fmtVal(it.valorUnitarioEstimado):'Não informado';
-      const valTotal=it.valorTotal?fmtVal(it.valorTotal):'Não informado';
-      return`<div class="item-accordion">
-        <div class="item-header" onclick="toggleItem(${i})">
-          <span class="item-num-badge">Item ${it.numeroItem||i+1}</span>
-          <div class="item-resumo">
-            <div class="item-nome">${nomeResumido}</div>
-            <div class="item-qtd">Qtd: <strong>${it.quantidade||'—'} ${it.unidadeMedida||''}</strong></div>
-          </div>
-          <span class="item-chevron" id="chev-${i}">▼</span>
-        </div>
+      const valT=it.valorTotal?fmtVal(it.valorTotal):'Não informado';
+      return`<div class="item-accordion"><div class="item-header" onclick="toggleItem(${i})">
+        <span class="item-num-badge">Item ${it.numeroItem||i+1}</span>
+        <div class="item-resumo"><div class="item-nome">${nome}</div><div class="item-qtd">Qtd: <strong>${it.quantidade||'—'} ${it.unidadeMedida||''}</strong></div></div>
+        <span class="item-chevron" id="chev-${i}">▼</span></div>
         <div class="item-detalhe" id="det-${i}">
           <div class="item-detalhe-grid">
             <div class="item-detalhe-campo"><label>Quantidade</label><span>${it.quantidade||'—'} ${it.unidadeMedida||''}</span></div>
             <div class="item-detalhe-campo"><label>Vlr. unitário</label><span>${val}</span></div>
-            <div class="item-detalhe-campo"><label>Vlr. total</label><span>${valTotal}</span></div>
+            <div class="item-detalhe-campo"><label>Vlr. total</label><span>${valT}</span></div>
             <div class="item-detalhe-campo"><label>Tipo</label><span>${it.materialOuServicoNome||'—'}</span></div>
             <div class="item-detalhe-campo"><label>Situação</label><span>${it.situacaoCompraItemNome||'—'}</span></div>
             <div class="item-detalhe-campo"><label>Julgamento</label><span>${it.criterioJulgamentoNome||'—'}</span></div>
           </div>
           <div class="item-desc-full">${it.descricao||'Sem descrição'}</div>
-        </div>
-      </div>`;
+        </div></div>`;
     }).join('')}</div>`;
   }
-
   function filtrarItens(){
-    const termo=document.getElementById('buscaItem').value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    const filtrados=termo?todosItens.filter(it=>(it.descricao||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(termo)):todosItens;
-    renderItens(filtrados);
+    const t=document.getElementById('buscaItem').value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    renderItens(t?todosItens.filter(it=>(it.descricao||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(t)):todosItens);
   }
-
   function abrirDrawer(item){
     itemAtualDrawer=item;
     const{direto}=buildLinks(item);
@@ -560,10 +895,7 @@
     document.getElementById('d-encerramento').textContent=fmt(item.data_fim_vigencia);
     document.getElementById('d-valor').textContent=fmtVal(item.valor_global);
     document.getElementById('d-situacao').textContent=badge.texto;
-    document.getElementById('d-tags').innerHTML=`
-      <span class="drawer-tag">${item.modalidade_licitacao_nome||'—'}</span>
-      <span class="drawer-tag badge ${badge.cls}">${badge.texto}</span>
-      ${item.esfera_nome?`<span class="drawer-tag">${item.esfera_nome}</span>`:''}`;
+    document.getElementById('d-tags').innerHTML=`<span class="drawer-tag">${item.modalidade_licitacao_nome||'—'}</span><span class="drawer-tag badge ${badge.cls}">${badge.texto}</span>${item.esfera_nome?`<span class="drawer-tag">${item.esfera_nome}</span>`:''}`;
     document.getElementById('d-btn-acessar').onclick=()=>window.open(direto,'_blank');
     document.getElementById('d-btn-busca').onclick=()=>window.open(direto,'_blank');
     document.getElementById('d-btn-acessar').style.display=direto?'block':'none';
@@ -571,8 +903,7 @@
     const btnNeg=document.getElementById('d-btn-negocio');
     btnNeg.textContent=jaAdicionado?'✅ Já nos seus negócios':'💼 Adicionar aos meus negócios';
     btnNeg.classList.toggle('adicionado',jaAdicionado);
-    document.getElementById('buscaItem').value='';
-    todosItens=[];
+    document.getElementById('buscaItem').value='';todosItens=[];
     document.getElementById('d-itens').innerHTML='<div class="item-loading">⏳ Carregando itens...</div>';
     document.getElementById('drawer').classList.add('ativo');
     document.getElementById('overlay').classList.add('ativo');
@@ -583,8 +914,7 @@
   function fecharDrawer(){
     document.getElementById('drawer').classList.remove('ativo');
     document.getElementById('overlay').classList.remove('ativo');
-    document.body.style.overflow='';
-    itemAtualDrawer=null;
+    document.body.style.overflow='';itemAtualDrawer=null;
   }
   async function carregarItens(cnpj,ano,seq){
     try{
@@ -595,12 +925,11 @@
     }catch(e){document.getElementById('d-itens').innerHTML='<div class="item-loading">Erro ao carregar itens.</div>'}
   }
 
+  // ===== BUSCA =====
   async function buscar(pagina){
     paginaAtual=pagina;
     const kw=document.getElementById('palavraChave').value.trim();
-    const uf=document.getElementById('uf').value;
-    const mod=document.getElementById('modalidade').value;
-    const st=document.getElementById('status').value;
+    const uf=document.getElementById('uf').value,mod=document.getElementById('modalidade').value,st=document.getElementById('status').value;
     const params=new URLSearchParams({pagina});
     if(kw)params.append('palavraChave',kw);
     if(uf)params.append('uf',uf);
@@ -609,32 +938,22 @@
     const btn=document.getElementById('btnBuscar');
     btn.disabled=true;btn.textContent='Buscando...';
     document.getElementById('resultado').innerHTML='<div class="loading">⏳ Buscando licitações...</div>';
-    document.getElementById('paginacao').style.display='none';
-    document.getElementById('resumo').innerHTML='';
+    document.getElementById('paginacao').style.display='none';document.getElementById('resumo').innerHTML='';
     try{
       const resp=await fetch(`/api/buscar?${params}`);
       const data=await resp.json();
       if(data.erro){document.getElementById('resultado').innerHTML=`<div class="erro">Erro: ${data.erro}</div>`;return}
       salvarHistorico(kw,uf,mod,st);
-      const itens=data.data||[];
-      const total=data.totalRegistros||0;
+      const itens=data.data||[],total=data.totalRegistros||0;
       totalPaginas=data.totalPaginas||1;
       document.getElementById('resumo').innerHTML=`<strong>${total.toLocaleString('pt-BR')}</strong> licitações encontradas · Página ${paginaAtual} de ${totalPaginas}`;
       if(!itens.length){document.getElementById('resultado').innerHTML='<div class="vazio">Nenhuma licitação encontrada.</div>';return}
       document.getElementById('resultado').innerHTML=`<div class="cards">${itens.map(item=>{
         const badge=statusBadge(item);
         return`<div class="card" onclick='abrirDrawer(${JSON.stringify(item)})'>
-          <div class="card-header">
-            <div class="card-titulo">${item.title||'Sem título'}</div>
-            <span class="badge ${badge.cls}">${badge.texto}</span>
-          </div>
+          <div class="card-header"><div class="card-titulo">${item.title||'Sem título'}</div><span class="badge ${badge.cls}">${badge.texto}</span></div>
           <div class="card-desc">${item.description||'—'}</div>
-          <div class="card-info">
-            <span>📍 ${item.uf||'—'} · ${item.municipio_nome||''}</span>
-            <span>📋 ${item.modalidade_licitacao_nome||'—'}</span>
-            <span>📅 Abertura: ${fmt(item.data_inicio_vigencia)}</span>
-            <span>⏰ Encerra: ${fmt(item.data_fim_vigencia)}</span>
-          </div>
+          <div class="card-info"><span>📍 ${item.uf||'—'} · ${item.municipio_nome||''}</span><span>📋 ${item.modalidade_licitacao_nome||'—'}</span><span>📅 Abertura: ${fmt(item.data_inicio_vigencia)}</span><span>⏰ Encerra: ${fmt(item.data_fim_vigencia)}</span></div>
           <div class="card-orgao">🏛️ ${item.orgao_nome||'—'}</div>
         </div>`;
       }).join('')}</div>`;
@@ -642,23 +961,24 @@
       document.getElementById('paginaInfo').textContent=`Página ${paginaAtual} de ${totalPaginas}`;
       document.getElementById('btnAnterior').disabled=paginaAtual<=1;
       document.getElementById('btnProxima').disabled=paginaAtual>=totalPaginas;
-    }catch(e){
-      document.getElementById('resultado').innerHTML=`<div class="erro">Erro de conexão: ${e.message}</div>`;
-    }finally{btn.disabled=false;btn.textContent='Buscar'}
+    }catch(e){document.getElementById('resultado').innerHTML=`<div class="erro">Erro de conexão: ${e.message}</div>`;}
+    finally{btn.disabled=false;btn.textContent='Buscar'}
   }
   function mudarPagina(d){const n=paginaAtual+d;if(n>=1&&n<=totalPaginas)buscar(n)}
   function limpar(){
-    document.getElementById('palavraChave').value='';
-    document.getElementById('uf').value='';
-    document.getElementById('modalidade').value='';
-    document.getElementById('status').value='recebendo_proposta';
-    document.getElementById('resultado').innerHTML='';
-    document.getElementById('resumo').innerHTML='';
+    document.getElementById('palavraChave').value='';document.getElementById('uf').value='';
+    document.getElementById('modalidade').value='';document.getElementById('status').value='recebendo_proposta';
+    document.getElementById('resultado').innerHTML='';document.getElementById('resumo').innerHTML='';
     document.getElementById('paginacao').style.display='none';
   }
   document.getElementById('palavraChave').addEventListener('keydown',e=>{if(e.key==='Enter')buscar(1)});
+
+  // ===== INIT =====
   carregarTema();
   renderHistorico();
+  renderNotificacoes();
+  // Verificar jornais automaticamente ao abrir
+  setTimeout(()=>verificarTodosJornais(),2000);
 </script>
 </body>
 </html>
