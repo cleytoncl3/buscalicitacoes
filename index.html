@@ -86,13 +86,6 @@
     .select-trigger{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.95rem;background:var(--surface2);color:var(--text);text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px}
     .select-trigger-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
 
-    /* STATUS RADIOS */
-    .status-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px}
-    .status-op{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.88rem;color:var(--text2)}
-    .status-op input[type=radio]{accent-color:var(--primary);width:15px;height:15px;cursor:pointer}
-    .status-op:hover{color:var(--text)}
-    .status-op input:checked + span{color:var(--text);font-weight:600}
-
     /* DATA ROW */
     .data-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
     .data-row-label{font-size:.82rem;color:var(--text3);white-space:nowrap}
@@ -320,7 +313,6 @@
       .kanban{grid-template-columns:repeat(3,1fr)}
       .header-logo span{display:none}
       .nav-btn{padding:6px 10px;font-size:.82rem}
-      .status-grid{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -473,27 +465,6 @@
           <span style="color:var(--text3);font-size:.75rem;flex-shrink:0">▼</span>
         </button>
       </div>
-
-      <!-- Linha 3: Status radios -->
-      <div class="status-grid">
-        <label class="status-op">
-          <input type="radio" name="status" value="recebendo_proposta" checked onchange="onStatusChange()"/>
-          <span>A Receber / Recebendo Proposta</span>
-        </label>
-        <label class="status-op">
-          <input type="radio" name="status" value="em_julgamento" onchange="onStatusChange()"/>
-          <span>Em Julgamento / Propostas Encerradas</span>
-        </label>
-        <label class="status-op">
-          <input type="radio" name="status" value="encerrada" onchange="onStatusChange()"/>
-          <span>Encerradas</span>
-        </label>
-        <label class="status-op">
-          <input type="radio" name="status" value="" onchange="onStatusChange()"/>
-          <span>Todos</span>
-        </label>
-      </div>
-
       <!-- Linha 4: Data compacta -->
       <div class="data-row">
         <span class="data-row-label">📅 Abertura:</span>
@@ -660,13 +631,6 @@
     document.getElementById('dataFinal').value=fim;
   }
   function limparDatas(){document.getElementById('dataInicial').value='';document.getElementById('dataFinal').value=''}
-
-  // ===== STATUS =====
-  function onStatusChange(){}
-  function getStatus(){
-    const el=document.querySelector('input[name=status]:checked');
-    return el?el.value:'recebendo_proposta';
-  }
 
   // ===== MODAL UF =====
   function renderModalUF(){
@@ -945,10 +909,10 @@
 
   // ===== HISTÓRICO =====
   function getHistorico(){try{return JSON.parse(localStorage.getItem(HIST_KEY)||'[]')}catch{return[]}}
-  function salvarHistorico(kw,ufs,mods,st){
+  function salvarHistorico(kw,ufs,mods){
     if(!kw)return;
     const h=getHistorico().filter(x=>x.kw!==kw);
-    h.unshift({kw,ufs:[...ufs],mods:[...mods],st});
+    h.unshift({kw,ufs:[...ufs],mods:[...mods]});
     localStorage.setItem(HIST_KEY,JSON.stringify(h.slice(0,15)));renderHistorico();
   }
   function renderHistorico(){
@@ -965,8 +929,6 @@
     document.getElementById('palavraChave').value=h.kw;
     selectedUFs=h.ufs||[];atualizarBotaoUF();
     selectedMods=h.mods||['6','8'];atualizarBotaoMod();
-    const radio=document.querySelector(`input[name=status][value="${h.st||'recebendo_proposta'}"]`);
-    if(radio)radio.checked=true;
     buscar(1);
   }
   function removerHistorico(i){const h=getHistorico();h.splice(i,1);localStorage.setItem(HIST_KEY,JSON.stringify(h));renderHistorico()}
@@ -1068,7 +1030,6 @@
   async function buscar(pagina){
     paginaAtual=pagina;
     const kw=document.getElementById('palavraChave').value.trim();
-    const st=getStatus();
     const dataInicial=document.getElementById('dataInicial').value;
     const dataFinal=document.getElementById('dataFinal').value;
     const ufParam=selectedUFs.join(',');
@@ -1077,7 +1038,6 @@
     if(kw)params.append('palavraChave',kw);
     if(ufParam)params.append('uf',ufParam);
     if(modParam)params.append('modalidade',modParam);
-    if(st)params.append('status',st);
     if(dataInicial)params.append('dataInicial',dataInicial);
     if(dataFinal)params.append('dataFinal',dataFinal);
     const btn=document.getElementById('btnBuscar');
@@ -1088,7 +1048,7 @@
       const resp=await fetchComRetry(`/api/buscar?${params}`);
       const data=await resp.json();
       if(data.erro){document.getElementById('resultado').innerHTML=`<div class="erro">Erro: ${data.erro}<br><small>Tente novamente em alguns segundos.</small></div>`;return}
-      salvarHistorico(kw,selectedUFs,selectedMods,st);
+      salvarHistorico(kw,selectedUFs,selectedMods);
       const itens=data.data||[],total=data.totalRegistros||0;
       totalPaginas=data.totalPaginas||1;
       document.getElementById('resumo').innerHTML=`<strong>${total.toLocaleString('pt-BR')}</strong> licitações encontradas · Página ${paginaAtual} de ${totalPaginas}`;
@@ -1122,7 +1082,6 @@
     document.getElementById('palavraChave').value='';
     selectedUFs=[];atualizarBotaoUF();
     selectedMods=['6','8'];atualizarBotaoMod();
-    const radio=document.querySelector('input[name=status][value="recebendo_proposta"]');if(radio)radio.checked=true;
     limparDatas();
     document.getElementById('resultado').innerHTML='';
     document.getElementById('resumo').innerHTML='';
