@@ -8,21 +8,6 @@ export default async function handler(req, res) {
   const ufs = uf ? uf.split(',').map(u => u.trim()).filter(Boolean) : [];
   const modalidades = modalidade ? modalidade.split(',').map(m => m.trim()).filter(Boolean) : [];
 
-  const isSimple = keywords.length === 1 && ufs.length <= 1 && modalidades.length === 0 && !dataInicial && !dataFinal;
-
-  const buildUrl = (kw, ufItem, paginaReq) => {
-    const params = new URLSearchParams({
-      tipos_documento: 'edital',
-      ordenacao: '-data',
-      pagina: paginaReq,
-      tam_pagina: isSimple ? 20 : 50,
-      status: 'recebendo_proposta',
-    });
-    if (kw) params.append('q', kw);
-    if (ufItem) params.append('ufs', ufItem);
-    return `https://pncp.gov.br/api/search/?${params}`;
-  };
-
   const fetchJSON = async (url, tentativas = 3) => {
     for (let i = 0; i < tentativas; i++) {
       try {
@@ -37,40 +22,39 @@ export default async function handler(req, res) {
     return null;
   };
 
+  // Monta URL — UFs passadas como parâmetros repetidos (PNCP suporta)
+  const buildUrl = (kw, paginaReq) => {
+    const params = new URLSearchParams({
+      tipos_documento: 'edital',
+      ordenacao: '-data',
+      status: 'recebendo_proposta',
+      pagina: paginaReq,
+      tam_pagina: 20,
+    });
+    if (kw) params.append('q', kw);
+    ufs.forEach(u => params.append('ufs', u));
+    return `https://pncp.gov.br/api/search/?${params}`;
+  };
+
   try {
     let items = [], totalBase = 0, totalPaginas = 1;
 
-    if (isSimple) {
-      const data = await fetchJSON(buildUrl(keywords[0], ufs[0] || '', pg));
-      if (data) {
-        items = data.items || [];
-        totalBase = data.total || 0;
-        totalPaginas = Math.ceil(totalBase / 20);
-      }
-    } else {
-      const ufList = ufs.length > 0 ? ufs : [''];
-      const combinations = [];
-      for (const kw of keywords) for (const ufItem of ufList) combinations.push({ kw, uf: ufItem });
-      const limited = combinations.slice(0, 10);
+    if (keywords.length === 1) {
+      // BUSCA SIMPLES — uma query, paginação nativa do PNCP
+      const data = await fetchJSON(buildUrl(keywords[0], pg));
+      items = data?.items || [];
+      totalBase = data?.total || 0;
+      totalPaginas = Math.ceil(totalBase / 20) || 1;
 
-      const results = await Promise.all(limited.map(({ kw, uf: ufItem }) => fetchJSON(buildUrl(kw, ufItem, 1))));
-      const seen = new Set();
-      results.forEach(data => {
-        if (!data) return;
-        (data.items || []).forEach(item => {
-          const key = item.id || item.numero_controle_pncp;
-          if (!seen.has(key)) { seen.add(key); items.push(item); }
-        });
-      });
-
+      // Filtros client-side (só quando necessário)
       if (modalidades.length > 0)
-        items = items.filter(item => modalidades.includes(String(item.modalidade_licitacao_id || '')));
+        items = items.filter(i => modalidades.includes(String(i.modalidade_licitacao_id || '')));
 
       if (dataInicial || dataFinal) {
         const dIni = dataInicial ? new Date(dataInicial) : null;
         const dFim = dataFinal ? new Date(dataFinal + 'T23:59:59') : null;
-        items = items.filter(item => {
-          const ab = item.data_inicio_vigencia ? new Date(item.data_inicio_vigencia) : null;
+        items = items.filter(i => {
+          const ab = i.data_inicio_vigencia ? new Date(i.data_inicio_vigencia) : null;
           if (!ab) return true;
           if (dIni && ab < dIni) return false;
           if (dFim && ab > dFim) return false;
@@ -78,14 +62,44 @@ export default async function handler(req, res) {
         });
       }
 
-      const tamPag = 20;
+    } else {
+      // MÚLTIPLOS KEYWORDS — uma query por keyword, sem expansão adicional
+      const results = await Promise.all(
+        keywords.slice(0, 5).map(kw => fetchJSON(buildUrl(kw, 1)))
+      );
+
+      const seen = new Set();
+      results.forEach(data => {
+        (data?.items || []).forEach(item => {
+          const key = item.id || item.numero_controle_pncp;
+          if (!seen.has(key)) { seen.add(key); items.push(item); }
+        });
+      });
+
+      if (modalidades.length > 0)
+        items = items.filter(i => modalidades.includes(String(i.modalidade_licitacao_id || '')));
+
+      if (dataInicial || dataFinal) {
+        const dIni = dataInicial ? new Date(dataInicial) : null;
+        const dFim = dataFinal ? new Date(dataFinal + 'T23:59:59') : null;
+        items = items.filter(i => {
+          const ab = i.data_inicio_vigencia ? new Date(i.data_inicio_vigencia) : null;
+          if (!ab) return true;
+          if (dIni && ab < dIni) return false;
+          if (dFim && ab > dFim) return false;
+          return true;
+        });
+      }
+
+      // Paginação client-side para multi-keyword
       totalBase = items.length;
-      totalPaginas = Math.ceil(totalBase / tamPag) || 1;
-      const inicio = (pg - 1) * tamPag;
-      items = items.slice(inicio, inicio + tamPag);
+      totalPaginas = Math.ceil(totalBase / 20) || 1;
+      const ini = (pg - 1) * 20;
+      items = items.slice(ini, ini + 20);
     }
 
     return res.status(200).json({ data: items, totalRegistros: totalBase, totalPaginas });
+
   } catch (error) {
     return res.status(500).json({ erro: error.message });
   }
