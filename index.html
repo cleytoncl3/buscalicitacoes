@@ -1026,24 +1026,22 @@
       const data = await r.json();
       const todos = data.data || [];
 
-      // Filtra itens que contêm a(s) palavra-chave(s) buscada(s)
-      // Cada grupo separado por ';' é uma busca distinta (ex: "papel;caneta").
-      // Dentro de cada grupo, as palavras separadas por espaço são tratadas
-      // individualmente (ex: "papel kraft" -> ["papel","kraft"]), e o item
-      // só é considerado um match se TODAS as palavras de pelo menos um
-      // grupo aparecerem na descrição (em qualquer ordem).
+      // Filtra itens que contêm a(s) palavra-chave(s) buscada(s).
+      // A busca geral aceita múltiplos termos separados por ';'.
+      // Aqui, cada termo é ainda quebrado por espaço em palavras
+      // individuais (ex: "papel kraft" -> "papel" e "kraft"), e cada
+      // palavra é tratada como uma busca independente: o item entra
+      // na lista se a descrição contiver QUALQUER uma das palavras.
       const normalizar = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       const kwRaw = document.getElementById('palavraChave').value.trim();
-      const grupos = kwRaw
-        ? kwRaw.split(';')
-            .map(g => normalizar(g).trim().split(/\s+/).filter(Boolean))
-            .filter(palavras => palavras.length)
+      const termos = kwRaw
+        ? normalizar(kwRaw).split(/[;\s]+/).map(t => t.trim()).filter(Boolean)
         : [];
 
-      const filtrados = grupos.length
+      const filtrados = termos.length
         ? todos.filter(it => {
             const desc = normalizar(it.descricao || '');
-            return grupos.some(palavras => palavras.every(p => desc.includes(p)));
+            return termos.some(t => desc.includes(t));
           })
         : todos.slice(0, 6);
 
