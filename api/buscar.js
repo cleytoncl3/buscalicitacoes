@@ -3,39 +3,69 @@ export default async function handler(req, res) {
 
   const { palavraChave = '', uf = '', pagina = 1, modalidade = '', status = 'recebendo_proposta' } = req.query;
 
-  const params = new URLSearchParams({
-    tipos_documento: 'edital',
-    ordenacao: '-data',
-    pagina: pagina,
-    tam_pagina: 20,
-    status: status,
-  });
+  // Múltiplas palavras-chave separadas por ponto e vírgula
+  const keywords = palavraChave ? palavraChave.split(';').map(k => k.trim()).filter(Boolean) : [''];
 
-  if (palavraChave) params.append('q', palavraChave);
-  if (uf) params.append('ufs', uf);
-  if (modalidade) params.append('modalidade', modalidade);
+  // Múltiplos estados separados por vírgula
+  const ufs = uf ? uf.split(',').map(u => u.trim()).filter(Boolean) : [];
+
+  const buildUrl = (kw, ufItem) => {
+    const params = new URLSearchParams({
+      tipos_documento: 'edital',
+      ordenacao: '-data',
+      pagina: keywords.length > 1 || ufs.length > 1 ? 1 : pagina,
+      tam_pagina: keywords.length > 1 || ufs.length > 1 ? 50 : 20,
+      status: status || 'recebendo_proposta',
+    });
+    if (kw) params.append('q', kw);
+    if (ufItem) params.append('ufs', ufItem);
+    if (modalidade) params.append('modalidade', modalidade);
+    return `https://pncp.gov.br/api/search/?${params}`;
+  };
+
+  const fetchComRetry = async (url, tentativas = 3) => {
+    for (let i = 0; i < tentativas; i++) {
+      try {
+        const r = await fetch(url, { headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' } });
+        const text = await r.text();
+        try { return JSON.parse(text); } catch { if (i === tentativas - 1) return null; }
+      } catch (e) {
+        if (i === tentativas - 1) return null;
+        await new Promise(r => setTimeout(r, 800));
+      }
+    }
+    return null;
+  };
 
   try {
-    const url = `https://pncp.gov.br/api/search/?${params}`;
-
-    const response = await fetch(url, {
-      headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' }
-    });
-
-    const text = await response.text();
-
-    let data;
-    try { data = JSON.parse(text); }
-    catch { return res.status(500).json({ erro: `PNCP retornou: ${text.substring(0, 300)}` }); }
-
-    if (!response.ok) {
-      return res.status(response.status).json({ erro: data.detail || data.message || text });
+    const ufList = ufs.length > 0 ? ufs : [''];
+    const combinations = [];
+    for (const kw of keywords) {
+      for (const ufItem of ufList) {
+        combinations.push({ kw, uf: ufItem });
+      }
     }
 
+    const results = await Promise.all(combinations.map(({ kw, uf: ufItem }) => fetchComRetry(buildUrl(kw, ufItem))));
+
+    const seen = new Set();
+    let items = [];
+    let totalBase = 0;
+
+    results.forEach((data, i) => {
+      if (!data) return;
+      if (i === 0) totalBase = data.total || 0;
+      (data.items || []).forEach(item => {
+        const key = item.id || item.numero_controle_pncp;
+        if (!seen.has(key)) { seen.add(key); items.push(item); }
+      });
+    });
+
+    const isMulti = keywords.length > 1 || ufs.length > 1;
     return res.status(200).json({
-      data: data.items || data.results || data,
-      totalRegistros: data.total || data.count || 0,
-      totalPaginas: Math.ceil((data.total || data.count || 0) / 20)
+      data: items,
+      totalRegistros: isMulti ? items.length : totalBase,
+      totalPaginas: isMulti ? Math.ceil(items.length / 20) : Math.ceil(totalBase / 20)
     });
 
   } catch (error) {
