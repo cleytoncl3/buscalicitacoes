@@ -303,6 +303,45 @@
     .cal-evento.encerramento{background:#7f1d1d;color:#fca5a5}
     [data-tema="escuro"] .cal-evento{background:#245239}
 
+
+    /* ===== CARD EXPANDIDO COM ITENS ===== */
+    .layout-toggle{display:flex;gap:6px;margin-bottom:14px;align-items:center}
+    .layout-btn{padding:6px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:.82rem;cursor:pointer}
+    .layout-btn.ativo{background:var(--primary);color:var(--accent);border-color:var(--primary)}
+
+    .card-exp{background:var(--surface);border-radius:10px;box-shadow:var(--card-shadow);border:1px solid var(--border);border-left:4px solid var(--primary);cursor:pointer;overflow:hidden;transition:box-shadow .2s}
+    .card-exp:hover{box-shadow:var(--card-shadow-hover);border-left-color:var(--accent)}
+    .card-exp-main{display:grid;grid-template-columns:1fr 320px;min-height:140px}
+    .card-exp-left{padding:14px 16px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:6px}
+    .card-exp-titulo{font-weight:700;font-size:.88rem;color:var(--accent);line-height:1.3}
+    [data-tema="claro"] .card-exp-titulo{color:var(--primary)}
+    .card-exp-desc{font-size:.82rem;color:var(--text2);line-height:1.4;flex:1}
+    .card-exp-tags{display:flex;flex-wrap:wrap;gap:5px}
+    .card-exp-tag{background:var(--surface2);color:var(--text3);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:.72rem}
+    .card-exp-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:2px}
+    .card-exp-meta span{font-size:.78rem;color:var(--text2)}
+    .card-exp-badge{font-size:.72rem;padding:2px 8px;border-radius:4px;font-weight:600}
+    .card-exp-badge-portal{background:#0d2b1a;color:#4ade80;border:1px solid #2d4a38}
+    [data-tema="claro"] .card-exp-badge-portal{background:#e6f4ec;color:#1a7a3c;border-color:#c5ddd0}
+    .card-exp-badge-mod{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+
+    .card-exp-items{padding:10px 12px;background:var(--surface2);display:flex;flex-direction:column;gap:0}
+    .card-exp-items-titulo{font-size:.7rem;text-transform:uppercase;color:var(--text3);letter-spacing:.5px;margin-bottom:6px;font-weight:600}
+    .card-exp-items-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+    .card-item-prev{background:var(--surface);border-radius:5px;padding:5px 8px;border:1px solid var(--border)}
+    .card-item-prev-num{font-size:.68rem;color:var(--primary);font-weight:700}
+    [data-tema="escuro"] .card-item-prev-num{color:var(--accent)}
+    .card-item-prev-nome{font-size:.72rem;color:var(--text);font-weight:500;line-height:1.2;margin:1px 0}
+    .card-item-prev-qtd{font-size:.68rem;color:var(--text3)}
+    .card-item-prev-qtd strong{color:var(--text2)}
+    .card-items-loading{text-align:center;padding:20px;color:var(--text3);font-size:.8rem}
+    .card-items-vazio{text-align:center;padding:20px;color:var(--text3);font-size:.78rem}
+
+    .card-exp-footer{background:var(--surface2);border-top:1px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+    .card-exp-footer span{font-size:.78rem;color:var(--text2)}
+
+    @media(max-width:900px){.card-exp-main{grid-template-columns:1fr}.card-exp-items{border-top:1px solid var(--border);border-right:none}}
+
     @media(max-width:800px){
       .filtros-linha-busca{grid-template-columns:1fr}
       .filtros-linha-selects{grid-template-columns:1fr}
@@ -511,7 +550,15 @@
       <div class="historico-label"><span>🕒 Buscas recentes</span><button onclick="limparHistorico()">Limpar tudo</button></div>
       <div class="historico-chips" id="historicoChips"></div>
     </div>
-    <div id="resumo" class="resumo"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div id="resumo" class="resumo" style="margin-bottom:0"></div>
+      <div class="layout-toggle" id="layoutToggle" style="display:none">
+        <span style="font-size:.78rem;color:var(--text3)">Visualização:</span>
+        <button class="layout-btn ativo" id="btnLayoutCompacto" onclick="setLayout('compacto')">≡ Compacto</button>
+        <button class="layout-btn" id="btnLayoutExpandido" onclick="setLayout('expandido')">⊞ Com Itens</button>
+      </div>
+    </div>
+    <div id="resumo-spacer" style="height:10px"></div>
     <div id="resultado"></div>
     <div class="paginacao" id="paginacao" style="display:none">
       <button class="btn-pag" id="btnAnterior" onclick="mudarPagina(-1)">← Anterior</button>
@@ -910,6 +957,114 @@
       </div>`).join('');
   }
 
+
+  // ===== LAYOUT =====
+  let layoutAtual = 'compacto';
+  let ultimosItens = [];
+
+  function setLayout(tipo) {
+    layoutAtual = tipo;
+    document.getElementById('btnLayoutCompacto').classList.toggle('ativo', tipo==='compacto');
+    document.getElementById('btnLayoutExpandido').classList.toggle('ativo', tipo==='expandido');
+    if (ultimosItens.length) renderCards(ultimosItens);
+  }
+
+  function renderCards(itens) {
+    ultimosItens = itens;
+    if (layoutAtual === 'expandido') {
+      document.getElementById('resultado').innerHTML =
+        `<div class="cards" style="gap:14px">${itens.map(renderCardExpandido).join('')}</div>`;
+      // Carrega itens de forma assíncrona
+      itens.forEach((item, idx) => {
+        const p = parseControle(item.numero_controle_pncp);
+        if (p) carregarItensCard(p.cnpj, p.ano, p.seq, item.id || idx);
+      });
+    } else {
+      document.getElementById('resultado').innerHTML =
+        `<div class="cards">${itens.map(renderCardCompacto).join('')}</div>`;
+    }
+  }
+
+  function fmtModalidadeNome(nome) {
+    if (!nome) return '';
+    return nome.replace(' - ', ' ').replace('Eletrônico', 'Eletrônico').replace('Presencial', 'Presencial');
+  }
+
+  function renderCardCompacto(item) {
+    const badge = statusBadge(item);
+    const mod = fmtModalidade(item.modalidade_licitacao_nome) || 'Licitação';
+    const num = extrairNumEdital(item);
+    const titulo = `${mod.toUpperCase()}${num ? ' Nº ' + num : ''} — ${(item.orgao_nome || '').toUpperCase()}${item.uf ? ' / ' + item.uf : ''}`;
+    return `<div class="card" onclick='abrirDrawer(${JSON.stringify(item)})'>
+      <div class="card-titulo-principal">${titulo}</div>
+      <div class="card-desc">${item.description || '—'}</div>
+      <div class="card-info">
+        <span class="badge ${badge.cls}">${badge.texto}</span>
+        <span>📍 ${item.municipio_nome || item.uf || '—'} / ${item.uf || ''}</span>
+        <span>📅 Abertura: ${fmt(item.data_inicio_vigencia)}</span>
+        <span>⏰ Encerra: ${fmt(item.data_fim_vigencia)}</span>
+      </div>
+    </div>`;
+  }
+
+  function renderCardExpandido(item) {
+    const badge = statusBadge(item);
+    const mod = fmtModalidade(item.modalidade_licitacao_nome) || 'Licitação';
+    const num = extrairNumEdital(item);
+    const titulo = `${mod.toUpperCase()}${num ? ' Nº ' + num : ''} — ${(item.orgao_nome || '').toUpperCase()}${item.uf ? ' / ' + item.uf : ''}`;
+    const cardId = item.id || item.numero_controle_pncp || Math.random().toString(36).substr(2,9);
+    const esferaNome = item.esfera_id === 'F' ? 'Comprasnet' : item.esfera_id === 'E' ? 'Estadual' : item.esfera_id === 'M' ? 'Municipal' : '';
+    return `<div class="card-exp" onclick='abrirDrawer(${JSON.stringify(item)})'>
+      <div class="card-exp-main">
+        <div class="card-exp-left">
+          <div class="card-exp-titulo">${titulo}</div>
+          <div class="card-exp-desc">${item.description || '—'}</div>
+          <div class="card-exp-meta">
+            <span>📅 Abertura: <strong>${fmt(item.data_inicio_vigencia)}</strong></span>
+            <span>⏰ Encerra: <strong>${fmt(item.data_fim_vigencia)}</strong></span>
+            ${item.modalidade_licitacao_nome ? `<span class="card-exp-badge card-exp-badge-mod">${fmtModalidade(item.modalidade_licitacao_nome)}</span>` : ''}
+            ${esferaNome ? `<span class="card-exp-badge card-exp-badge-portal">${esferaNome}</span>` : ''}
+          </div>
+        </div>
+        <div class="card-exp-items" id="card-items-${cardId}">
+          <div class="card-items-loading">⏳ Carregando itens...</div>
+        </div>
+      </div>
+      <div class="card-exp-footer">
+        <span class="badge ${badge.cls}">${badge.texto}</span>
+        <span>📍 ${item.municipio_nome || '—'} / ${item.uf || '—'}</span>
+        <span>📅 ${fmt(item.data_inicio_vigencia)}</span>
+        <span>⏰ ${fmt(item.data_fim_vigencia)}</span>
+      </div>
+    </div>`;
+  }
+
+  async function carregarItensCard(cnpj, ano, seq, cardId) {
+    const el = document.getElementById('card-items-' + cardId);
+    if (!el) return;
+    try {
+      const r = await fetch(`/api/itens?cnpj=${cnpj}&ano=${ano}&sequencial=${seq}`);
+      const data = await r.json();
+      const itens = (data.data || []).slice(0, 8);
+      if (!itens.length) {
+        el.innerHTML = '<div class="card-items-vazio">Sem itens encontrados</div>';
+        return;
+      }
+      el.innerHTML = `
+        <div class="card-exp-items-titulo">Itens da licitação</div>
+        <div class="card-exp-items-grid">
+          ${itens.map(it => `
+            <div class="card-item-prev">
+              <div class="card-item-prev-num">Item ${it.numeroItem || '—'}</div>
+              <div class="card-item-prev-nome">${(it.descricao || 'Sem descrição').substring(0, 45)}${(it.descricao || '').length > 45 ? '...' : ''}</div>
+              <div class="card-item-prev-qtd">Qtd: <strong>${it.quantidade || '—'} ${it.unidadeMedida || ''}</strong></div>
+            </div>`).join('')}
+        </div>`;
+    } catch {
+      el.innerHTML = '<div class="card-items-vazio">—</div>';
+    }
+  }
+
   // ===== NEGÓCIOS =====
   function getNegocios(){try{return JSON.parse(localStorage.getItem(NEG_KEY)||'[]')}catch{return[]}}
   function salvarNegocios(n){localStorage.setItem(NEG_KEY,JSON.stringify(n))}
@@ -1118,22 +1273,8 @@
       totalPaginas=data.totalPaginas||1;
       document.getElementById('resumo').innerHTML=`<strong>${total.toLocaleString('pt-BR')}</strong> licitações encontradas · Página ${paginaAtual} de ${totalPaginas}`;
       if(!itens.length){document.getElementById('resultado').innerHTML='<div class="vazio">Nenhuma licitação encontrada para esses filtros.</div>';return}
-      document.getElementById('resultado').innerHTML=`<div class="cards">${itens.map(item=>{
-        const badge=statusBadge(item);
-        const mod=fmtModalidade(item.modalidade_licitacao_nome)||'Licitação';
-        const num=extrairNumEdital(item);
-        const tituloCard=`${mod.toUpperCase()}${num?' Nº '+num:''} — ${(item.orgao_nome||'').toUpperCase()}${item.uf?' / '+item.uf:''}`;
-        return`<div class="card" onclick='abrirDrawer(${JSON.stringify(item)})'>
-          <div class="card-titulo-principal">${tituloCard}</div>
-          <div class="card-desc">${item.description||'—'}</div>
-          <div class="card-info">
-            <span class="badge ${badge.cls}">${badge.texto}</span>
-            <span>📍 ${item.municipio_nome||item.uf||'—'} / ${item.uf||''}</span>
-            <span>📅 Abertura: ${fmt(item.data_inicio_vigencia)}</span>
-            <span>⏰ Encerra: ${fmt(item.data_fim_vigencia)}</span>
-          </div>
-        </div>`;
-      }).join('')}</div>`;
+      document.getElementById('layoutToggle').style.display='flex';
+      renderCards(itens);
       document.getElementById('paginacao').style.display='flex';
       document.getElementById('paginaInfo').textContent=`Página ${paginaAtual} de ${totalPaginas}`;
       document.getElementById('btnAnterior').disabled=paginaAtual<=1;
@@ -1150,6 +1291,7 @@
     selectedPortais=['F'];atualizarBotaoPortal();
     limparDatas();
     document.getElementById('resultado').innerHTML='';
+    document.getElementById('layoutToggle').style.display='none';
     document.getElementById('resumo').innerHTML='';
     document.getElementById('paginacao').style.display='none';
   }
