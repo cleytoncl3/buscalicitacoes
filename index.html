@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-tema="claro">
+<html lang="pt-BR" data-tema="escuro">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Busca Licitações – Arantes Papéis</title>
+  <title>Arantes Licitações</title>
   <style>
     :root{
       --bg:#f4f6f8;--surface:#fff;--surface2:#f8f9fa;--border:#e0e0e0;
@@ -30,8 +30,6 @@
     }
     *{box-sizing:border-box;margin:0;padding:0;transition:background-color .2s,color .2s,border-color .2s}
     body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text)}
-
-    /* HEADER */
     header{background:var(--primary);color:var(--accent);padding:0 32px;display:flex;justify-content:space-between;align-items:center;height:58px;position:sticky;top:0;z-index:300}
     .header-left{display:flex;align-items:center;gap:24px}
     .header-logo{font-size:1.2rem;font-weight:700;letter-spacing:1px;white-space:nowrap;color:var(--accent)}
@@ -40,7 +38,7 @@
     .nav-btn{background:transparent;border:none;color:rgba(255,255,255,.7);padding:8px 14px;border-radius:8px;font-size:.9rem;cursor:pointer;display:flex;align-items:center;gap:6px;position:relative;white-space:nowrap}
     .nav-btn:hover,.nav-btn.ativo{background:rgba(255,255,255,.15);color:#fff}
     .nav-btn.ativo{color:var(--accent)}
-    .dropdown{position:absolute;top:calc(100% + 6px);left:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);min-width:200px;z-index:400;display:none;padding:4px}
+    .dropdown{position:absolute;top:calc(100% + 6px);left:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:200px;z-index:400;display:none;padding:4px}
     .dropdown.aberto{display:block}
     .dropdown-item{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:.88rem;color:var(--text);cursor:pointer;border-radius:7px}
     .dropdown-item:hover{background:var(--chip-bg);color:var(--primary)}
@@ -49,30 +47,24 @@
     .header-right{display:flex;align-items:center;gap:10px}
     .btn-tema{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:pointer}
     .btn-tema:hover{background:rgba(255,255,255,.25)}
-
-    /* SININHO */
     .btn-sino{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1rem;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center}
     .btn-sino:hover{background:rgba(255,255,255,.25)}
     .sino-badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:.6rem;font-weight:700;border-radius:20px;padding:1px 5px;min-width:16px;text-align:center;display:none}
     .sino-badge.visivel{display:block}
-    .notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:360px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:400;display:none;max-height:500px;overflow-y:auto}
+    .notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:360px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:400;display:none;max-height:500px;overflow-y:auto}
     .notif-panel.aberto{display:block}
     .notif-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
     .notif-header span{font-weight:600;font-size:.9rem}
     .notif-header button{background:none;border:none;color:#ef4444;font-size:.78rem;cursor:pointer}
     .notif-item{padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer}
     .notif-item:hover{background:var(--surface2)}
-    .notif-item:last-child{border-bottom:none}
     .notif-titulo{font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:3px}
     .notif-desc{font-size:.78rem;color:var(--text2)}
     .notif-data{font-size:.72rem;color:var(--text3);margin-top:3px}
     .notif-vazia{padding:24px;text-align:center;color:var(--text3);font-size:.88rem}
     .notif-wrapper{position:relative}
-
-    /* CONTAINER / VIEWS */
     .container{max-width:1100px;margin:0 auto;padding:24px 16px}
-    .view{display:none}
-    .view.ativo{display:block}
+    .view{display:none}.view.ativo{display:block}
 
     /* FILTROS */
     .filtros{background:var(--surface);border-radius:10px;padding:20px;box-shadow:var(--card-shadow);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:8px;border:1px solid var(--border)}
@@ -83,6 +75,26 @@
     .btn-buscar:hover{background:var(--primary-hover)}
     .btn-buscar:disabled{background:var(--text3);cursor:wait}
     .btn-limpar{background:transparent;color:var(--text3);border:1px solid var(--border);padding:10px 16px;border-radius:8px;font-size:.9rem;cursor:pointer}
+    .kw-hint{font-size:.75rem;color:var(--text3);margin-top:4px;grid-column:1/-1}
+
+    /* MULTI-SELECT UF */
+    .uf-multiselect{position:relative;width:100%}
+    .uf-btn{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.95rem;background:var(--surface2);color:var(--text);text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .uf-btn:focus{outline:none;border-color:var(--primary)}
+    .uf-btn-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+    .uf-chevron{flex-shrink:0;font-size:.75rem;color:var(--text3)}
+    .uf-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:250;display:none}
+    .uf-dropdown.aberto{display:block}
+    .uf-search-wrap{padding:10px 12px;border-bottom:1px solid var(--border)}
+    .uf-search-wrap input{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:.85rem;background:var(--surface2);color:var(--text);outline:none}
+    .uf-opts{max-height:220px;overflow-y:auto;padding:6px}
+    .uf-opt{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.88rem;color:var(--text)}
+    .uf-opt:hover{background:var(--chip-bg)}
+    .uf-opt input[type=checkbox]{cursor:pointer;accent-color:var(--primary);width:14px;height:14px}
+    .uf-footer{padding:8px 12px;border-top:1px solid var(--border);display:flex;gap:8px}
+    .uf-footer button{font-size:.78rem;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer}
+    .uf-footer button:hover{background:var(--chip-bg);color:var(--primary)}
+    .uf-count-badge{background:var(--primary);color:var(--accent);font-size:.7rem;padding:1px 7px;border-radius:20px;font-weight:700;flex-shrink:0}
 
     /* HISTÓRICO */
     .historico-box{background:var(--surface);border-radius:10px;padding:12px 16px;box-shadow:var(--card-shadow);margin-bottom:16px;display:none;border:1px solid var(--border)}
@@ -129,19 +141,19 @@
     .jornal-chip{background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:20px;padding:3px 10px;font-size:.78rem;font-weight:600}
     [data-tema="escuro"] .jornal-chip{color:var(--accent)}
     .jornal-meta{font-size:.78rem;color:var(--text3);margin-bottom:10px}
-    .jornal-actions{display:flex;gap:8px}
+    .jornal-actions{display:flex;gap:8px;flex-wrap:wrap}
     .jornal-btn{font-size:.8rem;padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer}
     .jornal-btn:hover{background:var(--chip-bg);color:var(--primary)}
     .jornal-btn-danger{color:#ef4444;border-color:#fca5a5}
-    .jornal-btn-danger:hover{background:#fff3f3;color:#dc2626}
+    .jornal-btn-danger:hover{background:var(--erro-bg);color:#dc2626}
     .jornal-btn-primary{background:var(--primary);color:var(--accent);border-color:var(--primary)}
     .jornal-btn-primary:hover{background:var(--primary-hover)}
     .jornal-resultado{font-size:.82rem;font-weight:600;color:var(--badge-verde-txt);background:var(--badge-verde-bg);border-radius:20px;padding:3px 10px}
 
-    /* MODAL JORNAL */
-    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center}
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:none;align-items:center;justify-content:center}
     .modal-overlay.aberto{display:flex}
-    .modal{background:var(--surface);border-radius:14px;padding:28px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+    .modal{background:var(--surface);border-radius:14px;padding:28px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.4)}
     .modal h3{font-size:1.1rem;font-weight:700;margin-bottom:20px}
     .modal-campo{margin-bottom:16px}
     .modal-campo label{display:block;font-size:.82rem;color:var(--text2);margin-bottom:6px;font-weight:600}
@@ -215,8 +227,7 @@
     .neg-tab:hover{color:var(--text)}
     .neg-tab.ativo{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
     [data-tema="escuro"] .neg-tab.ativo{color:var(--accent);border-bottom-color:var(--accent)}
-    .neg-view{display:none}
-    .neg-view.ativo{display:block}
+    .neg-view{display:none}.neg-view.ativo{display:block}
     .funil{display:flex;flex-direction:column;gap:24px}
     .fase-titulo{display:flex;align-items:center;gap:10px;margin-bottom:12px}
     .fase-badge{padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:700}
@@ -238,7 +249,7 @@
     .neg-btn{font-size:.75rem;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer}
     .neg-btn:hover{background:var(--chip-bg);color:var(--primary)}
     .neg-btn-danger{color:#ef4444;border-color:#fca5a5}
-    .neg-btn-danger:hover{background:#fff3f3;color:#dc2626}
+    .neg-btn-danger:hover{background:var(--erro-bg);color:#dc2626}
     .fase-vazio{color:var(--text3);font-size:.85rem;padding:10px 0}
     .kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;overflow-x:auto;padding-bottom:8px}
     .kanban-col{background:var(--surface2);border-radius:10px;padding:12px;border:1px solid var(--border);min-width:180px}
@@ -260,7 +271,6 @@
     .cal-evento{background:var(--primary);color:var(--accent);border-radius:3px;padding:1px 4px;font-size:.65rem;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .cal-evento.encerramento{background:#7f1d1d;color:#fca5a5}
     [data-tema="escuro"] .cal-evento{background:#245239}
-
     @media(max-width:800px){.filtros{grid-template-columns:1fr}.filtros .campo-busca{flex-direction:column}.drawer{width:100%;right:-100%}.drawer-grid{grid-template-columns:1fr}.item-detalhe-grid{grid-template-columns:1fr 1fr}.kanban{grid-template-columns:repeat(3,1fr)}.header-logo span{display:none}.nav-btn{padding:6px 10px;font-size:.82rem}}
   </style>
 </head>
@@ -276,7 +286,7 @@
       <input type="text" id="jornalNome" placeholder="ex: Papel Kraft, Embalagem"/>
     </div>
     <div class="modal-campo">
-      <label>Palavras-chave (pressione Enter ou clique em +)</label>
+      <label>Palavras-chave (Enter ou clique em +)</label>
       <div class="kw-input-row">
         <input type="text" id="kwInput" placeholder="ex: papel kraft" onkeydown="kwKeydown(event)"/>
         <button class="btn-add-kw" onclick="adicionarKw()">+ Adicionar</button>
@@ -337,19 +347,13 @@
   </div>
   <div class="header-right">
     <div class="notif-wrapper">
-      <button class="btn-sino" onclick="toggleNotificacoes()" title="Notificações">
-        🔔
-        <span class="sino-badge" id="sinoBadge">0</span>
-      </button>
+      <button class="btn-sino" onclick="toggleNotificacoes()">🔔<span class="sino-badge" id="sinoBadge">0</span></button>
       <div class="notif-panel" id="notifPanel">
-        <div class="notif-header">
-          <span>🔔 Notificações</span>
-          <button onclick="limparNotificacoes()">Limpar todas</button>
-        </div>
+        <div class="notif-header"><span>🔔 Notificações</span><button onclick="limparNotificacoes()">Limpar todas</button></div>
         <div id="notifLista"><div class="notif-vazia">Nenhuma notificação</div></div>
       </div>
     </div>
-    <button class="btn-tema" id="btnTema" onclick="alternarTema()">🌙</button>
+    <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
   </div>
 </header>
 
@@ -358,20 +362,31 @@
   <div class="container">
     <div class="filtros">
       <div class="campo-busca">
-        <input type="text" id="palavraChave" placeholder="Palavra-chave (ex: papel, bobina, kraft, embalagem...)"/>
+        <input type="text" id="palavraChave" placeholder="Palavras-chave separadas por ; (ex: papel kraft; bobina; embalagem)"/>
         <button class="btn-buscar" id="btnBuscar" onclick="buscar(1)">Buscar</button>
         <button class="btn-limpar" onclick="limpar()">Limpar</button>
       </div>
-      <select id="uf">
-        <option value="">Todos os estados</option>
-        <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
-        <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
-        <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
-        <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
-        <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
-        <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
-        <option>SP</option><option>SE</option><option>TO</option>
-      </select>
+      <div class="kw-hint">💡 Separe múltiplas palavras com ponto e vírgula: <strong>papel kraft; bobina; embalagem parda</strong></div>
+
+      <!-- MULTI-SELECT UF -->
+      <div class="uf-multiselect" id="ufMultiselect">
+        <button class="uf-btn" onclick="toggleUFDropdown(event)" type="button">
+          <span class="uf-btn-txt" id="ufBtnTxt">Todos os estados</span>
+          <span class="uf-chevron">▼</span>
+        </button>
+        <div class="uf-dropdown" id="ufDropdown">
+          <div class="uf-search-wrap">
+            <input type="text" id="ufSearch" placeholder="Buscar estado..." oninput="filtrarUFOpts()"/>
+          </div>
+          <div class="uf-opts" id="ufOpts"></div>
+          <div class="uf-footer">
+            <button onclick="selecionarSudeste()">Sudeste</button>
+            <button onclick="selecionarTodos()">Todos</button>
+            <button onclick="limparUFs()">Limpar</button>
+          </div>
+        </div>
+      </div>
+
       <select id="modalidade">
         <option value="">Todas as modalidades</option>
         <option value="6">Pregão Eletrônico</option>
@@ -408,7 +423,7 @@
     <div class="jornais-header">
       <div>
         <h2>📰 Meus Jornais</h2>
-        <p style="font-size:.85rem;color:var(--text3);margin-top:4px">Palavras-chave monitoradas automaticamente. Verificado toda vez que você abre o site.</p>
+        <p style="font-size:.85rem;color:var(--text3);margin-top:4px">Palavras-chave monitoradas. Verificado automaticamente ao abrir o site.</p>
       </div>
       <button class="btn-novo-jornal" onclick="abrirModalNovo()">+ Novo jornal</button>
     </div>
@@ -476,8 +491,9 @@
 
 <script>
   // ===== STATE =====
-  let paginaAtual=1,totalPaginas=1,itemAtualDrawer=null,mesAtual=new Date(),todosItens=[];
-  let kwAtual=[];
+  let paginaAtual=1,totalPaginas=1,itemAtualDrawer=null,mesAtual=new Date(),todosItens=[],kwAtual=[];
+  let selectedUFs=[];
+  const ESTADOS=['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
   const HIST_KEY='arantesBusca_historico';
   const TEMA_KEY='arantesBusca_tema';
   const NEG_KEY='arantesBusca_negocios';
@@ -491,7 +507,7 @@
     {id:'contrato',nome:'Contrato',cls:'fase-contrato',emoji:'🟢'},
   ];
 
-  // ===== TEMA =====
+  // ===== TEMA — padrão escuro =====
   function alternarTema(){
     const html=document.documentElement,novo=html.getAttribute('data-tema')==='escuro'?'claro':'escuro';
     html.setAttribute('data-tema',novo);
@@ -499,35 +515,66 @@
     localStorage.setItem(TEMA_KEY,novo);
   }
   function carregarTema(){
-    const t=localStorage.getItem(TEMA_KEY)||'claro';
+    const salvo=localStorage.getItem(TEMA_KEY);
+    const t=salvo||'escuro'; // padrão escuro
     document.documentElement.setAttribute('data-tema',t);
     document.getElementById('btnTema').textContent=t==='escuro'?'☀️':'🌙';
   }
+
+  // ===== MULTI-SELECT UF =====
+  function renderUFOpts(filtro=''){
+    const div=document.getElementById('ufOpts');
+    div.innerHTML=ESTADOS.filter(e=>!filtro||e.toLowerCase().includes(filtro.toLowerCase())).map(e=>`
+      <div class="uf-opt" onclick="toggleUF('${e}')">
+        <input type="checkbox" value="${e}" ${selectedUFs.includes(e)?'checked':''} onclick="event.stopPropagation();toggleUF('${e}')"/>
+        ${e}
+      </div>`).join('');
+  }
+  function filtrarUFOpts(){renderUFOpts(document.getElementById('ufSearch').value)}
+  function toggleUFDropdown(e){
+    e.stopPropagation();
+    document.getElementById('ufDropdown').classList.toggle('aberto');
+    document.getElementById('ufSearch').value='';
+    renderUFOpts();
+  }
+  function toggleUF(uf){
+    if(selectedUFs.includes(uf))selectedUFs=selectedUFs.filter(u=>u!==uf);
+    else selectedUFs.push(uf);
+    updateUFBtn();
+    renderUFOpts(document.getElementById('ufSearch').value);
+  }
+  function updateUFBtn(){
+    const txt=document.getElementById('ufBtnTxt');
+    const badge=document.querySelector('.uf-count-badge');
+    if(!selectedUFs.length){txt.textContent='Todos os estados';if(badge)badge.remove();}
+    else if(selectedUFs.length<=4){txt.textContent=selectedUFs.join(', ');}
+    else{txt.textContent=selectedUFs.slice(0,4).join(', ')+` (+${selectedUFs.length-4})`;}
+  }
+  function limparUFs(){selectedUFs=[];updateUFBtn();renderUFOpts()}
+  function selecionarSudeste(){selectedUFs=['RJ','SP','MG','ES'];updateUFBtn();renderUFOpts()}
+  function selecionarTodos(){selectedUFs=[...ESTADOS];updateUFBtn();renderUFOpts()}
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('#ufMultiselect'))document.getElementById('ufDropdown').classList.remove('aberto');
+    if(!e.target.closest('.nav-btn')&&!e.target.closest('.notif-wrapper'))
+      document.querySelectorAll('.dropdown,.notif-panel').forEach(d=>d.classList.remove('aberto'));
+  });
 
   // ===== NAVEGAÇÃO =====
   function toggleDropdown(id){
     document.querySelectorAll('.dropdown').forEach(d=>{if(d.id!==id)d.classList.remove('aberto')});
     document.getElementById(id).classList.toggle('aberto');
   }
-  document.addEventListener('click',e=>{
-    if(!e.target.closest('.nav-btn')&&!e.target.closest('.notif-wrapper'))
-      document.querySelectorAll('.dropdown,.notif-panel').forEach(d=>d.classList.remove('aberto'));
-  });
-
   function irParaView(view){
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('ativo'));
     document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('ativo'));
     document.querySelectorAll('.dropdown').forEach(d=>d.classList.remove('aberto'));
-    const viewEl=document.getElementById('view'+view.charAt(0).toUpperCase()+view.slice(1));
-    if(viewEl)viewEl.classList.add('ativo');
+    const el=document.getElementById('view'+view.charAt(0).toUpperCase()+view.slice(1));
+    if(el)el.classList.add('ativo');
     if(view==='busca'||view==='jornais')document.getElementById('navOportunidades').classList.add('ativo');
     if(view==='negocios')document.getElementById('navNegocios').classList.add('ativo');
     if(view==='jornais')renderJornais();
   }
-  function irParaNegocios(aba){
-    irParaView('negocios');
-    mudarAbaNegocios(aba);
-  }
+  function irParaNegocios(aba){irParaView('negocios');mudarAbaNegocios(aba)}
   function mudarAbaNegocios(aba){
     document.querySelectorAll('.neg-tab').forEach(t=>t.classList.remove('ativo'));
     document.querySelectorAll('.neg-view').forEach(v=>v.classList.remove('ativo'));
@@ -541,9 +588,9 @@
   // ===== NOTIFICAÇÕES =====
   function getNotificacoes(){try{return JSON.parse(localStorage.getItem(NOTIF_KEY)||'[]')}catch{return[]}}
   function salvarNotificacoes(n){localStorage.setItem(NOTIF_KEY,JSON.stringify(n))}
-  function adicionarNotificacao(titulo,desc,jornal){
+  function adicionarNotificacao(titulo,desc){
     const notifs=getNotificacoes();
-    notifs.unshift({id:Date.now().toString(),titulo,desc,jornal,data:new Date().toISOString(),lida:false});
+    notifs.unshift({id:Date.now().toString(),titulo,desc,data:new Date().toISOString(),lida:false});
     salvarNotificacoes(notifs.slice(0,50));
     renderNotificacoes();
   }
@@ -562,24 +609,13 @@
         <div class="notif-data">${new Date(n.data).toLocaleString('pt-BR')}</div>
       </div>`).join('');
   }
-  function marcarLida(id){
-    const notifs=getNotificacoes();
-    const n=notifs.find(x=>x.id===id);
-    if(n)n.lida=true;
-    salvarNotificacoes(notifs);
-    renderNotificacoes();
-  }
-  function limparNotificacoes(){
-    salvarNotificacoes([]);
-    renderNotificacoes();
-    document.getElementById('notifPanel').classList.remove('aberto');
-  }
+  function marcarLida(id){const notifs=getNotificacoes(),n=notifs.find(x=>x.id===id);if(n)n.lida=true;salvarNotificacoes(notifs);renderNotificacoes()}
+  function limparNotificacoes(){salvarNotificacoes([]);renderNotificacoes();document.getElementById('notifPanel').classList.remove('aberto')}
   function toggleNotificacoes(){
     const panel=document.getElementById('notifPanel');
     panel.classList.toggle('aberto');
     if(panel.classList.contains('aberto')){
-      const notifs=getNotificacoes().map(n=>({...n,lida:true}));
-      salvarNotificacoes(notifs);
+      salvarNotificacoes(getNotificacoes().map(n=>({...n,lida:true})));
       renderNotificacoes();
     }
   }
@@ -587,79 +623,46 @@
   // ===== JORNAIS =====
   function getJornais(){try{return JSON.parse(localStorage.getItem(JORNAIS_KEY)||'[]')}catch{return[]}}
   function salvarJornaisLS(j){localStorage.setItem(JORNAIS_KEY,JSON.stringify(j))}
-
   function abrirModalNovo(){
     document.getElementById('modalTitulo').textContent='Novo Jornal';
     document.getElementById('modalJornalId').value='';
     document.getElementById('jornalNome').value='';
     document.getElementById('jornalUF').value='';
     document.getElementById('jornalModalidade').value='';
-    kwAtual=[];
-    renderKwLista();
+    kwAtual=[];renderKwLista();
     document.getElementById('modalOverlay').classList.add('aberto');
-    document.getElementById('kwInput').focus();
+    setTimeout(()=>document.getElementById('kwInput').focus(),100);
   }
   function editarJornal(id){
-    const j=getJornais().find(x=>x.id===id);
-    if(!j)return;
+    const j=getJornais().find(x=>x.id===id);if(!j)return;
     document.getElementById('modalTitulo').textContent='Editar Jornal';
     document.getElementById('modalJornalId').value=id;
     document.getElementById('jornalNome').value=j.nome;
     document.getElementById('jornalUF').value=j.uf||'';
     document.getElementById('jornalModalidade').value=j.modalidade||'';
-    kwAtual=[...j.palavrasChave];
-    renderKwLista();
+    kwAtual=[...j.palavrasChave];renderKwLista();
     document.getElementById('modalOverlay').classList.add('aberto');
   }
   function fecharModal(e){if(e.target===document.getElementById('modalOverlay'))fecharModalDireto()}
   function fecharModalDireto(){document.getElementById('modalOverlay').classList.remove('aberto')}
-
   function kwKeydown(e){if(e.key==='Enter'){e.preventDefault();adicionarKw()}}
-  function adicionarKw(){
-    const input=document.getElementById('kwInput');
-    const val=input.value.trim();
-    if(val&&!kwAtual.includes(val)){kwAtual.push(val);renderKwLista()}
-    input.value='';input.focus();
-  }
+  function adicionarKw(){const i=document.getElementById('kwInput'),v=i.value.trim();if(v&&!kwAtual.includes(v)){kwAtual.push(v);renderKwLista()}i.value='';i.focus()}
   function removerKw(i){kwAtual.splice(i,1);renderKwLista()}
-  function renderKwLista(){
-    document.getElementById('kwLista').innerHTML=kwAtual.map((k,i)=>
-      `<span class="kw-chip">${k}<span onclick="removerKw(${i})">✕</span></span>`).join('');
-  }
-
+  function renderKwLista(){document.getElementById('kwLista').innerHTML=kwAtual.map((k,i)=>`<span class="kw-chip">${k}<span onclick="removerKw(${i})">✕</span></span>`).join('')}
   function salvarJornal(){
     const nome=document.getElementById('jornalNome').value.trim();
     if(!nome){alert('Dê um nome ao jornal');return}
     if(!kwAtual.length){alert('Adicione ao menos uma palavra-chave');return}
     const jornais=getJornais();
     const id=document.getElementById('modalJornalId').value;
-    const jornal={
-      id:id||Date.now().toString(),
-      nome,
-      palavrasChave:[...kwAtual],
-      uf:document.getElementById('jornalUF').value,
-      modalidade:document.getElementById('jornalModalidade').value,
-      criadoEm:id?jornais.find(j=>j.id===id)?.criadoEm:new Date().toISOString(),
-      ultimaVerificacao:null,
-      ultimoTotal:0,
-    };
-    if(id){const idx=jornais.findIndex(j=>j.id===id);if(idx>=0)jornais[idx]=jornal;else jornais.unshift(jornal);}
+    const jornal={id:id||Date.now().toString(),nome,palavrasChave:[...kwAtual],uf:document.getElementById('jornalUF').value,modalidade:document.getElementById('jornalModalidade').value,criadoEm:id?jornais.find(j=>j.id===id)?.criadoEm:new Date().toISOString(),ultimaVerificacao:null,ultimoTotal:0};
+    if(id){const idx=jornais.findIndex(j=>j.id===id);if(idx>=0)jornais[idx]=jornal;else jornais.unshift(jornal)}
     else jornais.unshift(jornal);
-    salvarJornaisLS(jornais);
-    fecharModalDireto();
-    renderJornais();
+    salvarJornaisLS(jornais);fecharModalDireto();renderJornais();
   }
-
-  function removerJornal(id){
-    if(!confirm('Remover este jornal?'))return;
-    salvarJornaisLS(getJornais().filter(j=>j.id!==id));
-    renderJornais();
-  }
-
+  function removerJornal(id){if(!confirm('Remover este jornal?'))return;salvarJornaisLS(getJornais().filter(j=>j.id!==id));renderJornais()}
   async function verificarJornal(id){
-    const jornais=getJornais();
-    const j=jornais.find(x=>x.id===id);
-    if(!j)return;
+    const jornais=getJornais(),j=jornais.find(x=>x.id===id);if(!j)return;
     const el=document.getElementById('jornal-resultado-'+id);
     if(el)el.textContent='⏳ Verificando...';
     let totalNovos=0;
@@ -673,59 +676,36 @@
         totalNovos+=data.totalRegistros||0;
       }catch(e){}
     }
-    const anteriorTotal=j.ultimoTotal||0;
-    j.ultimaVerificacao=new Date().toISOString();
-    j.ultimoTotal=totalNovos;
+    const anterior=j.ultimoTotal||0;
+    j.ultimaVerificacao=new Date().toISOString();j.ultimoTotal=totalNovos;
     salvarJornaisLS(jornais);
-    if(totalNovos>anteriorTotal&&anteriorTotal>0){
-      const diff=totalNovos-anteriorTotal;
-      adicionarNotificacao(
-        `📰 ${j.nome}`,
-        `${diff} nova(s) licitação(ões) encontrada(s) para "${j.palavrasChave.join(', ')}"`,
-        j.nome
-      );
-    }
+    if(totalNovos>anterior&&anterior>0)adicionarNotificacao(`📰 ${j.nome}`,`${totalNovos-anterior} nova(s) licitação(ões) encontrada(s) para "${j.palavrasChave.join(', ')}"`);
     renderJornais();
   }
-
-  async function verificarTodosJornais(){
-    const jornais=getJornais();
-    if(!jornais.length)return;
-    for(const j of jornais)await verificarJornal(j.id);
-  }
-
-  function executarBuscaJornal(j){
+  async function verificarTodosJornais(){const jornais=getJornais();for(const j of jornais)await verificarJornal(j.id)}
+  function executarBuscaJornal(kws,uf,mod){
     irParaView('busca');
-    document.getElementById('palavraChave').value=j.palavrasChave[0]||'';
-    document.getElementById('uf').value=j.uf||'';
-    document.getElementById('modalidade').value=j.modalidade||'';
+    document.getElementById('palavraChave').value=kws;
+    if(uf){selectedUFs=[uf];updateUFBtn();}
+    document.getElementById('modalidade').value=mod||'';
     buscar(1);
   }
-
   function renderJornais(){
-    const jornais=getJornais();
-    const lista=document.getElementById('jornaisLista');
-    if(!jornais.length){
-      lista.innerHTML=`<div class="vazio">Nenhum jornal criado ainda.<br><br>
-        <button class="btn-novo-jornal" onclick="abrirModalNovo()">+ Criar primeiro jornal</button></div>`;
-      return;
-    }
+    const jornais=getJornais(),lista=document.getElementById('jornaisLista');
+    if(!jornais.length){lista.innerHTML=`<div class="vazio">Nenhum jornal ainda.<br><br><button class="btn-novo-jornal" onclick="abrirModalNovo()">+ Criar primeiro jornal</button></div>`;return}
     lista.innerHTML=jornais.map(j=>`
       <div class="jornal-card">
         <div class="jornal-card-header">
           <div class="jornal-nome">📰 ${j.nome}</div>
-          ${j.ultimoTotal?`<span class="jornal-resultado" id="jornal-resultado-${j.id}">${j.ultimoTotal.toLocaleString('pt-BR')} licitações</span>`:`<span id="jornal-resultado-${j.id}" style="font-size:.78rem;color:var(--text3)">Não verificado</span>`}
+          <span class="jornal-resultado" id="jornal-resultado-${j.id}">${j.ultimoTotal?j.ultimoTotal.toLocaleString('pt-BR')+' licitações':'Não verificado'}</span>
         </div>
         <div class="jornal-chips">
           ${j.palavrasChave.map(k=>`<span class="jornal-chip">🔍 ${k}</span>`).join('')}
           ${j.uf?`<span class="jornal-chip">📍 ${j.uf}</span>`:''}
-          ${j.modalidade?`<span class="jornal-chip">📋 ${['','','','','Concorrência','Concorrência Presencial','Pregão Eletrônico','Pregão Presencial','Dispensa','Inexigibilidade'][j.modalidade]||j.modalidade}</span>`:''}
         </div>
-        <div class="jornal-meta">
-          ${j.ultimaVerificacao?`Última verificação: ${new Date(j.ultimaVerificacao).toLocaleString('pt-BR')}`:'Ainda não verificado'}
-        </div>
+        <div class="jornal-meta">${j.ultimaVerificacao?`Última verificação: ${new Date(j.ultimaVerificacao).toLocaleString('pt-BR')}`:'Ainda não verificado'}</div>
         <div class="jornal-actions">
-          <button class="jornal-btn jornal-btn-primary" onclick="executarBuscaJornal(${JSON.stringify(j).replace(/"/g,'&quot;')})">🔍 Ver licitações</button>
+          <button class="jornal-btn jornal-btn-primary" onclick="executarBuscaJornal('${j.palavrasChave.join(';')}','${j.uf||''}','${j.modalidade||''}')">🔍 Ver licitações</button>
           <button class="jornal-btn" onclick="verificarJornal('${j.id}')">↻ Verificar agora</button>
           <button class="jornal-btn" onclick="editarJornal('${j.id}')">✎ Editar</button>
           <button class="jornal-btn jornal-btn-danger" onclick="removerJornal('${j.id}')">✕ Remover</button>
@@ -741,15 +721,7 @@
     const negs=getNegocios();
     if(negs.find(n=>n.numero_controle===itemAtualDrawer.numero_controle_pncp)){alert('Já está nos seus negócios!');return}
     const p=parseControle(itemAtualDrawer.numero_controle_pncp);
-    negs.unshift({
-      id:Date.now().toString(),titulo:itemAtualDrawer.title||'Sem título',
-      objeto:itemAtualDrawer.description||'',orgao:itemAtualDrawer.orgao_nome||'',
-      uf:itemAtualDrawer.uf||'',modalidade:itemAtualDrawer.modalidade_licitacao_nome||'',
-      abertura:itemAtualDrawer.data_inicio_vigencia||'',encerramento:itemAtualDrawer.data_fim_vigencia||'',
-      numero_controle:itemAtualDrawer.numero_controle_pncp||'',
-      link_pncp:p?`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`:'',
-      fase:'oportunidade',adicionado_em:new Date().toISOString(),
-    });
+    negs.unshift({id:Date.now().toString(),titulo:itemAtualDrawer.title||'Sem título',objeto:itemAtualDrawer.description||'',orgao:itemAtualDrawer.orgao_nome||'',uf:itemAtualDrawer.uf||'',modalidade:itemAtualDrawer.modalidade_licitacao_nome||'',abertura:itemAtualDrawer.data_inicio_vigencia||'',encerramento:itemAtualDrawer.data_fim_vigencia||'',numero_controle:itemAtualDrawer.numero_controle_pncp||'',link_pncp:p?`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`:'',fase:'oportunidade',adicionado_em:new Date().toISOString()});
     salvarNegocios(negs);
     const btn=document.getElementById('d-btn-negocio');
     btn.textContent='✅ Adicionado!';btn.classList.add('adicionado');
@@ -788,31 +760,25 @@
   function renderAgenda(){
     const negs=getNegocios(),ano=mesAtual.getFullYear(),mes=mesAtual.getMonth();
     document.getElementById('agendaMes').textContent=mesAtual.toLocaleString('pt-BR',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
-    const primeiroDia=new Date(ano,mes,1).getDay(),diasNoMes=new Date(ano,mes+1,0).getDate(),hoje=new Date();
-    let grid='';
-    ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(d=>{grid+=`<div class="cal-dia-semana">${d}</div>`});
-    for(let i=0;i<primeiroDia;i++)grid+=`<div class="cal-dia outro-mes"></div>`;
-    for(let d=1;d<=diasNoMes;d++){
-      const ehHoje=new Date(ano,mes,d).toDateString()===hoje.toDateString();
-      const eventos=negs.filter(n=>{
-        const ab=n.abertura?new Date(n.abertura):null,en=n.encerramento?new Date(n.encerramento):null;
-        return(ab&&ab.getDate()===d&&ab.getMonth()===mes&&ab.getFullYear()===ano)||(en&&en.getDate()===d&&en.getMonth()===mes&&en.getFullYear()===ano);
-      });
-      grid+=`<div class="cal-dia${ehHoje?' hoje':''}"><div class="cal-dia-num">${d}</div>${eventos.map(n=>{
-        const ab=n.abertura?new Date(n.abertura):null,ehAb=ab&&ab.getDate()===d&&ab.getMonth()===mes&&ab.getFullYear()===ano;
-        return`<div class="cal-evento${ehAb?'':' encerramento'}">${ehAb?'📅':'⏰'} ${n.titulo.substring(0,20)}</div>`;
-      }).join('')}</div>`;
+    const p=new Date(ano,mes,1).getDay(),dias=new Date(ano,mes+1,0).getDate(),hoje=new Date();
+    let g='';
+    ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(d=>{g+=`<div class="cal-dia-semana">${d}</div>`});
+    for(let i=0;i<p;i++)g+=`<div class="cal-dia outro-mes"></div>`;
+    for(let d=1;d<=dias;d++){
+      const ehH=new Date(ano,mes,d).toDateString()===hoje.toDateString();
+      const ev=negs.filter(n=>{const ab=n.abertura?new Date(n.abertura):null,en=n.encerramento?new Date(n.encerramento):null;return(ab&&ab.getDate()===d&&ab.getMonth()===mes&&ab.getFullYear()===ano)||(en&&en.getDate()===d&&en.getMonth()===mes&&en.getFullYear()===ano)});
+      g+=`<div class="cal-dia${ehH?' hoje':''}"><div class="cal-dia-num">${d}</div>${ev.map(n=>{const ab=n.abertura?new Date(n.abertura):null,ehA=ab&&ab.getDate()===d&&ab.getMonth()===mes&&ab.getFullYear()===ano;return`<div class="cal-evento${ehA?'':' encerramento'}">${ehA?'📅':'⏰'} ${n.titulo.substring(0,20)}</div>`}).join('')}</div>`;
     }
-    document.getElementById('calendarioGrid').innerHTML=grid;
+    document.getElementById('calendarioGrid').innerHTML=g;
   }
   function mudarMes(dir){if(dir===0)mesAtual=new Date();else mesAtual=new Date(mesAtual.getFullYear(),mesAtual.getMonth()+dir,1);renderAgenda()}
 
   // ===== HISTÓRICO =====
   function getHistorico(){try{return JSON.parse(localStorage.getItem(HIST_KEY)||'[]')}catch{return[]}}
-  function salvarHistorico(kw,uf,mod,st){
+  function salvarHistorico(kw,ufs,mod,st){
     if(!kw)return;
     const h=getHistorico().filter(x=>x.kw!==kw);
-    h.unshift({kw,uf,mod,st});
+    h.unshift({kw,ufs,mod,st});
     localStorage.setItem(HIST_KEY,JSON.stringify(h.slice(0,15)));
     renderHistorico();
   }
@@ -821,11 +787,18 @@
     if(!h.length){box.style.display='none';return}
     box.style.display='block';
     document.getElementById('historicoChips').innerHTML=h.map((x,i)=>`
-      <span class="chip" onclick="aplicarHistorico(${i})">${x.kw}${x.uf?' · '+x.uf:''}
+      <span class="chip" onclick="aplicarHistorico(${i})">${x.kw}${x.ufs&&x.ufs.length?' · '+x.ufs.join(','):''}
         <span class="chip-x" onclick="event.stopPropagation();removerHistorico(${i})">✕</span>
       </span>`).join('');
   }
-  function aplicarHistorico(i){const h=getHistorico()[i];if(!h)return;document.getElementById('palavraChave').value=h.kw;document.getElementById('uf').value=h.uf||'';document.getElementById('modalidade').value=h.mod||'';document.getElementById('status').value=h.st||'recebendo_proposta';buscar(1)}
+  function aplicarHistorico(i){
+    const h=getHistorico()[i];if(!h)return;
+    document.getElementById('palavraChave').value=h.kw;
+    selectedUFs=h.ufs||[];updateUFBtn();
+    document.getElementById('modalidade').value=h.mod||'';
+    document.getElementById('status').value=h.st||'recebendo_proposta';
+    buscar(1);
+  }
   function removerHistorico(i){const h=getHistorico();h.splice(i,1);localStorage.setItem(HIST_KEY,JSON.stringify(h));renderHistorico()}
   function limparHistorico(){localStorage.removeItem(HIST_KEY);renderHistorico()}
 
@@ -839,17 +812,8 @@
     if(ini&&agora>=ini)return{texto:'Recebendo proposta',cls:'badge-verde'};
     return{texto:'Aguardando abertura',cls:'badge-amarelo'};
   }
-  function parseControle(c){
-    if(!c)return null;
-    const m=c.match(/^(\d+)-(\d+)-(\d+)\/(\d+)$/);
-    if(!m)return null;
-    return{cnpj:m[1],seqOrgao:m[2],seq:parseInt(m[3]),ano:m[4]};
-  }
-  function buildLinks(item){
-    const p=parseControle(item.numero_controle_pncp);
-    if(!p)return{direto:''};
-    return{direto:`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`};
-  }
+  function parseControle(c){if(!c)return null;const m=c.match(/^(\d+)-(\d+)-(\d+)\/(\d+)$/);if(!m)return null;return{cnpj:m[1],seqOrgao:m[2],seq:parseInt(m[3]),ano:m[4]}}
+  function buildLinks(item){const p=parseControle(item.numero_controle_pncp);if(!p)return{direto:''};return{direto:`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`}}
 
   // ===== DRAWER =====
   function toggleItem(i){document.getElementById('det-'+i).classList.toggle('aberto');document.getElementById('chev-'+i).classList.toggle('aberto')}
@@ -911,28 +875,39 @@
     const p=parseControle(item.numero_controle_pncp);
     if(p)carregarItens(p.cnpj,p.ano,p.seq);
   }
-  function fecharDrawer(){
-    document.getElementById('drawer').classList.remove('ativo');
-    document.getElementById('overlay').classList.remove('ativo');
-    document.body.style.overflow='';itemAtualDrawer=null;
-  }
+  function fecharDrawer(){document.getElementById('drawer').classList.remove('ativo');document.getElementById('overlay').classList.remove('ativo');document.body.style.overflow='';itemAtualDrawer=null}
   async function carregarItens(cnpj,ano,seq){
     try{
       const r=await fetch(`/api/itens?cnpj=${cnpj}&ano=${ano}&sequencial=${seq}`);
       const data=await r.json();
-      todosItens=data.data||[];
-      renderItens(todosItens);
+      todosItens=data.data||[];renderItens(todosItens);
     }catch(e){document.getElementById('d-itens').innerHTML='<div class="item-loading">Erro ao carregar itens.</div>'}
   }
 
-  // ===== BUSCA =====
+  // ===== BUSCA COM RETRY =====
+  async function fetchComRetry(url,tentativas=3){
+    for(let i=0;i<tentativas;i++){
+      try{
+        const r=await fetch(url);
+        if(r.ok)return r;
+        if(i===tentativas-1)return r;
+        await new Promise(r=>setTimeout(r,800));
+      }catch(e){
+        if(i===tentativas-1)throw e;
+        await new Promise(r=>setTimeout(r,800));
+      }
+    }
+  }
+
   async function buscar(pagina){
     paginaAtual=pagina;
     const kw=document.getElementById('palavraChave').value.trim();
-    const uf=document.getElementById('uf').value,mod=document.getElementById('modalidade').value,st=document.getElementById('status').value;
+    const mod=document.getElementById('modalidade').value;
+    const st=document.getElementById('status').value;
+    const ufParam=selectedUFs.join(',');
     const params=new URLSearchParams({pagina});
     if(kw)params.append('palavraChave',kw);
-    if(uf)params.append('uf',uf);
+    if(ufParam)params.append('uf',ufParam);
     if(mod)params.append('modalidade',mod);
     if(st)params.append('status',st);
     const btn=document.getElementById('btnBuscar');
@@ -940,10 +915,10 @@
     document.getElementById('resultado').innerHTML='<div class="loading">⏳ Buscando licitações...</div>';
     document.getElementById('paginacao').style.display='none';document.getElementById('resumo').innerHTML='';
     try{
-      const resp=await fetch(`/api/buscar?${params}`);
+      const resp=await fetchComRetry(`/api/buscar?${params}`);
       const data=await resp.json();
-      if(data.erro){document.getElementById('resultado').innerHTML=`<div class="erro">Erro: ${data.erro}</div>`;return}
-      salvarHistorico(kw,uf,mod,st);
+      if(data.erro){document.getElementById('resultado').innerHTML=`<div class="erro">Erro: ${data.erro}<br><small>Tente novamente em alguns segundos.</small></div>`;return}
+      salvarHistorico(kw,selectedUFs,mod,st);
       const itens=data.data||[],total=data.totalRegistros||0;
       totalPaginas=data.totalPaginas||1;
       document.getElementById('resumo').innerHTML=`<strong>${total.toLocaleString('pt-BR')}</strong> licitações encontradas · Página ${paginaAtual} de ${totalPaginas}`;
@@ -961,12 +936,13 @@
       document.getElementById('paginaInfo').textContent=`Página ${paginaAtual} de ${totalPaginas}`;
       document.getElementById('btnAnterior').disabled=paginaAtual<=1;
       document.getElementById('btnProxima').disabled=paginaAtual>=totalPaginas;
-    }catch(e){document.getElementById('resultado').innerHTML=`<div class="erro">Erro de conexão: ${e.message}</div>`;}
-    finally{btn.disabled=false;btn.textContent='Buscar'}
+    }catch(e){
+      document.getElementById('resultado').innerHTML=`<div class="erro">Erro de conexão: ${e.message}<br><button class="btn-buscar" style="margin-top:10px" onclick="buscar(${pagina})">↻ Tentar novamente</button></div>`;
+    }finally{btn.disabled=false;btn.textContent='Buscar'}
   }
   function mudarPagina(d){const n=paginaAtual+d;if(n>=1&&n<=totalPaginas)buscar(n)}
   function limpar(){
-    document.getElementById('palavraChave').value='';document.getElementById('uf').value='';
+    document.getElementById('palavraChave').value='';selectedUFs=[];updateUFBtn();
     document.getElementById('modalidade').value='';document.getElementById('status').value='recebendo_proposta';
     document.getElementById('resultado').innerHTML='';document.getElementById('resumo').innerHTML='';
     document.getElementById('paginacao').style.display='none';
@@ -975,9 +951,9 @@
 
   // ===== INIT =====
   carregarTema();
+  renderUFOpts();
   renderHistorico();
   renderNotificacoes();
-  // Verificar jornais automaticamente ao abrir
   setTimeout(()=>verificarTodosJornais(),2000);
 </script>
 </body>
