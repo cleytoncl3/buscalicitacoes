@@ -62,14 +62,11 @@ export default async function handler(req, res) {
     });
   };
 
-  const filtrarPortal = (items) =>
-    portais.length ? items.filter(i => portais.includes(String(i.esfera_id || ''))) : items;
-
   const filtrarMod = (items) =>
     mods.length ? items.filter(i => mods.includes(String(i.modalidade_licitacao_id || ''))) : items;
 
   // ── aplica todos os filtros client-side ──────────────────────────
-  const aplicar = (items) => filtrarData(filtrarPortal(filtrarMod(items)));
+  const aplicar = (items) => filtrarData(filtrarMod(items));
 
   try {
     // ══════════════════════════════════════════════════════════════
