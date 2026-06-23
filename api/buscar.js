@@ -3,7 +3,7 @@ export default async function handler(req, res) {
 
   const {
     palavraChave = '', uf = '', pagina = 1,
-    modalidade = '', dataInicial = '', dataFinal = '', portal = ''
+    modalidade = '', dataInicial = '', dataFinal = ''
   } = req.query;
 
   const pg  = parseInt(pagina) || 1;
@@ -14,7 +14,6 @@ export default async function handler(req, res) {
     : [''];
   const ufs     = uf        ? uf.split(',').map(u => u.trim()).filter(Boolean)        : [];
   const mods    = modalidade ? modalidade.split(',').map(m => m.trim()).filter(Boolean) : [];
-  const portais = portal    ? portal.split(',').map(p => p.trim()).filter(Boolean)     : [];
 
   // ── fetch com retry simples ──────────────────────────────────────
   const fetchJSON = async (url) => {
@@ -46,8 +45,7 @@ export default async function handler(req, res) {
     if (kw) p.append('q', kw);
     ufs.forEach(u   => p.append('ufs',      u));   // PNCP aceita múltiplos
     mods.forEach(m  => p.append('modalidade', m));  // tenta server-side
-    portais.forEach(pt => p.append('esfera', pt));  // tenta server-side (F/E/M)
-    return `https://pncp.gov.br/api/search/?${p}`;
+      return `https://pncp.gov.br/api/search/?${p}`;
   };
 
   // ── filtros client-side (garante mesmo que PNCP ignore) ─────────
