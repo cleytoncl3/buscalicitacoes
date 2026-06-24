@@ -48,15 +48,20 @@ export default async function handler(req, res) {
   };
 
   // Filtro de data client-side (PNCP não suporta este filtro na /api/search/)
+  // Lógica: inclui licitação se ela for RELEVANTE no período selecionado
+  // = encerramento depois do início do período E abertura antes do fim do período
+  // Isso captura licitações que abriram antes do filtro mas ainda estão recebendo propostas
   const filtrarData = (items) => {
     if (!dataInicial && !dataFinal) return items;
     const dI = dataInicial ? new Date(dataInicial + 'T00:00:00') : null;
     const dF = dataFinal   ? new Date(dataFinal   + 'T23:59:59') : null;
     return items.filter(i => {
-      const ab = i.data_inicio_vigencia ? new Date(i.data_inicio_vigencia) : null;
-      if (!ab) return true;
-      if (dI && ab < dI) return false;
-      if (dF && ab > dF) return false;
+      const ab  = i.data_inicio_vigencia ? new Date(i.data_inicio_vigencia) : null;
+      const fim = i.data_fim_vigencia    ? new Date(i.data_fim_vigencia)    : null;
+      // Se encerrou antes do início do período: fora
+      if (dI && fim && fim < dI) return false;
+      // Se ainda não abriu no fim do período: fora
+      if (dF && ab && ab > dF) return false;
       return true;
     });
   };
