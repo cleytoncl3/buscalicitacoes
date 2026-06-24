@@ -362,8 +362,13 @@
     .card-exp-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:2px}
     .card-exp-meta span{font-size:.75rem;color:var(--text2)}
     .card-exp-badge{font-size:.72rem;padding:2px 8px;border-radius:4px;font-weight:600}
-    .card-exp-badge-portal{background:var(--badge-verde-bg);color:var(--badge-verde-txt)}
-    .card-exp-badge-mod{background:var(--surface2);color:var(--text3);border:1px solid var(--border);font-size:.7rem;padding:2px 7px;border-radius:4px}
+    .card-exp-badge-portal{background:var(--primary);color:var(--accent);font-size:.7rem;padding:2px 8px;border-radius:4px}
+    .card-exp-badge-mod{background:var(--surface2);color:var(--accent);border:1px solid var(--border);font-size:.7rem;padding:2px 7px;border-radius:4px}
+    [data-tema="claro"] .card-exp-badge-portal{background:var(--chip-bg);color:var(--primary)}
+    [data-tema="claro"] .card-exp-badge-mod{color:var(--primary)}
+    /* Footer badges com accent */
+    .footer-badge{font-size:.72rem;font-weight:600;color:var(--accent);background:var(--primary);padding:2px 8px;border-radius:4px;white-space:nowrap}
+    [data-tema="claro"] .footer-badge{color:var(--primary);background:var(--chip-bg)}
 
     .card-exp-items{padding:10px 12px;background:var(--surface);display:flex;flex-direction:column;gap:4px;border-left:1px solid var(--border)}
     .card-exp-items-titulo{font-size:.68rem;text-transform:uppercase;color:var(--text3);letter-spacing:.5px;font-weight:600;margin-bottom:2px}
@@ -416,7 +421,7 @@
 
       /* UF e Modalidade — coluna única */
       .filtros-linha-selects{grid-template-columns:1fr}
-      .select-trigger{width:100%}
+      .select-trigger{width:100%;font-size:.88rem;padding:10px 12px}
 
       /* Data — coluna única */
       .data-row{flex-direction:column;align-items:stretch;gap:6px}
@@ -1075,13 +1080,13 @@
       <div class="card-vert-desc">${item.description||'—'}</div>
       <div class="card-vert-divider"></div>
       <div class="card-vert-datas">
-        <div class="card-vert-data"><span>📋 Divulgação</span><span>${fmt(item.data_publicacao_pncp)}</span></div>
-        <div class="card-vert-data"><span>📅 Início propostas</span><span>${fmt(item.data_inicio_vigencia)}</span></div>
-        <div class="card-vert-data"><span>⏰ Fim propostas</span><span>${fmt(item.data_fim_vigencia)}</span></div>
+        <div class="card-vert-data"><span>📅 Início</span><span>${fmt(item.data_inicio_vigencia)}</span></div>
+        <div class="card-vert-data"><span>⏰ Fim</span><span>${fmt(item.data_fim_vigencia)}</span></div>
       </div>
       <div class="card-vert-footer">
         <span class="badge ${badge.cls}">${badge.texto}</span>
         <span class="card-vert-local">📍 ${item.municipio_nome||item.uf||'—'} / ${item.uf||''}</span>
+        ${item.esfera_nome ? `<span class="footer-badge">${item.esfera_nome}</span>` : ''}
       </div>
     </div>`;
   }
@@ -1116,9 +1121,8 @@
           <div class="card-exp-titulo">${titulo}</div>
           <div class="card-exp-desc">${item.description || '—'}</div>
           <div class="card-exp-meta">
-            <span>📋 Divulgação: <strong>${fmt(item.data_publicacao_pncp)}</strong></span>
-            <span>📅 Início propostas: <strong>${fmt(item.data_inicio_vigencia)}</strong></span>
-            <span>⏰ Fim propostas: <strong>${fmt(item.data_fim_vigencia)}</strong></span>
+            <span>📅 Início: ${fmt(item.data_inicio_vigencia)}</span>
+            <span>⏰ Fim: ${fmt(item.data_fim_vigencia)}</span>
             ${item.modalidade_licitacao_nome ? `<span class="card-exp-badge card-exp-badge-mod">${fmtModalidade(item.modalidade_licitacao_nome)}</span>` : ''}
             ${esferaNome ? `<span class="card-exp-badge card-exp-badge-portal">${esferaNome}</span>` : ''}
           </div>
@@ -1552,6 +1556,11 @@
   // No desktop: layout horizontal por padrão (cards com preview de itens)
   if (window.innerWidth <= 900) {
     layoutAtual = 'compacto';
+    // Atualiza visual dos botões para refletir layout real
+    setTimeout(() => {
+      document.getElementById('btnLayoutCompacto')?.classList.add('ativo');
+      document.getElementById('btnLayoutExpandido')?.classList.remove('ativo');
+    }, 0);
   }
 
   carregarTema();
