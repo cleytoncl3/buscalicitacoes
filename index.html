@@ -412,6 +412,25 @@
     .card-exp-items::-webkit-scrollbar-track{background:transparent}
     .card-exp-items::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
     .card-exp-items::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+
+    /* ═══ LISTA DE ITENS (drawer) ═══ */
+    .item-lista{display:flex;flex-direction:column;gap:6px}
+    .item-accordion{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+    .item-header{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:var(--surface2)}
+    .item-header:hover{filter:brightness(1.05)}
+    .item-num-badge{background:var(--primary);color:var(--accent);border-radius:6px;padding:2px 8px;font-size:.75rem;font-weight:700;white-space:nowrap;min-width:56px;text-align:center;flex-shrink:0}
+    .item-resumo{flex:1;min-width:0}
+    .item-nome{font-size:.88rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .item-qtd{font-size:.78rem;color:var(--text2);margin-top:2px}
+    .item-chevron{color:var(--text3);font-size:.85rem;transition:transform .2s;flex-shrink:0}
+    .item-chevron.aberto{transform:rotate(180deg)}
+    .item-detalhe{display:none;padding:14px;background:var(--surface);border-top:1px solid var(--border)}
+    .item-detalhe.aberto{display:block}
+    .item-detalhe-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+    .item-detalhe-campo{background:var(--surface2);border-radius:6px;padding:8px 10px;border:1px solid var(--border)}
+    .item-detalhe-campo label{font-size:.7rem;color:var(--text3);display:block;text-transform:uppercase;margin-bottom:2px}
+    .item-detalhe-campo span{font-size:.85rem;font-weight:600;color:var(--text)}
+
     /* ═══ TABLET/MOBILE (≤1024px) ═══ */
     @media(max-width:1024px){
       .card-exp-main{grid-template-columns:1fr}
