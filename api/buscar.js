@@ -16,9 +16,8 @@ export default async function handler(req, res) {
   const ufs  = uf        ? uf.split(',').map(u => u.trim()).filter(Boolean) : [];
   const mods = modalidade ? modalidade.split(',').map(m => m.trim()).filter(Boolean) : [];
 
-  const statusValidos = ['recebendo_proposta', 'propostas_encerradas', 'encerradas', 'todos'];
+  const statusValidos = ['recebendo_proposta','propostas_encerradas','encerradas','todos'];
   const statusFinal   = statusValidos.includes(status) ? status : 'recebendo_proposta';
-  const hasDateFilter = !!(dataInicial || dataFinal);
 
   const fetchJSON = async (url) => {
     for (let i = 0; i < 3; i++) {
@@ -32,24 +31,25 @@ export default async function handler(req, res) {
     return null;
   };
 
-  // Parâmetros corretos descobertos na investigação da API real do PNCP:
-  // ✅ modalidades (plural, pipe)  ✅ ufs (pipe)  ✅ ordenacao=-data
-  const buildUrl = (kw, paginaReq, tamPag = TAM) => {
+  // Parâmetros corretos do PNCP:
+  // ✅ modalidades (plural) com pipe  ✅ ufs com pipe  ✅ ordenacao=-data
+  const buildUrl = (kw, paginaReq) => {
     const p = new URLSearchParams({
       tipos_documento: 'edital',
       ordenacao:       '-data',
       status:          statusFinal,
       pagina:          paginaReq,
-      tam_pagina:      tamPag,
+      tam_pagina:      TAM,
     });
-    if (kw)          p.append('q',          kw);
-    if (ufs.length)  p.append('ufs',        ufs.join('|'));
+    if (kw)          p.append('q',           kw);
+    if (ufs.length)  p.append('ufs',         ufs.join('|'));
     if (mods.length) p.append('modalidades', mods.join('|'));
     return `https://pncp.gov.br/api/search/?${p}`;
   };
 
+  // Filtro de data client-side (PNCP não suporta este filtro na /api/search/)
   const filtrarData = (items) => {
-    if (!hasDateFilter) return items;
+    if (!dataInicial && !dataFinal) return items;
     const dI = dataInicial ? new Date(dataInicial + 'T00:00:00') : null;
     const dF = dataFinal   ? new Date(dataFinal   + 'T23:59:59') : null;
     return items.filter(i => {
@@ -62,59 +62,27 @@ export default async function handler(req, res) {
   };
 
   try {
+    // ════════════════════════════════════════════════════════════
+    // KEYWORD ÚNICO — paginação nativa do PNCP sempre
+    // Simples, estável e nunca quebra
+    // ════════════════════════════════════════════════════════════
     if (keywords.length === 1) {
-      // ══════════════════════════════════════════════════════════
-      // SEM FILTRO DE DATA → paginação nativa do PNCP (estável)
-      // Sempre retorna exatamente 20 itens por página
-      // ══════════════════════════════════════════════════════════
-      if (!hasDateFilter) {
-        const data  = await fetchJSON(buildUrl(keywords[0], pg));
-        const items = data?.items || [];
-        const total = data?.total || 0;
-        return res.status(200).json({
-          data:           items,
-          totalRegistros: total,
-          totalPaginas:   Math.ceil(total / TAM) || 1,
-        });
-      }
-
-      // ══════════════════════════════════════════════════════════
-      // COM FILTRO DE DATA → busca lote grande (PNCP suporta até
-      // 1000 por página), aplica filtro, pagina client-side.
-      // Garante sempre 20 itens por página mesmo após filtrar.
-      // ══════════════════════════════════════════════════════════
-
-      // Passo 1: descobre o total real com uma query rápida (tam=1)
-      const probe = await fetchJSON(buildUrl(keywords[0], 1, 1));
-      const totalPNCP = probe?.total || 0;
-
-      if (totalPNCP === 0) {
-        return res.status(200).json({ data: [], totalRegistros: 0, totalPaginas: 1 });
-      }
-
-      // Passo 2: busca todos os itens em uma chamada (máx 500)
-      const tamLote  = Math.min(totalPNCP, 500);
-      const allData  = await fetchJSON(buildUrl(keywords[0], 1, tamLote));
-      const allItems = allData?.items || [];
-
-      // Passo 3: aplica filtro de data
-      const filtered = filtrarData(allItems);
-      const total    = filtered.length;
-      const ini      = (pg - 1) * TAM;
+      const data  = await fetchJSON(buildUrl(keywords[0], pg));
+      const raw   = data?.items || [];
+      const total = data?.total  || 0;
 
       return res.status(200).json({
-        data:           filtered.slice(ini, ini + TAM),
-        totalRegistros: total,
+        data:           filtrarData(raw),   // filtro de data na página atual
+        totalRegistros: total,              // total real do PNCP
         totalPaginas:   Math.ceil(total / TAM) || 1,
       });
     }
 
-    // ══════════════════════════════════════════════════════════
-    // MÚLTIPLOS KEYWORDS (;) → uma query por keyword, merge
-    // ══════════════════════════════════════════════════════════
-    const tamMult  = hasDateFilter ? 100 : TAM;
-    const results  = await Promise.all(
-      keywords.slice(0, 5).map(kw => fetchJSON(buildUrl(kw, 1, tamMult)))
+    // ════════════════════════════════════════════════════════════
+    // MÚLTIPLOS KEYWORDS (;) — uma query por keyword, merge
+    // ════════════════════════════════════════════════════════════
+    const results = await Promise.all(
+      keywords.slice(0, 5).map(kw => fetchJSON(buildUrl(kw, pg)))
     );
 
     const seen   = new Set();
@@ -126,14 +94,13 @@ export default async function handler(req, res) {
       })
     );
 
-    const filtered = filtrarData(merged);
-    const total    = filtered.length;
-    const ini      = (pg - 1) * TAM;
+    const filtered  = filtrarData(merged);
+    const totalEst  = results[0]?.total || filtered.length;
 
     return res.status(200).json({
-      data:           filtered.slice(ini, ini + TAM),
-      totalRegistros: total,
-      totalPaginas:   Math.ceil(total / TAM) || 1,
+      data:           filtered,
+      totalRegistros: totalEst,
+      totalPaginas:   Math.ceil(totalEst / TAM) || 1,
     });
 
   } catch (err) {
