@@ -947,9 +947,10 @@
       // HORIZONTAL — card com itens à direita
       document.getElementById('resultado').innerHTML =
         `<div class="cards" style="gap:14px">${itens.map(renderCardExpandido).join('')}</div>`;
-      itens.forEach((item, idx) => {
+      itens.forEach((item) => {
         const p = parseControle(item.numero_controle_pncp);
-        if (p) carregarItensCard(p.cnpj, p.ano, p.seq, item.id || idx);
+        const cardId = (item.numero_controle_pncp || item.id || '').replace(/[^a-z0-9]/gi,'_');
+        if (p && cardId) carregarItensCard(p.cnpj, p.ano, p.seq, cardId);
       });
     } else {
       // VERTICAL — grid estilo smartphone
@@ -1009,7 +1010,7 @@
     const mod = fmtModalidade(item.modalidade_licitacao_nome) || 'Licitação';
     const num = extrairNumEdital(item);
     const titulo = `${mod.toUpperCase()}${num ? ' Nº ' + num : ''} — ${(item.orgao_nome || '').toUpperCase()}${item.uf ? ' / ' + item.uf : ''}`;
-    const cardId = item.id || item.numero_controle_pncp || Math.random().toString(36).substr(2,9);
+    const cardId = (item.numero_controle_pncp || item.id || Math.random().toString(36).substr(2,9)).replace(/[^a-z0-9]/gi,'_');
     const esferaNome = item.esfera_id === 'F' ? 'Comprasnet' : item.esfera_id === 'E' ? 'Estadual' : item.esfera_id === 'M' ? 'Municipal' : '';
     return `<div class="card-exp" onclick='abrirDrawer(${JSON.stringify(item)})'>
       <div class="card-exp-main">
@@ -1039,49 +1040,84 @@
   async function carregarItensCard(cnpj, ano, seq, cardId) {
     const el = document.getElementById('card-items-' + cardId);
     if (!el) return;
+
+    // ── Cache localStorage (1h) — evita refetch da mesma licitação ──
+    const cacheKey = `pncp_itens_${cnpj}_${ano}_${seq}`;
+    let todos = null;
     try {
-      const r = await fetch(`/api/itens?cnpj=${cnpj}&ano=${ano}&sequencial=${seq}`);
-      const data = await r.json();
-      const todos = data.data || [];
+      const c = localStorage.getItem(cacheKey);
+      if (c) { const { d, ts } = JSON.parse(c); if (Date.now() - ts < 3600000) todos = d; }
+    } catch {}
 
-      // Separa cada keyword por espaço E por ponto-e-vírgula
-      // "papel kraft" → ["papel","kraft"]  |  "papel kraft; bobina" → ["papel","kraft","bobina"]
-      const kwRaw = document.getElementById('palavraChave').value.trim();
-      const termos = kwRaw
-        ? [...new Set(
-            kwRaw.split(';')
-              .flatMap(k => k.trim().split(/\s+/))
-              .map(t => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,''))
-              .filter(t => t.length > 2)   // ignora palavras curtas (de, ou, a, o...)
-          )]
-        : [];
-
-      // Filtra apenas itens cujo nome contém QUALQUER das palavras da busca
-      const filtrados = termos.length
-        ? todos.filter(it => {
-            const desc = (it.descricao || '').toLowerCase()
-              .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-            return termos.some(t => desc.includes(t));
-          })
-        : [];
-
-      // Sem fallback — só mostra itens realmente relacionados à busca
-      if (!filtrados.length) {
-        el.innerHTML = '<div class="card-items-vazio" style="font-size:.72rem;padding:8px 4px">Sem itens relacionados à busca</div>';
+    if (!todos) {
+      try {
+        const r = await fetch(`/api/itens?cnpj=${cnpj}&ano=${ano}&sequencial=${seq}`);
+        todos = (await r.json()).data || [];
+        try { localStorage.setItem(cacheKey, JSON.stringify({ d: todos, ts: Date.now() })); } catch {}
+      } catch {
+        el.innerHTML = '<div class="card-items-vazio">—</div>';
         return;
       }
-
-      el.innerHTML = `
-        <div class="card-exp-items-titulo">Itens encontrados (${filtrados.length})</div>
-        ${filtrados.slice(0, 8).map(it => `
-          <div class="card-item-prev">
-            <span class="card-item-prev-num">#${it.numeroItem||'—'}</span>
-            <span class="card-item-prev-nome">${(it.descricao||'').substring(0,38)}${(it.descricao||'').length>38?'…':''}</span>
-            <span class="card-item-prev-qtd"><strong>${it.quantidade||'—'}</strong> ${it.unidadeMedida||''}</span>
-          </div>`).join('')}`;
-    } catch {
-      el.innerHTML = '<div class="card-items-vazio">—</div>';
     }
+
+    // ── Extrai termos da busca (sem aspas, sem palavras curtas) ──
+    const kwRaw = document.getElementById('palavraChave').value.trim();
+    const norm  = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/"/g,'');
+    const termos = kwRaw
+      ? [...new Set(
+          kwRaw.split(';')
+            .flatMap(k => k.trim().split(/\s+/))
+            .map(t => norm(t).replace(/[^a-z0-9]/g,''))
+            .filter(t => t.length > 2)
+        )]
+      : [];
+
+    if (!termos.length) {
+      el.innerHTML = '<div class="card-items-vazio" style="font-size:.72rem;padding:8px 4px">Digite uma busca para ver itens</div>';
+      return;
+    }
+
+    // ── Matching por prioridade de relevância ──
+    // P1: descrição contém a FRASE COMPLETA (ex: "papel kraft")
+    // P2: descrição contém TODAS as palavras (ex: "papel" E "kraft")
+    // P3: descrição contém QUALQUER palavra  (ex: "papel" OU "kraft")
+    const frase = termos.join(' ');
+    const p1 = [], p2 = [], p3 = [];
+    const vistos = new Set();
+    todos.forEach(it => {
+      const desc = norm(it.descricao);
+      if (desc.includes(frase)) { p1.push(it); vistos.add(it.numeroItem); }
+    });
+    todos.forEach(it => {
+      if (vistos.has(it.numeroItem)) return;
+      const desc = norm(it.descricao);
+      if (termos.every(t => desc.includes(t))) { p2.push(it); vistos.add(it.numeroItem); }
+    });
+    todos.forEach(it => {
+      if (vistos.has(it.numeroItem)) return;
+      const desc = norm(it.descricao);
+      if (termos.some(t => desc.includes(t))) { p3.push(it); vistos.add(it.numeroItem); }
+    });
+
+    const filtrados = [...p1, ...p2, ...p3];
+
+    if (!filtrados.length) {
+      el.innerHTML = '<div class="card-items-vazio" style="font-size:.72rem;padding:8px 4px">Sem itens relacionados à busca</div>';
+      return;
+    }
+
+    const label = p1.length ? `Itens (frase exata: ${p1.length})` :
+                  p2.length ? `Itens (todas as palavras: ${filtrados.length})` :
+                              `Itens (palavras separadas: ${filtrados.length})`;
+
+    el.innerHTML = `
+      <div class="card-exp-items-titulo">${label}</div>
+      ${filtrados.slice(0, 8).map(it => `
+        <div class="card-item-prev">
+          <span class="card-item-prev-num">#${it.numeroItem||'—'}</span>
+          <span class="card-item-prev-nome">${norm(it.descricao).substring(0,38)}${(it.descricao||'').length>38?'…':''}</span>
+          <span class="card-item-prev-qtd"><strong>${it.quantidade||'—'}</strong> ${it.unidadeMedida||''}</span>
+        </div>`).join('')}`;
   }
 
   // ===== NEGÓCIOS =====
