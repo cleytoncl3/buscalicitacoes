@@ -741,35 +741,62 @@
 <!-- DRAWER -->
 <div class="overlay" id="overlay" onclick="fecharDrawer()"></div>
 <div class="drawer" id="drawer">
+
   <div class="drawer-header">
     <button class="drawer-fechar" onclick="fecharDrawer()">✕</button>
-    <h2 id="d-titulo">Carregando...</h2>
-    <div class="drawer-sub" id="d-numero"></div>
+    <div class="d-fonte-badge" id="d-fonte-badge">PNCP</div>
+    <div class="d-num-header" id="d-num-header"></div>
   </div>
+
   <div class="drawer-body">
+
+    <div class="d-orgao-bloco">
+      <div class="d-orgao-nome" id="d-orgao"></div>
+      <div class="d-unidade-nome" id="d-unidade"></div>
+      <div class="d-local" id="d-uf"></div>
+    </div>
+
+    <div class="d-sep"></div>
+
+    <div class="d-objeto" id="d-objeto"></div>
+
     <div class="drawer-tags" id="d-tags"></div>
-    <div class="drawer-section"><h3>Objeto</h3><div class="drawer-desc" id="d-objeto"></div></div>
-    <div class="drawer-section">
-      <div class="drawer-grid">
-        <div class="drawer-campo"><label>Órgão</label><span id="d-orgao"></span></div>
-        <div class="drawer-campo"><label>Unidade</label><span id="d-unidade"></span></div>
-        <div class="drawer-campo"><label>Estado</label><span id="d-uf"></span></div>
-        <div class="drawer-campo"><label>Modalidade</label><span id="d-modalidade"></span></div>
-        <div class="drawer-campo"><label>Início de propostas</label><span id="d-abertura"></span></div>
-        <div class="drawer-campo"><label>Fim de propostas</label><span id="d-encerramento"></span></div>
-        <div class="drawer-campo"><label>Valor estimado</label><span id="d-valor"></span></div>
-        <div class="drawer-campo"><label>Situação</label><span id="d-situacao"></span></div>
+
+    <div class="d-abertura-box">
+      <div class="d-abertura-label">📅 Início de recebimento de propostas</div>
+      <div class="d-abertura-data" id="d-abertura">—</div>
+    </div>
+
+    <div class="d-info-row">
+      <div class="d-info-item">
+        <span class="d-info-label">⏰ Encerramento</span>
+        <span class="d-info-val" id="d-encerramento">—</span>
+      </div>
+      <div class="d-info-item">
+        <span class="d-info-label">💰 Valor estimado</span>
+        <span class="d-info-val" id="d-valor">—</span>
       </div>
     </div>
-    <button class="drawer-btn" id="d-btn-acessar">📄 Acessar edital no PNCP</button>
-    <button class="drawer-btn drawer-btn-sec" id="d-btn-busca">🔍 Buscar no PNCP</button>
-    <button class="drawer-btn drawer-btn-destaque" id="d-btn-negocio" onclick="adicionarAosNegocios()">💼 Adicionar aos meus negócios</button>
-    <div class="drawer-section">
-      <h3>Itens do pregão</h3>
-      <div class="drawer-kw-chips" id="drawerKwChips"></div>
-      <input type="text" class="item-busca" id="buscaItem" placeholder="🔍 Buscar item dentro desta licitação..." oninput="filtrarItens()"/>
-      <div id="d-itens"><div class="item-loading">⏳ Carregando itens...</div></div>
+
+    <div class="d-situacao-row">
+      <span class="d-sit-badge" id="d-situacao"></span>
+      <span class="d-mod-badge" id="d-modalidade"></span>
     </div>
+
+    <div class="d-acoes">
+      <button class="d-btn-acessar" id="d-btn-acessar">📄 Acessar edital no PNCP</button>
+      <button class="d-btn-negocio" id="d-btn-negocio" onclick="adicionarAosNegocios()">💼 Adicionar aos meus negócios</button>
+    </div>
+
+    <div class="d-sep"></div>
+
+    <div class="d-itens-titulo">Itens da licitação</div>
+    <div class="drawer-kw-chips" id="drawerKwChips"></div>
+    <input type="text" class="item-busca" id="buscaItem"
+      placeholder="🔍 Buscar item dentro desta licitação..."
+      oninput="filtrarItens()"/>
+    <div id="d-itens"><div class="item-loading">⏳ Carregando itens...</div></div>
+
   </div>
 </div>
 
