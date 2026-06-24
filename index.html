@@ -305,6 +305,11 @@
 
 
 
+
+    /* Autocomplete */
+    #palavraChave::-webkit-calendar-picker-indicator{display:none !important}
+    datalist option{font-size:.9rem}
+
     /* ===== LAYOUT VERTICAL (smartphone style) ===== */
     .cards-vertical{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
     .card-vert{background:var(--surface);border-radius:10px;padding:14px;box-shadow:var(--card-shadow);border-top:3px solid var(--primary);cursor:pointer;display:flex;flex-direction:column;gap:8px;transition:box-shadow .2s}
@@ -503,11 +508,65 @@
 
       <!-- Linha 1: Keyword -->
       <div class="filtros-linha filtros-linha-busca">
-        <input type="text" id="palavraChave" placeholder="Palavras-chave separadas por ; (ex: papel kraft; bobina; embalagem parda)"/>
+        <input type="text" id="palavraChave" list="kw-sugestoes" autocomplete="off" placeholder="Palavras-chave separadas por ; (ex: papel kraft; bobina; embalagem parda)"/>
+      <datalist id="kw-sugestoes">
+        <option value="papel kraft">
+        <option value="papel sulfite">
+        <option value="papel A4">
+        <option value="papel A3">
+        <option value="papel ofício">
+        <option value="papel pardo">
+        <option value="papel reciclado">
+        <option value="papel cartão">
+        <option value="papel offset">
+        <option value="papel vegetal">
+        <option value="papel alumínio">
+        <option value="papel térmico">
+        <option value="papel higiênico">
+        <option value="papel toalha">
+        <option value="bobina kraft">
+        <option value="bobina papel kraft">
+        <option value="bobina semi kraft">
+        <option value="bobina térmica">
+        <option value="semi kraft">
+        <option value="papel kraft natural">
+        <option value="papel kraft pardo">
+        <option value="papel para embalagem">
+        <option value="papel para impressão">
+        <option value="saco kraft">
+        <option value="envelope kraft">
+        <option value="caixa papelão">
+        <option value="caixa kraft">
+        <option value="resma papel">
+        <option value="resma sulfite">
+        <option value="material de escritório">
+        <option value="material de expediente">
+        <option value="material de papelaria">
+        <option value="caderno">
+        <option value="bloco de notas">
+        <option value="pasta arquivo">
+        <option value="pasta papelão">
+        <option value="etiqueta adesiva">
+        <option value="etiqueta papel">
+        <option value="fita adesiva">
+        <option value="fita crepe">
+        <option value="guardanapo">
+        <option value="papel A4 75g">
+        <option value="papel A4 90g">
+        <option value="papel sulfite A4">
+        <option value="papel sulfite A3">
+        <option value="papel couché">
+        <option value="papel jornal">
+        <option value="papelão">
+        <option value="papelão ondulado">
+        <option value="embalagem papel">
+        <option value="embalagem kraft">
+        <option value="material de limpeza">
+      </datalist>
         <button class="btn-buscar" id="btnBuscar" onclick="buscar(1)">Buscar</button>
         <button class="btn-limpar" onclick="limpar()">Limpar</button>
       </div>
-      <div class="kw-hint">💡 Separe múltiplas palavras-chave com <strong>;</strong> — a busca prioriza a frase completa e também busca palavras individuais</div>
+      <div class="kw-hint">💡 Separe com <strong>;</strong> para múltiplos termos · Use <strong>"aspas"</strong> para busca exata · Ex: papel kraft; "bobina kraft"</div>
 
       <!-- Linha 2: UF + Modalidade -->
       <div class="filtros-linha filtros-linha-selects">
