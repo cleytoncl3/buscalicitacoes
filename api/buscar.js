@@ -10,8 +10,20 @@ export default async function handler(req, res) {
   const pg  = parseInt(pagina) || 1;
   const TAM = 20;
 
+  // Cada keyword separada por ";" vira uma busca de frase exata automaticamente:
+  // "bobina papel kraft" ou bobina papel kraft → enviado como "bobina papel kraft" pro PNCP
+  // Palavra única → sem aspas (não precisa)
+  // Já entre aspas → mantém como está
+  const wrapFrase = (kw) => {
+    kw = kw.trim();
+    if (!kw) return kw;
+    if (kw.startsWith('"') && kw.endsWith('"')) return kw; // já tem aspas
+    if (kw.includes(' ')) return `"${kw}"`; // multi-palavra → adiciona aspas
+    return kw; // palavra única → sem aspas
+  };
+
   const keywords = palavraChave
-    ? palavraChave.split(';').map(k => k.trim()).filter(Boolean)
+    ? palavraChave.split(';').map(k => wrapFrase(k)).filter(Boolean)
     : [''];
   const ufs  = uf        ? uf.split(',').map(u => u.trim()).filter(Boolean) : [];
   const mods = modalidade ? modalidade.split(',').map(m => m.trim()).filter(Boolean) : [];
