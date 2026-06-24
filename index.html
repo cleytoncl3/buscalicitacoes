@@ -448,6 +448,49 @@
     .btn-topo.visivel{display:flex}
     .btn-topo:hover{background:var(--primary-hover)}
 
+
+    /* ═══ NOVAS VIEWS ═══ */
+    .page-header{margin-bottom:20px}
+    .page-header h2{font-size:1.2rem;font-weight:700;margin-bottom:4px}
+    .page-header p{font-size:.85rem;color:var(--text3)}
+    .busca-form{background:var(--surface);border-radius:10px;padding:16px;border:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+    .busca-form input,.busca-form select{flex:1;min-width:160px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.9rem;background:var(--surface2);color:var(--text);outline:none}
+    .busca-form input:focus,.busca-form select:focus{border-color:var(--primary)}
+    .btn-primario{background:var(--primary);color:var(--accent);border:none;padding:10px 24px;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer;white-space:nowrap}
+    .btn-primario:hover{background:var(--primary-hover)}
+    .resultado-grid{display:grid;gap:10px}
+    .result-card{background:var(--surface);border-radius:10px;padding:16px;border:1px solid var(--border);border-left:4px solid var(--primary);cursor:pointer;transition:box-shadow .15s}
+    .result-card:hover{box-shadow:var(--card-shadow-hover);border-left-color:var(--accent)}
+    .result-card-titulo{font-weight:700;font-size:.9rem;color:var(--accent);margin-bottom:4px}
+    [data-tema="claro"] .result-card-titulo{color:var(--primary)}
+    .result-card-info{font-size:.8rem;color:var(--text2);display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
+    .stat-badge{background:var(--primary);color:var(--accent);border-radius:20px;padding:2px 10px;font-size:.72rem;font-weight:700}
+    .cnpj-box{background:var(--surface);border-radius:12px;padding:20px;border:1px solid var(--border);margin-bottom:16px}
+    .cnpj-box h3{font-size:1rem;font-weight:700;margin-bottom:12px;color:var(--accent)}
+    .cnpj-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .cnpj-campo{background:var(--surface2);border-radius:8px;padding:10px 12px;border:1px solid var(--border)}
+    .cnpj-campo label{font-size:.7rem;color:var(--text3);display:block;text-transform:uppercase;margin-bottom:2px}
+    .cnpj-campo span{font-size:.88rem;font-weight:600;color:var(--text)}
+    .empresa-form{background:var(--surface);border-radius:10px;padding:20px;border:1px solid var(--border);margin-bottom:16px}
+    .empresa-form .campo{margin-bottom:12px}
+    .empresa-form label{display:block;font-size:.78rem;color:var(--text2);margin-bottom:5px;font-weight:600}
+    .empresa-form input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.9rem;background:var(--surface2);color:var(--text);outline:none}
+    .empresa-form input:focus{border-color:var(--primary)}
+    .doc-lista{display:flex;flex-direction:column;gap:8px}
+    .doc-item{background:var(--surface);border-radius:8px;padding:12px 16px;border:1px solid var(--border);display:flex;align-items:center;gap:12px}
+    .doc-icon{font-size:1.3rem;flex-shrink:0}
+    .doc-nome{flex:1;font-size:.88rem;font-weight:600;color:var(--text)}
+    .doc-meta{font-size:.75rem;color:var(--text3)}
+    .doc-acoes{display:flex;gap:6px}
+    .doc-btn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:.78rem;cursor:pointer}
+    .doc-btn:hover{background:var(--chip-bg)}
+    .info-vazia{text-align:center;padding:40px;color:var(--text3);font-size:.9rem}
+    .loading-box{text-align:center;padding:30px;color:var(--text3)}
+    .ata-card{background:var(--surface);border-radius:8px;padding:14px 16px;border:1px solid var(--border);border-left:4px solid var(--accent);margin-bottom:8px}
+    .ata-titulo{font-size:.88rem;font-weight:700;color:var(--accent);margin-bottom:4px}
+    .ata-info{font-size:.78rem;color:var(--text2);display:flex;flex-wrap:wrap;gap:10px}
+    .ata-valor{font-size:.85rem;font-weight:700;color:var(--badge-verde-txt);background:var(--badge-verde-bg);padding:3px 10px;border-radius:20px}
+
     /* ═══ TABLET/MOBILE (≤1024px) ═══ */
     @media(max-width:1024px){
       .card-exp-main{grid-template-columns:1fr}
@@ -644,7 +687,7 @@
     <button class="nav-btn ativo" id="navOportunidades" onclick="toggleDropdown('dropOportunidades')">
       <span class="nav-btn-icon">🔍</span> Pesquisar ▾
       <div class="dropdown" id="dropOportunidades">
-        <div class="dropdown-item" onclick="irParaView('busca')">🔍 Buscar Licitações</div>
+        <div class="dropdown-item" onclick="irParaView('busca')">🔍 Nova Pesquisa</div>
         <div class="dropdown-sep"></div>
         <div class="dropdown-item" onclick="irParaView('jornais')">🔔 Meus Alertas</div>
       </div>
@@ -786,6 +829,101 @@
       </div>
       <div class="calendario" id="calendarioGrid"></div>
     </div>
+  </div>
+</div>
+
+
+<!-- VIEW ÓRGÃOS PÚBLICOS -->
+<div class="view" id="viewOrgaos">
+  <div class="container">
+    <div class="page-header"><h2>🏛️ Órgãos Públicos</h2><p>Encontre órgãos por nome ou estado e veja suas licitações ativas.</p></div>
+    <div class="busca-form">
+      <input type="text" id="orgaoQ" placeholder="Nome do órgão ou palavra-chave..."/>
+      <select id="orgaoUF"><option value="">Todos os estados</option>
+        <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option>
+      </select>
+      <button class="btn-primario" onclick="buscarOrgaos()">Buscar</button>
+    </div>
+    <div id="orgaosResultado"><div class="info-vazia">Digite um nome de órgão para buscar.</div></div>
+  </div>
+</div>
+
+<!-- VIEW BUSCAR POR NÚMERO -->
+<div class="view" id="viewBuscarNum">
+  <div class="container">
+    <div class="page-header"><h2>🔢 Buscar por Número</h2><p>Acesse diretamente uma licitação informando o CNPJ do órgão, ano e número sequencial do PNCP.</p></div>
+    <div class="cnpj-box">
+      <div class="busca-form" style="flex-direction:column;gap:12px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div>
+            <label style="font-size:.78rem;color:var(--text3);display:block;margin-bottom:4px">CNPJ do Órgão</label>
+            <input type="text" id="bnCnpj" placeholder="00.000.000/0001-00"/>
+          </div>
+          <div>
+            <label style="font-size:.78rem;color:var(--text3);display:block;margin-bottom:4px">Ano</label>
+            <input type="text" id="bnAno" placeholder="2026" maxlength="4"/>
+          </div>
+          <div>
+            <label style="font-size:.78rem;color:var(--text3);display:block;margin-bottom:4px">Número Sequencial</label>
+            <input type="text" id="bnSeq" placeholder="000050"/>
+          </div>
+        </div>
+        <button class="btn-primario" style="width:100%" onclick="buscarPorNumero()">🔍 Buscar Licitação</button>
+      </div>
+      <div id="buscarNumResultado"></div>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW PREÇOS PRATICADOS (HISTÓRICO) -->
+<div class="view" id="viewHistorico">
+  <div class="container">
+    <div class="page-header"><h2>📈 Preços Praticados</h2><p>Consulte o histórico de compras públicas (atas de registro de preços) para referência de preços.</p></div>
+    <div class="busca-form">
+      <input type="text" id="histQ" placeholder="Ex: papel kraft, cadeira, caneta..." style="flex:2"/>
+      <select id="histUF"><option value="">Todos os estados</option>
+        <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option>
+      </select>
+      <button class="btn-primario" onclick="buscarHistorico(1)">Buscar</button>
+    </div>
+    <div id="historicoResumo" class="resumo"></div>
+    <div id="historicoResultado"><div class="info-vazia">Busque por um produto para ver preços praticados em atas de registro de preços.</div></div>
+    <div class="paginacao" id="historicoPag" style="display:none">
+      <button class="btn-pag" id="histAnterior" onclick="buscarHistorico(histPagAtual-1)">← Anterior</button>
+      <span class="pagina-info" id="histPagInfo"></span>
+      <button class="btn-pag" id="histProxima" onclick="buscarHistorico(histPagAtual+1)">Próxima →</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW CONSULTAR EMPRESA -->
+<div class="view" id="viewEmpresa">
+  <div class="container">
+    <div class="page-header"><h2>🔎 Consultar Empresa</h2><p>Pesquise qualquer empresa pelo CNPJ e veja seus dados cadastrais e licitações no PNCP.</p></div>
+    <div class="busca-form">
+      <input type="text" id="empresaCnpj" placeholder="CNPJ: 00.000.000/0001-00" maxlength="18"/>
+      <button class="btn-primario" onclick="consultarEmpresa()">Consultar</button>
+    </div>
+    <div id="empresaResultado"><div class="info-vazia">Digite um CNPJ para consultar dados da empresa.</div></div>
+  </div>
+</div>
+
+<!-- VIEW MINHA EMPRESA -->
+<div class="view" id="viewMinhaEmpresa">
+  <div class="container">
+    <div class="page-header"><h2>🏢 Minha Empresa</h2><p>Dados da sua empresa para uso na plataforma.</p></div>
+    <div id="minhaEmpresaForm"></div>
+  </div>
+</div>
+
+<!-- VIEW DOCUMENTOS -->
+<div class="view" id="viewDocumentos">
+  <div class="container">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
+      <div><h2>📂 Documentos</h2><p>Links e referências de documentos importantes da sua empresa.</p></div>
+      <button class="btn-primario" onclick="abrirAddDoc()">+ Adicionar</button>
+    </div>
+    <div id="documentosLista"></div>
   </div>
 </div>
 
@@ -1000,9 +1138,12 @@
     document.querySelectorAll('.dropdown').forEach(d=>d.classList.remove('aberto'));
     const el=document.getElementById('view'+view.charAt(0).toUpperCase()+view.slice(1));
     if(el)el.classList.add('ativo');
-    if(view==='busca'||view==='jornais')document.getElementById('navOportunidades').classList.add('ativo');
-    if(view==='negocios')document.getElementById('navNegocios').classList.add('ativo');
+    if(['busca','jornais','orgaos','buscarNum'].includes(view))document.getElementById('navOportunidades').classList.add('ativo');
+    if(['historico','empresa'].includes(view))document.getElementById('navAnalise').classList.add('ativo');
+    if(['negocios','minhaEmpresa','documentos'].includes(view))document.getElementById('navNegocios').classList.add('ativo');
     if(view==='jornais')renderJornais();
+    if(view==='minhaEmpresa')renderMinhaEmpresa();
+    if(view==='documentos')renderDocumentos();
   }
   function irParaNegocios(aba){irParaView('negocios');mudarAbaNegocios(aba)}
   function mudarAbaNegocios(aba){
@@ -1661,6 +1802,254 @@
   }
   document.getElementById('palavraChave').addEventListener('keydown',e=>{if(e.key==='Enter')buscar(1)});
 
+
+
+  // ═══════════════════════════════════════════════════
+  // ÓRGÃOS PÚBLICOS
+  // ═══════════════════════════════════════════════════
+  async function buscarOrgaos() {
+    const q = document.getElementById('orgaoQ').value.trim();
+    const uf = document.getElementById('orgaoUF').value;
+    const div = document.getElementById('orgaosResultado');
+    div.innerHTML = '<div class="loading-box">⏳ Buscando órgãos...</div>';
+    try {
+      const params = new URLSearchParams({ pagina: 1 });
+      if (q) params.append('q', q);
+      if (uf) params.append('uf', uf);
+      const r = await fetch('/api/orgaos?' + params);
+      const data = await r.json();
+      if (!data.orgaos?.length) { div.innerHTML = '<div class="info-vazia">Nenhum órgão encontrado.</div>'; return; }
+      div.innerHTML = `<p class="resumo"><strong>${data.orgaos.length}</strong> órgãos encontrados</p>
+        <div class="resultado-grid">${data.orgaos.map(o => `
+          <div class="result-card" onclick="buscarLicOrgao('${o.nome}')">
+            <div class="result-card-titulo">🏛️ ${o.nome || '—'}</div>
+            <div class="result-card-info">
+              <span>📍 ${o.municipio || '—'} / ${o.uf || '—'}</span>
+              <span>${o.esfera || '—'}</span>
+              ${o.cnpj ? `<span>CNPJ: ${o.cnpj}</span>` : ''}
+              <span class="stat-badge">${o.total} licitação(ões)</span>
+            </div>
+          </div>`).join('')}</div>`;
+    } catch(e) {
+      div.innerHTML = '<div class="info-vazia">Erro ao buscar órgãos.</div>';
+    }
+  }
+
+  function buscarLicOrgao(nome) {
+    irParaView('busca');
+    document.getElementById('palavraChave').value = nome;
+    buscar(1);
+  }
+
+  // ═══════════════════════════════════════════════════
+  // BUSCAR POR NÚMERO
+  // ═══════════════════════════════════════════════════
+  async function buscarPorNumero() {
+    const cnpj = document.getElementById('bnCnpj').value.replace(/\D/g, '');
+    const ano = document.getElementById('bnAno').value.trim();
+    const seq = document.getElementById('bnSeq').value.trim().padStart(6, '0');
+    const div = document.getElementById('buscarNumResultado');
+    if (!cnpj || !ano || !seq) { alert('Preencha CNPJ, Ano e Número Sequencial'); return; }
+    div.innerHTML = '<div class="loading-box">⏳ Buscando...</div>';
+    try {
+      const r = await fetch(`https://pncp.gov.br/api/pncp/v1/orgaos/${cnpj}/compras/${ano}/${parseInt(seq)}`, {
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!r.ok) { div.innerHTML = '<div class="info-vazia">Licitação não encontrada. Verifique os dados.</div>'; return; }
+      const d = await r.json();
+      const url = `https://pncp.gov.br/app/editais/${cnpj}/${ano}/${parseInt(seq)}`;
+      div.innerHTML = `
+        <div class="cnpj-box" style="margin-top:16px">
+          <h3>${d.objetoCompra || 'Licitação encontrada'}</h3>
+          <div class="cnpj-grid">
+            <div class="cnpj-campo"><label>Órgão</label><span>${d.orgaoEntidade?.razaoSocial || '—'}</span></div>
+            <div class="cnpj-campo"><label>Modalidade</label><span>${d.modalidadeNome || '—'}</span></div>
+            <div class="cnpj-campo"><label>Abertura</label><span>${d.dataAberturaProposta ? new Date(d.dataAberturaProposta).toLocaleString('pt-BR') : '—'}</span></div>
+            <div class="cnpj-campo"><label>Encerramento</label><span>${d.dataEncerramentoProposta ? new Date(d.dataEncerramentoProposta).toLocaleString('pt-BR') : '—'}</span></div>
+            <div class="cnpj-campo"><label>Situação</label><span>${d.situacaoCompraNome || '—'}</span></div>
+            <div class="cnpj-campo"><label>Valor estimado</label><span>${d.valorTotalEstimado ? d.valorTotalEstimado.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : 'Não informado'}</span></div>
+          </div>
+          <a href="${url}" target="_blank" style="display:inline-block;margin-top:14px;background:var(--primary);color:var(--accent);padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700">📄 Abrir no PNCP</a>
+        </div>`;
+    } catch(e) {
+      div.innerHTML = '<div class="info-vazia">Erro ao buscar. Verifique o CNPJ e tente novamente.</div>';
+    }
+  }
+
+  // ═══════════════════════════════════════════════════
+  // PREÇOS PRATICADOS (ATAS)
+  // ═══════════════════════════════════════════════════
+  let histPagAtual = 1, histTotalPags = 1;
+  async function buscarHistorico(pagina = 1) {
+    const q = document.getElementById('histQ').value.trim();
+    const uf = document.getElementById('histUF').value;
+    if (!q) { alert('Digite um produto para buscar'); return; }
+    histPagAtual = pagina;
+    const div = document.getElementById('historicoResultado');
+    div.innerHTML = '<div class="loading-box">⏳ Buscando atas...</div>';
+    document.getElementById('historicoPag').style.display = 'none';
+    try {
+      const params = new URLSearchParams({ descricao: q, pagina });
+      if (uf) params.append('uf', uf);
+      const r = await fetch('/api/historico?' + params);
+      const data = await r.json();
+      histTotalPags = data.totalPaginas || 1;
+      document.getElementById('historicoResumo').innerHTML =
+        `<strong>${(data.total||0).toLocaleString('pt-BR')}</strong> atas encontradas · Página ${pagina} de ${histTotalPags}`;
+      if (!data.data?.length) { div.innerHTML = '<div class="info-vazia">Nenhuma ata encontrada.</div>'; return; }
+      div.innerHTML = data.data.map(a => {
+        const num = a.numero_sequencial && a.ano ? `Nº ${parseInt(a.numero_sequencial)}/${a.ano}` : '';
+        return `<div class="ata-card">
+          <div class="ata-titulo">${a.modalidade_licitacao_nome?.replace(' - ',' ')||'Ata'} ${num} — ${a.orgao_nome||'—'} / ${a.uf||'—'}</div>
+          <div class="ata-info">
+            <span>📋 ${a.description?.substring(0,120)||'—'}</span>
+          </div>
+          <div class="ata-info" style="margin-top:6px">
+            <span>📍 ${a.municipio_nome||'—'}</span>
+            <span>📅 ${a.data_publicacao_pncp ? new Date(a.data_publicacao_pncp).toLocaleDateString('pt-BR') : '—'}</span>
+            ${a.valor_global ? `<span class="ata-valor">${Number(a.valor_global).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+      if (histTotalPags > 1) {
+        document.getElementById('historicoPag').style.display = 'flex';
+        document.getElementById('histPagInfo').textContent = `Página ${pagina} de ${histTotalPags}`;
+        document.getElementById('histAnterior').disabled = pagina <= 1;
+        document.getElementById('histProxima').disabled = pagina >= histTotalPags;
+      }
+    } catch(e) {
+      div.innerHTML = '<div class="info-vazia">Erro ao buscar histórico.</div>';
+    }
+  }
+
+  // ═══════════════════════════════════════════════════
+  // CONSULTAR EMPRESA
+  // ═══════════════════════════════════════════════════
+  async function consultarEmpresa() {
+    const cnpj = document.getElementById('empresaCnpj').value.replace(/\D/g,'');
+    const div = document.getElementById('empresaResultado');
+    if (cnpj.length !== 14) { alert('CNPJ inválido. Digite os 14 dígitos.'); return; }
+    div.innerHTML = '<div class="loading-box">⏳ Consultando empresa...</div>';
+    try {
+      const r = await fetch('/api/empresa?cnpj=' + cnpj);
+      const data = await r.json();
+      const e = data.empresa || {};
+      if (e.status === 'ERROR') { div.innerHTML = '<div class="info-vazia">CNPJ não encontrado.</div>'; return; }
+      div.innerHTML = `
+        <div class="cnpj-box">
+          <h3>${e.razao_social || '—'}</h3>
+          <div class="cnpj-grid">
+            <div class="cnpj-campo"><label>CNPJ</label><span>${e.cnpj || cnpj}</span></div>
+            <div class="cnpj-campo"><label>Situação</label><span>${e.descricao_situacao_cadastral || '—'}</span></div>
+            <div class="cnpj-campo"><label>Porte</label><span>${e.porte || '—'}</span></div>
+            <div class="cnpj-campo"><label>Natureza Jurídica</label><span>${e.natureza_juridica || '—'}</span></div>
+            <div class="cnpj-campo"><label>Município</label><span>${e.municipio || '—'} / ${e.uf || '—'}</span></div>
+            <div class="cnpj-campo"><label>Atividade Principal</label><span>${e.cnae_fiscal_descricao || '—'}</span></div>
+            <div class="cnpj-campo"><label>Capital Social</label><span>${e.capital_social ? 'R$ ' + Number(e.capital_social).toLocaleString('pt-BR') : '—'}</span></div>
+            <div class="cnpj-campo"><label>Telefone</label><span>${e.ddd_telefone_1 || '—'}</span></div>
+          </div>
+        </div>
+        ${data.licitacoes?.length ? `
+        <div>
+          <p class="resumo"><strong>${data.totalLicitacoes}</strong> licitações encontradas para este CNPJ</p>
+          ${data.licitacoes.slice(0,5).map(l => `
+            <div class="result-card" onclick='abrirDrawer(${JSON.stringify(l)})'>
+              <div class="result-card-titulo">${l.title||'—'}</div>
+              <div class="result-card-info"><span>${l.modalidade_licitacao_nome||''}</span><span>${l.uf||''}</span></div>
+            </div>`).join('')}
+        </div>` : '<div class="info-vazia" style="padding:16px">Nenhuma licitação ativa encontrada para este CNPJ.</div>'}`;
+    } catch(e) {
+      div.innerHTML = '<div class="info-vazia">Erro ao consultar empresa.</div>';
+    }
+  }
+
+  // ═══════════════════════════════════════════════════
+  // MINHA EMPRESA
+  // ═══════════════════════════════════════════════════
+  const ME_KEY = 'arantes_minha_empresa';
+  function getMinhaEmpresa() { try { return JSON.parse(localStorage.getItem(ME_KEY)||'{}') } catch { return {} } }
+  function renderMinhaEmpresa() {
+    const me = getMinhaEmpresa();
+    const campos = [
+      {id:'meNome',label:'Razão Social',val:me.nome||''},
+      {id:'meCnpj',label:'CNPJ',val:me.cnpj||''},
+      {id:'meIe',label:'Inscrição Estadual',val:me.ie||''},
+      {id:'meEnd',label:'Endereço',val:me.endereco||''},
+      {id:'meCidade',label:'Cidade / UF',val:me.cidade||''},
+      {id:'meCep',label:'CEP',val:me.cep||''},
+      {id:'meTel',label:'Telefone',val:me.tel||''},
+      {id:'meEmail',label:'E-mail',val:me.email||''},
+      {id:'meResp',label:'Responsável',val:me.resp||''},
+      {id:'meBanco',label:'Banco',val:me.banco||''},
+      {id:'meAgencia',label:'Agência',val:me.agencia||''},
+      {id:'meConta',label:'Conta',val:me.conta||''},
+    ];
+    document.getElementById('minhaEmpresaForm').innerHTML = `
+      <div class="empresa-form">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          ${campos.map(f=>`<div class="campo"><label>${f.label}</label><input type="text" id="${f.id}" value="${f.val}"/></div>`).join('')}
+        </div>
+        <button class="btn-primario" style="margin-top:16px;width:100%" onclick="salvarMinhaEmpresa()">💾 Salvar dados da empresa</button>
+      </div>`;
+  }
+  function salvarMinhaEmpresa() {
+    const me = {
+      nome: document.getElementById('meNome').value,
+      cnpj: document.getElementById('meCnpj').value,
+      ie: document.getElementById('meIe').value,
+      endereco: document.getElementById('meEnd').value,
+      cidade: document.getElementById('meCidade').value,
+      cep: document.getElementById('meCep').value,
+      tel: document.getElementById('meTel').value,
+      email: document.getElementById('meEmail').value,
+      resp: document.getElementById('meResp').value,
+      banco: document.getElementById('meBanco').value,
+      agencia: document.getElementById('meAgencia').value,
+      conta: document.getElementById('meConta').value,
+    };
+    localStorage.setItem(ME_KEY, JSON.stringify(me));
+    alert('✅ Dados salvos com sucesso!');
+  }
+
+  // ═══════════════════════════════════════════════════
+  // DOCUMENTOS
+  // ═══════════════════════════════════════════════════
+  const DOC_KEY = 'arantes_documentos';
+  function getDocs() { try { return JSON.parse(localStorage.getItem(DOC_KEY)||'[]') } catch { return [] } }
+  function renderDocumentos() {
+    const docs = getDocs();
+    const div = document.getElementById('documentosLista');
+    if (!docs.length) { div.innerHTML = '<div class="info-vazia">Nenhum documento ainda.<br><small>Adicione links de documentos importantes: certidões, atestados, contratos.</small></div>'; return; }
+    div.innerHTML = `<div class="doc-lista">${docs.map((d,i)=>`
+      <div class="doc-item">
+        <div class="doc-icon">${d.tipo==='link'?'🔗':d.tipo==='pdf'?'📄':'📎'}</div>
+        <div style="flex:1">
+          <div class="doc-nome">${d.nome}</div>
+          <div class="doc-meta">${d.desc||''} ${d.vencimento?'· Vence: '+d.vencimento:''}</div>
+        </div>
+        <div class="doc-acoes">
+          ${d.url?`<a href="${d.url}" target="_blank" class="doc-btn">🔗 Abrir</a>`:''}
+          <button class="doc-btn" style="color:#ef4444" onclick="removerDoc(${i})">✕</button>
+        </div>
+      </div>`).join('')}</div>`;
+  }
+  function abrirAddDoc() {
+    const nome = prompt('Nome do documento:');
+    if (!nome) return;
+    const url = prompt('URL/link do documento (opcional):') || '';
+    const desc = prompt('Descrição (opcional):') || '';
+    const docs = getDocs();
+    docs.unshift({ nome, url, desc, tipo: url.includes('http')?'link':'pdf', criado: new Date().toLocaleDateString('pt-BR') });
+    localStorage.setItem(DOC_KEY, JSON.stringify(docs));
+    renderDocumentos();
+  }
+  function removerDoc(i) {
+    if (!confirm('Remover este documento?')) return;
+    const docs = getDocs();
+    docs.splice(i, 1);
+    localStorage.setItem(DOC_KEY, JSON.stringify(docs));
+    renderDocumentos();
+  }
 
   // ===== AUTOCOMPLETE =====
   const AC_SUGESTOES = [
