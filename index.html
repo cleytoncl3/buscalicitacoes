@@ -286,7 +286,8 @@
     [data-tema="escuro"] .fase-classificacao{background:#1e1040;color:#c4b5fd}
     [data-tema="escuro"] .fase-contrato{background:#0a2e1a;color:#6ee7b7}
     .fase-count{font-size:.78rem;color:var(--text3)}
-    .neg-card{background:var(--surface);border-radius:8px;padding:14px 16px;box-shadow:var(--card-shadow);border:1px solid var(--border);margin-bottom:8px}
+    .neg-card{background:var(--surface);border-radius:8px;padding:14px 16px;box-shadow:var(--card-shadow);border:1px solid var(--border);margin-bottom:8px;cursor:pointer;transition:box-shadow .15s,border-color .15s}
+    .neg-card:hover{box-shadow:var(--card-shadow-hover);border-color:var(--accent)}
     .neg-card-titulo{font-size:.9rem;font-weight:600;color:var(--text);margin-bottom:4px}
     .neg-card-info{font-size:.78rem;color:var(--text2);display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
     .neg-card-actions{display:flex;gap:6px;flex-wrap:wrap}
@@ -297,7 +298,8 @@
     .kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;overflow-x:auto;padding-bottom:8px}
     .kanban-col{background:var(--surface2);border-radius:10px;padding:12px;border:1px solid var(--border);min-width:180px}
     .kanban-col-titulo{font-size:.82rem;font-weight:700;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-    .kanban-card{background:var(--surface);border-radius:8px;padding:10px 12px;box-shadow:var(--card-shadow);border:1px solid var(--border);margin-bottom:8px}
+    .kanban-card{background:var(--surface);border-radius:8px;padding:10px 12px;box-shadow:var(--card-shadow);border:1px solid var(--border);margin-bottom:8px;transition:box-shadow .15s,border-color .15s}
+    .kanban-card:hover{box-shadow:var(--card-shadow-hover);border-color:var(--accent)}
     .kanban-card-titulo{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:4px}
     .kanban-card-info{font-size:.72rem;color:var(--text2)}
     .kanban-vazio{font-size:.78rem;color:var(--text3);text-align:center;padding:16px 0}
@@ -1388,14 +1390,13 @@
     document.getElementById('funilConteudo').innerHTML=FASES.map(f=>{
       const itens=negs.filter(n=>n.fase===f.id);
       return`<div><div class="fase-titulo"><span class="fase-badge ${f.cls}">${f.emoji} ${f.nome}</span><span class="fase-count">${itens.length} licitação(ões)</span></div>
-        ${itens.length===0?'<div class="fase-vazio">Nenhuma licitação nesta fase.</div>':itens.map(n=>`<div class="neg-card">
+        ${itens.length===0?'<div class="fase-vazio">Nenhuma licitação nesta fase.</div>':itens.map(n=>`<div class="neg-card" onclick="abrirDrawerNeg('${n.id}')">
           <div class="neg-card-titulo">${n.titulo}</div>
           <div class="neg-card-info"><span>📍 ${n.uf}</span><span>📋 ${n.modalidade}</span><span>⏰ ${n.encerramento?new Date(n.encerramento).toLocaleDateString('pt-BR'):'—'}</span></div>
-          <div class="neg-card-actions">
+          <div class="neg-card-actions" onclick="event.stopPropagation()">
             <select onchange="moverFase('${n.id}',this.value)" style="font-size:.75rem;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);cursor:pointer">
               ${FASES.map(f2=>`<option value="${f2.id}"${f2.id===n.fase?' selected':''}>${f2.emoji} ${f2.nome}</option>`).join('')}
             </select>
-            ${n.itemData?`<button class="neg-btn" onclick="abrirDrawerNeg('${n.id}')">📋 Detalhes</button>`:''}
             ${n.link_pncp?`<button class="neg-btn" onclick="window.open('${n.link_pncp}','_blank')">🔗 PNCP</button>`:''}
             <button class="neg-btn neg-btn-danger" onclick="removerNegocio('${n.id}')">✕</button>
           </div></div>`).join('')}</div>`;
@@ -1406,7 +1407,7 @@
     document.getElementById('kanbanConteudo').innerHTML=FASES.map(f=>{
       const itens=negs.filter(n=>n.fase===f.id);
       return`<div class="kanban-col"><div class="kanban-col-titulo"><span class="fase-badge ${f.cls}">${f.emoji} ${f.nome}</span></div>
-        ${itens.length===0?'<div class="kanban-vazio">—</div>':itens.map(n=>`<div class="kanban-card">
+        ${itens.length===0?'<div class="kanban-vazio">—</div>':itens.map(n=>`<div class="kanban-card" onclick="abrirDrawerNeg('${n.id}')" style="cursor:pointer">
           <div class="kanban-card-titulo">${n.titulo.substring(0,60)}${n.titulo.length>60?'...':''}</div>
           <div class="kanban-card-info">📍 ${n.uf} · ⏰ ${n.encerramento?new Date(n.encerramento).toLocaleDateString('pt-BR'):'—'}</div>
         </div>`).join('')}</div>`;
