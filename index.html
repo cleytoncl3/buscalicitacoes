@@ -33,21 +33,21 @@
     body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text)}
 
     /* HEADER */
-    header{background:var(--primary);padding:0 32px;display:flex;justify-content:space-between;align-items:center;height:58px;position:sticky;top:0;z-index:50}
-    .header-left{display:flex;align-items:center;gap:24px}
-    .header-logo{font-size:1.2rem;font-weight:700;letter-spacing:1px;white-space:nowrap;color:var(--accent)}
-    .header-logo span{font-size:.75rem;color:#aaa;display:block;font-weight:400;letter-spacing:0}
-    .nav{display:flex;gap:4px}
-    .nav-btn{background:transparent;border:none;color:rgba(255,255,255,.7);padding:8px 14px;border-radius:8px;font-size:.9rem;cursor:pointer;display:flex;align-items:center;gap:6px;position:relative;white-space:nowrap}
-    .nav-btn:hover,.nav-btn.ativo{background:rgba(255,255,255,.15);color:#fff}
-    .nav-btn.ativo{color:var(--accent)}
-    .dropdown{position:absolute;top:calc(100% + 6px);left:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:200px;z-index:400;display:none;padding:4px}
+    header{background:var(--primary);padding:0 24px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;height:58px;position:sticky;top:0;z-index:50;gap:16px}
+    .header-logo{font-size:1.05rem;font-weight:800;letter-spacing:1.5px;white-space:nowrap;color:var(--accent);text-transform:uppercase}
+    .header-logo span{font-size:.65rem;color:rgba(255,255,255,.5);display:block;font-weight:400;letter-spacing:.5px;text-transform:none;margin-top:1px}
+    .nav{display:flex;gap:2px;justify-content:center}
+    .nav-btn{background:transparent;border:none;color:rgba(255,255,255,.65);padding:8px 16px;border-radius:8px;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:7px;position:relative;white-space:nowrap;font-weight:500;transition:all .15s}
+    .nav-btn:hover{background:rgba(255,255,255,.12);color:#fff}
+    .nav-btn.ativo{background:rgba(255,255,255,.15);color:var(--accent);font-weight:700}
+    .nav-btn-icon{font-size:.95rem}
+    .dropdown{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);min-width:210px;z-index:400;display:none;padding:6px}
     .dropdown.aberto{display:block}
-    .dropdown-item{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:.88rem;color:var(--text);cursor:pointer;border-radius:7px}
+    .dropdown-item{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:.88rem;color:var(--text);cursor:pointer;border-radius:8px}
     .dropdown-item:hover{background:var(--chip-bg);color:var(--primary)}
     [data-tema="escuro"] .dropdown-item:hover{color:var(--accent)}
     .dropdown-sep{height:1px;background:var(--border);margin:4px 0}
-    .header-right{display:flex;align-items:center;gap:10px}
+    .header-right{display:flex;align-items:center;gap:8px;justify-content:flex-end}
     .btn-tema{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:pointer}
     .btn-tema:hover{background:rgba(255,255,255,.25)}
     .btn-sino{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1rem;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center}
@@ -460,11 +460,10 @@
       .data-row,.cards,.cards-vertical,.card-exp,.card-vert{width:100%;max-width:100%}
 
       /* Header mobile */
-      header{padding:0 10px;height:52px;gap:6px}
-      .header-left{gap:8px;min-width:0;flex:1}
-      .header-logo{font-size:.9rem;white-space:nowrap}
-      .header-logo span{display:none}
-      .nav{display:none}
+      header{padding:0 10px;height:52px;grid-template-columns:auto 1fr auto;gap:8px}
+      .header-logo{display:none}
+      .nav{justify-content:flex-start;gap:0}
+      .nav-btn:not(#navMobileBtn){display:none}
       .nav-mobile-btn{display:flex}
       .header-right{gap:6px}
       .btn-tema,.btn-sino{width:30px;height:30px;font-size:.9rem}
@@ -637,28 +636,28 @@
 </div>
 
 <header>
-  <div class="header-left">
-    <div class="header-logo">📋 Arantes Licitações<span>Arantes Papéis · PNCP</span></div>
-    <nav class="nav">
-      <button class="nav-btn ativo" id="navOportunidades" onclick="toggleDropdown('dropOportunidades')">
-        🔍 Oportunidades ▾
-        <div class="dropdown" id="dropOportunidades">
-          <div class="dropdown-item" onclick="irParaView('busca')">🔍 Buscar Licitações</div>
-          <div class="dropdown-sep"></div>
-          <div class="dropdown-item" onclick="irParaView('jornais')">📰 Meus Jornais</div>
-        </div>
-      </button>
-      <button class="nav-btn" id="navNegocios" onclick="toggleDropdown('dropNegocios')">
-        💼 Negócios ▾
-        <div class="dropdown" id="dropNegocios">
-          <div class="dropdown-item" onclick="irParaNegocios('funil')">📊 Funil de Licitações</div>
-          <div class="dropdown-item" onclick="irParaNegocios('quadros')">🗂️ Quadros</div>
-          <div class="dropdown-item" onclick="irParaNegocios('agenda')">📅 Agenda</div>
-        </div>
-      </button>
-    </nav>
+  <div class="header-logo">📋 Arantes<span>Licitações · PNCP</span></div>
+
+  <nav class="nav">
+    <button class="nav-btn ativo" id="navOportunidades" onclick="toggleDropdown('dropOportunidades')">
+      <span class="nav-btn-icon">🔍</span> Buscar ▾
+      <div class="dropdown" id="dropOportunidades">
+        <div class="dropdown-item" onclick="irParaView('busca')">🔍 Buscar Licitações</div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item" onclick="irParaView('jornais')">📰 Monitoramento</div>
+      </div>
+    </button>
+    <button class="nav-btn" id="navNegocios" onclick="toggleDropdown('dropNegocios')">
+      <span class="nav-btn-icon">📊</span> Pipeline ▾
+      <div class="dropdown" id="dropNegocios">
+        <div class="dropdown-item" onclick="irParaNegocios('funil')">📊 Funil de Oportunidades</div>
+        <div class="dropdown-item" onclick="irParaNegocios('quadros')">🗂️ Quadro Kanban</div>
+        <div class="dropdown-item" onclick="irParaNegocios('agenda')">📅 Agenda de Prazos</div>
+      </div>
+    </button>
     <button class="nav-mobile-btn" id="navMobileBtn" onclick="toggleMobileMenu()">☰</button>
-  </div>
+  </nav>
+
   <div class="header-right">
     <div class="notif-wrapper">
       <button class="btn-sino" onclick="toggleNotificacoes()">🔔<span class="sino-badge" id="sinoBadge">0</span></button>
@@ -674,11 +673,11 @@
 <!-- MENU MOBILE -->
 <div class="mobile-menu" id="mobileMenu">
   <div class="mobile-menu-item" onclick="irParaView('busca');fecharMobileMenu()">🔍 Buscar Licitações</div>
-  <div class="mobile-menu-item" onclick="irParaView('jornais');fecharMobileMenu()">📰 Meus Jornais</div>
+  <div class="mobile-menu-item" onclick="irParaView('jornais');fecharMobileMenu()">📰 Monitoramento</div>
   <div class="mobile-menu-sep"></div>
-  <div class="mobile-menu-item" onclick="irParaNegocios('funil');fecharMobileMenu()">📊 Funil de Licitações</div>
-  <div class="mobile-menu-item" onclick="irParaNegocios('quadros');fecharMobileMenu()">🗂️ Quadros</div>
-  <div class="mobile-menu-item" onclick="irParaNegocios('agenda');fecharMobileMenu()">📅 Agenda</div>
+  <div class="mobile-menu-item" onclick="irParaNegocios('funil');fecharMobileMenu()">📊 Funil de Oportunidades</div>
+  <div class="mobile-menu-item" onclick="irParaNegocios('quadros');fecharMobileMenu()">🗂️ Quadro Kanban</div>
+  <div class="mobile-menu-item" onclick="irParaNegocios('agenda');fecharMobileMenu()">📅 Agenda de Prazos</div>
   <div class="mobile-menu-sep"></div>
   <div class="mobile-menu-item" onclick="alternarTema();fecharMobileMenu()">🌓 Alternar tema</div>
 </div>
@@ -1009,8 +1008,8 @@
     document.querySelectorAll('.neg-view').forEach(v=>v.classList.remove('ativo'));
     document.getElementById('tab'+aba.charAt(0).toUpperCase()+aba.slice(1)).classList.add('ativo');
     document.getElementById('neg'+aba.charAt(0).toUpperCase()+aba.slice(1)).classList.add('ativo');
-    if(aba==='funil')renderFunil();
-    if(aba==='quadros')renderQuadros();
+    if(aba==='funil'){fetchNegocios().then(()=>renderFunil());}
+    if(aba==='quadros'){fetchNegocios().then(()=>renderQuadros());}
     if(aba==='agenda')renderAgenda();
   }
 
