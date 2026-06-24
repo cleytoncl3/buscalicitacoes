@@ -380,18 +380,71 @@
     .card-exp-footer span{font-size:.75rem;color:var(--text2)}
     .card-exp-footer .badge{font-size:.72rem}
 
-    @media(max-width:900px){.card-exp-main{grid-template-columns:1fr}.card-exp-items{border-top:1px solid var(--border);border-right:none}}
+    /* ═══ TABLET (≤900px) ═══ */
+    @media(max-width:900px){
+      .card-exp-main{grid-template-columns:1fr}
+      .card-exp-items{border-top:1px solid var(--border);border-right:none}
+      .cards-vertical{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+    }
 
-    @media(max-width:800px){
-      .filtros-linha-busca{grid-template-columns:1fr}
+    /* ═══ MOBILE (≤768px) ═══ */
+    @media(max-width:768px){
+      /* Header */
+      header{padding:0 12px;height:52px}
+      .header-logo{font-size:1rem}
+      .header-logo span{display:none}
+      .nav-btn{padding:6px 10px;font-size:.8rem}
+
+      /* Container */
+      .container{padding:12px 10px}
+
+      /* Filtros */
+      .filtros{padding:14px;gap:10px}
+      .filtros-linha-busca{grid-template-columns:1fr;gap:8px}
       .filtros-linha-selects{grid-template-columns:1fr}
-      .data-row{flex-direction:column;align-items:flex-start}
-      .drawer{width:100%;right:-100%}
+      .filtros-linha-busca .btn-buscar,.filtros-linha-busca .btn-limpar{width:100%}
+      .data-row{flex-direction:column;align-items:flex-start;gap:8px}
+      .data-row input[type=date]{width:100%;max-width:300px}
+      .data-atalhos{flex-wrap:wrap}
+
+      /* Cards verticais — 1 coluna no celular */
+      .cards-vertical{grid-template-columns:1fr}
+      .card-vert{padding:12px}
+
+      /* Card horizontal — empilha info + itens */
+      .card-exp-main{grid-template-columns:1fr;min-height:unset}
+      .card-exp-items{border-top:1px solid var(--border);border-right:none;max-height:200px;overflow-y:auto}
+      .card-exp-items-grid{grid-template-columns:1fr}
+
+      /* Toggle de layout */
+      .layout-toggle{flex-wrap:wrap}
+
+      /* Drawer — tela cheia no celular */
+      .drawer{width:100%;right:-100%;border-left:none}
       .drawer-grid{grid-template-columns:1fr}
       .item-detalhe-grid{grid-template-columns:1fr 1fr}
-      .kanban{grid-template-columns:repeat(3,1fr)}
-      .header-logo span{display:none}
-      .nav-btn{padding:6px 10px;font-size:.82rem}
+
+      /* Modais — quase tela cheia */
+      .modal-uf{width:95vw;max-height:85vh}
+      .modal{width:95vw;padding:20px}
+      .modal-uf-footer{flex-wrap:wrap;gap:8px}
+      .modal-uf-footer-left{flex-wrap:wrap}
+
+      /* Mod pills no celular */
+      .mod-pills{padding:14px}
+      .mod-pill{font-size:.82rem;padding:7px 12px}
+
+      /* Drawer chips de busca */
+      .drawer-kw-chips{flex-wrap:wrap}
+
+      /* Negócios */
+      .kanban{grid-template-columns:repeat(2,1fr)}
+      .negocios-tabs{overflow-x:auto;flex-wrap:nowrap}
+      .neg-tab{white-space:nowrap;font-size:.82rem;padding:8px 12px}
+
+      /* Paginação */
+      .paginacao{gap:6px}
+      .btn-pag{padding:7px 14px;font-size:.85rem}
     }
   </style>
 </head>
@@ -946,8 +999,10 @@
 
   function setLayout(tipo) {
     layoutAtual = tipo;
-    document.getElementById('btnLayoutCompacto').classList.toggle('ativo', tipo==='compacto');
-    document.getElementById('btnLayoutExpandido').classList.toggle('ativo', tipo==='expandido');
+    const btnC = document.getElementById('btnLayoutCompacto');
+    const btnE = document.getElementById('btnLayoutExpandido');
+    if (btnC) btnC.classList.toggle('ativo', tipo==='compacto');
+    if (btnE) btnE.classList.toggle('ativo', tipo==='expandido');
     if (ultimosItens.length) renderCards(ultimosItens);
   }
 
@@ -1461,6 +1516,12 @@
   document.getElementById('palavraChave').addEventListener('blur', acFechar);
 
   // ===== INIT =====
+  // No celular: layout vertical por padrão (cards mais compactos)
+  // No desktop: layout horizontal por padrão (cards com preview de itens)
+  if (window.innerWidth <= 768) {
+    layoutAtual = 'compacto';
+  }
+
   carregarTema();
   atualizarBotaoMod(); // mostra padrão
   renderHistorico();
