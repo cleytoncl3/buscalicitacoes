@@ -33,7 +33,7 @@
     body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text)}
 
     /* HEADER */
-    header{background:var(--primary);padding:0 32px;display:flex;justify-content:space-between;align-items:center;height:58px;position:sticky;top:0;z-index:300}
+    header{background:var(--primary);padding:0 32px;display:flex;justify-content:space-between;align-items:center;height:58px;position:sticky;top:0;z-index:50}
     .header-left{display:flex;align-items:center;gap:24px}
     .header-logo{font-size:1.2rem;font-weight:700;letter-spacing:1px;white-space:nowrap;color:var(--accent)}
     .header-logo span{font-size:.75rem;color:#aaa;display:block;font-weight:400;letter-spacing:0}
@@ -206,9 +206,9 @@
     .btn-add-kw{background:var(--primary);color:var(--accent);border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:.85rem;white-space:nowrap}
 
     /* ═══ DRAWER REDESIGN ═══ */
-    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:199;opacity:0;pointer-events:none;transition:opacity .25s}
     .overlay.ativo{opacity:1;pointer-events:all}
-    .drawer{position:fixed;top:0;right:-640px;width:600px;max-width:96vw;height:100vh;background:var(--drawer-bg);z-index:101;box-shadow:-4px 0 30px rgba(0,0,0,.35);transition:right .3s ease;display:flex;flex-direction:column;border-left:1px solid var(--border)}
+    .drawer{position:fixed;top:0;right:-640px;width:600px;max-width:96vw;height:100vh;background:var(--drawer-bg);z-index:200;box-shadow:-4px 0 30px rgba(0,0,0,.35);transition:right .3s ease;display:flex;flex-direction:column;border-left:1px solid var(--border)}
     .drawer.ativo{right:0}
 
     /* Cabeçalho */
@@ -431,6 +431,21 @@
     .item-detalhe-campo label{font-size:.7rem;color:var(--text3);display:block;text-transform:uppercase;margin-bottom:2px}
     .item-detalhe-campo span{font-size:.85rem;font-weight:600;color:var(--text)}
 
+
+    /* Hambúrguer mobile */
+    .nav-mobile-btn{display:none;background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:8px;font-size:1.2rem;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0}
+    .nav-mobile-btn:hover{background:rgba(255,255,255,.25)}
+    .mobile-menu{position:fixed;top:52px;left:0;right:0;background:var(--primary);z-index:499;padding:8px;display:none;flex-direction:column;gap:4px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+    .mobile-menu.aberto{display:flex}
+    .mobile-menu-item{padding:12px 16px;color:rgba(255,255,255,.85);font-size:.95rem;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:10px}
+    .mobile-menu-item:hover{background:rgba(255,255,255,.15);color:#fff}
+    .mobile-menu-sep{height:1px;background:rgba(255,255,255,.15);margin:4px 0}
+
+    /* Botão scroll-to-top */
+    .btn-topo{position:fixed;bottom:24px;right:16px;width:44px;height:44px;border-radius:50%;background:var(--primary);color:var(--accent);border:2px solid var(--accent);font-size:1.1rem;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:150;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:opacity .2s}
+    .btn-topo.visivel{display:flex}
+    .btn-topo:hover{background:var(--primary-hover)}
+
     /* ═══ TABLET/MOBILE (≤1024px) ═══ */
     @media(max-width:1024px){
       .card-exp-main{grid-template-columns:1fr}
@@ -444,13 +459,13 @@
       .container,.filtros,.filtros-linha-busca,.filtros-linha-selects,
       .data-row,.cards,.cards-vertical,.card-exp,.card-vert{width:100%;max-width:100%}
 
-      /* Header compacto */
+      /* Header mobile */
       header{padding:0 10px;height:52px;gap:6px}
-      .header-left{gap:10px;min-width:0;overflow:hidden}
-      .header-logo{font-size:.95rem;white-space:nowrap}
+      .header-left{gap:8px;min-width:0;flex:1}
+      .header-logo{font-size:.9rem;white-space:nowrap}
       .header-logo span{display:none}
-      .nav-btn{padding:5px 8px;font-size:.78rem}
-      .dropdown{min-width:160px}
+      .nav{display:none}
+      .nav-mobile-btn{display:flex}
       .header-right{gap:6px}
       .btn-tema,.btn-sino{width:30px;height:30px;font-size:.9rem}
 
@@ -642,6 +657,7 @@
         </div>
       </button>
     </nav>
+    <button class="nav-mobile-btn" id="navMobileBtn" onclick="toggleMobileMenu()">☰</button>
   </div>
   <div class="header-right">
     <div class="notif-wrapper">
@@ -654,6 +670,21 @@
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
   </div>
 </header>
+
+<!-- MENU MOBILE -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu-item" onclick="irParaView('busca');fecharMobileMenu()">🔍 Buscar Licitações</div>
+  <div class="mobile-menu-item" onclick="irParaView('jornais');fecharMobileMenu()">📰 Meus Jornais</div>
+  <div class="mobile-menu-sep"></div>
+  <div class="mobile-menu-item" onclick="irParaNegocios('funil');fecharMobileMenu()">📊 Funil de Licitações</div>
+  <div class="mobile-menu-item" onclick="irParaNegocios('quadros');fecharMobileMenu()">🗂️ Quadros</div>
+  <div class="mobile-menu-item" onclick="irParaNegocios('agenda');fecharMobileMenu()">📅 Agenda</div>
+  <div class="mobile-menu-sep"></div>
+  <div class="mobile-menu-item" onclick="alternarTema();fecharMobileMenu()">🌓 Alternar tema</div>
+</div>
+
+<button class="btn-topo" id="btnTopo" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Voltar ao topo">▲</button>
+
 
 <!-- VIEW BUSCA -->
 <div class="view ativo" id="viewBusca">
@@ -1272,22 +1303,71 @@
         </div>`).join('')}`;
   }
 
+
+  // ===== MENU MOBILE =====
+  function toggleMobileMenu(){document.getElementById('mobileMenu').classList.toggle('aberto')}
+  function fecharMobileMenu(){document.getElementById('mobileMenu').classList.remove('aberto')}
+  document.addEventListener('click', e => {
+    if(!e.target.closest('#navMobileBtn') && !e.target.closest('#mobileMenu'))
+      fecharMobileMenu();
+  });
+
+  // ===== SCROLL TO TOP =====
+  window.addEventListener('scroll', () => {
+    const btn = document.getElementById('btnTopo');
+    if(btn) btn.classList.toggle('visivel', window.scrollY > 350);
+  });
+
+  // ===== AUTO-SCROLL PARA RESULTADOS (mobile) =====
+  function scrollParaResultados(){
+    if(window.innerWidth <= 900){
+      const el = document.getElementById('resumo');
+      if(el) setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}), 200);
+    }
+  }
+
   // ===== NEGÓCIOS =====
+  // Negócios: API compartilhada (todos os funcionários veem) + localStorage como cache
+  async function fetchNegocios(){
+    try{const r=await fetch('/api/negocios');if(r.ok){const d=await r.json();localStorage.setItem(NEG_KEY,JSON.stringify(d));return d;}}catch{}
+    return getNegocios();
+  }
   function getNegocios(){try{return JSON.parse(localStorage.getItem(NEG_KEY)||'[]')}catch{return[]}}
-  function salvarNegocios(n){localStorage.setItem(NEG_KEY,JSON.stringify(n))}
+  async function salvarNegocios(arr){
+    localStorage.setItem(NEG_KEY,JSON.stringify(arr));
+    // Sincroniza com servidor de forma assíncrona
+  }
+  async function apiSalvarNegocio(neg){
+    try{await fetch('/api/negocios',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(neg)});}catch{}
+  }
+  async function apiMoverFase(id,fase){
+    try{await fetch('/api/negocios',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,fase})});}catch{}
+  }
+  async function apiRemoverNegocio(id){
+    try{await fetch('/api/negocios?id='+id,{method:'DELETE'});}catch{}
+  }
   function adicionarAosNegocios(){
     if(!itemAtualDrawer)return;
     const negs=getNegocios();
     if(negs.find(n=>n.numero_controle===itemAtualDrawer.numero_controle_pncp)){alert('Já está nos seus negócios!');return}
     const p=parseControle(itemAtualDrawer.numero_controle_pncp);
-    negs.unshift({id:Date.now().toString(),titulo:itemAtualDrawer.title||'',objeto:itemAtualDrawer.description||'',orgao:itemAtualDrawer.orgao_nome||'',uf:itemAtualDrawer.uf||'',modalidade:itemAtualDrawer.modalidade_licitacao_nome||'',abertura:itemAtualDrawer.data_inicio_vigencia||'',encerramento:itemAtualDrawer.data_fim_vigencia||'',numero_controle:itemAtualDrawer.numero_controle_pncp||'',link_pncp:p?`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`:'',fase:'oportunidade',adicionado_em:new Date().toISOString()});
+    const novoNeg={id:Date.now().toString(),titulo:itemAtualDrawer.title||'',objeto:itemAtualDrawer.description||'',orgao:itemAtualDrawer.orgao_nome||'',uf:itemAtualDrawer.uf||'',modalidade:itemAtualDrawer.modalidade_licitacao_nome||'',abertura:itemAtualDrawer.data_inicio_vigencia||'',encerramento:itemAtualDrawer.data_fim_vigencia||'',numero_controle:itemAtualDrawer.numero_controle_pncp||'',link_pncp:p?`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`:'',fase:'oportunidade',adicionado_em:new Date().toISOString(),itemData:JSON.stringify(itemAtualDrawer)};
+    negs.unshift(novoNeg);
     salvarNegocios(negs);
+    apiSalvarNegocio(novoNeg);
     const btn=document.getElementById('d-btn-negocio');
     btn.textContent='✅ Adicionado!';btn.classList.add('adicionado');
     setTimeout(()=>{btn.textContent='💼 Adicionar aos meus negócios';btn.classList.remove('adicionado')},2500);
   }
-  function moverFase(id,fase){const negs=getNegocios(),n=negs.find(x=>x.id===id);if(n){n.fase=fase;salvarNegocios(negs);renderFunil();renderQuadros()}}
-  function removerNegocio(id){if(!confirm('Remover?'))return;salvarNegocios(getNegocios().filter(n=>n.id!==id));renderFunil();renderQuadros();renderAgenda()}
+
+  function abrirDrawerNeg(id){
+    const n=getNegocios().find(x=>x.id===id);
+    if(!n||!n.itemData)return;
+    try{abrirDrawer(JSON.parse(n.itemData));}catch(e){alert('Não foi possível abrir os detalhes.');}
+  }
+
+  function moverFase(id,fase){const negs=getNegocios(),n=negs.find(x=>x.id===id);if(n){n.fase=fase;salvarNegocios(negs);apiMoverFase(id,fase);renderFunil();renderQuadros()}}
+  function removerNegocio(id){if(!confirm('Remover?'))return;salvarNegocios(getNegocios().filter(n=>n.id!==id));apiRemoverNegocio(id);renderFunil();renderQuadros();renderAgenda()}
   function renderFunil(){
     const negs=getNegocios();
     document.getElementById('funilConteudo').innerHTML=FASES.map(f=>{
@@ -1300,7 +1380,8 @@
             <select onchange="moverFase('${n.id}',this.value)" style="font-size:.75rem;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);cursor:pointer">
               ${FASES.map(f2=>`<option value="${f2.id}"${f2.id===n.fase?' selected':''}>${f2.emoji} ${f2.nome}</option>`).join('')}
             </select>
-            ${n.link_pncp?`<button class="neg-btn" onclick="window.open('${n.link_pncp}','_blank')">📄 PNCP</button>`:''}
+            ${n.itemData?`<button class="neg-btn" onclick="abrirDrawerNeg('${n.id}')">📋 Detalhes</button>`:''}
+            ${n.link_pncp?`<button class="neg-btn" onclick="window.open('${n.link_pncp}','_blank')">🔗 PNCP</button>`:''}
             <button class="neg-btn neg-btn-danger" onclick="removerNegocio('${n.id}')">✕</button>
           </div></div>`).join('')}</div>`;
     }).join('');
@@ -1542,6 +1623,7 @@
       if(!itens.length){document.getElementById('resultado').innerHTML='<div class="vazio">Nenhuma licitação encontrada para esses filtros.</div>';return}
       document.getElementById('layoutToggle').style.display='flex';
       renderCards(itens);
+      scrollParaResultados();
       document.getElementById('paginacao').style.display='flex';
       document.getElementById('paginaInfo').textContent=`Página ${paginaAtual} de ${totalPaginas}`;
       document.getElementById('btnAnterior').disabled=paginaAtual<=1;
