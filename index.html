@@ -382,9 +382,12 @@
     .card-items-loading{padding:12px;color:var(--text3);font-size:.75rem;text-align:center}
     .card-items-vazio{padding:12px;color:var(--text3);font-size:.75rem;text-align:center}
 
-    .card-exp-footer{background:var(--surface2);border-top:2px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-    .card-exp-footer span{font-size:.75rem;color:var(--text2)}
-    .card-exp-footer .badge{font-size:.72rem}
+    .card-exp-footer{background:var(--surface2);border-top:2px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .card-exp-footer span{font-size:.74rem;color:var(--text2)}
+    .footer-info{font-size:.74rem;color:var(--text2)}
+    .footer-badge{font-size:.72rem;font-weight:700;color:var(--accent) !important;background:var(--primary);padding:3px 9px;border-radius:4px;white-space:nowrap}
+    .badge-status{font-size:.72rem;font-weight:700;color:var(--accent) !important;background:var(--primary);padding:3px 9px;border-radius:4px}
+    [data-tema="claro"] .footer-badge,[data-tema="claro"] .badge-status{color:var(--primary) !important;background:var(--chip-bg)}
 
 
     /* Scrollbar discreta no painel de itens */
@@ -1096,8 +1099,9 @@
         <div class="card-vert-data"><span>⏰ Fim</span><span>${fmt(item.data_fim_vigencia)}</span></div>
       </div>
       <div class="card-vert-footer">
-        <span class="badge ${badge.cls}">${badge.texto}</span>
+        <span class="footer-badge badge-status">${badge.texto}</span>
         <span class="card-vert-local">📍 ${item.municipio_nome||item.uf||'—'} / ${item.uf||''}</span>
+        ${mod ? `<span class="footer-badge">${mod}</span>` : ''}
         ${item.esfera_nome ? `<span class="footer-badge">${item.esfera_nome}</span>` : ''}
       </div>
     </div>`;
@@ -1132,22 +1136,18 @@
         <div class="card-exp-left">
           <div class="card-exp-titulo">${titulo}</div>
           <div class="card-exp-desc">${item.description || '—'}</div>
-          <div class="card-exp-meta">
-            <span>📅 Início: ${fmt(item.data_inicio_vigencia)}</span>
-            <span>⏰ Fim: ${fmt(item.data_fim_vigencia)}</span>
-            ${item.modalidade_licitacao_nome ? `<span class="card-exp-badge card-exp-badge-mod">${fmtModalidade(item.modalidade_licitacao_nome)}</span>` : ''}
-            ${esferaNome ? `<span class="card-exp-badge card-exp-badge-portal">${esferaNome}</span>` : ''}
-          </div>
         </div>
         <div class="card-exp-items" id="card-items-${cardId}" onclick="event.stopPropagation()">
           <div class="card-items-loading">⏳ Carregando...</div>
         </div>
       </div>
       <div class="card-exp-footer">
-        <span class="badge ${badge.cls}">${badge.texto}</span>
-        <span>📍 ${item.municipio_nome || '—'} / ${item.uf || '—'}</span>
-        <span>📅 Propostas: ${fmt(item.data_inicio_vigencia)}</span>
-        <span>⏰ Encerra: ${fmt(item.data_fim_vigencia)}</span>
+        <span class="footer-badge badge-status">${badge.texto}</span>
+        <span class="footer-info">📍 ${item.municipio_nome || '—'} / ${item.uf || '—'}</span>
+        <span class="footer-info">📅 ${fmt(item.data_inicio_vigencia)}</span>
+        <span class="footer-info">⏰ ${fmt(item.data_fim_vigencia)}</span>
+        ${mod ? `<span class="footer-badge">${mod}</span>` : ''}
+        ${esferaNome ? `<span class="footer-badge">${esferaNome}</span>` : ''}
       </div>
     </div>`;
   }
@@ -1566,14 +1566,8 @@
   // ===== INIT =====
   // No celular: layout vertical por padrão (cards mais compactos)
   // No desktop: layout horizontal por padrão (cards com preview de itens)
-  if (window.innerWidth <= 900) {
-    layoutAtual = 'compacto';
-    // Atualiza visual dos botões para refletir layout real
-    setTimeout(() => {
-      document.getElementById('btnLayoutCompacto')?.classList.add('ativo');
-      document.getElementById('btnLayoutExpandido')?.classList.remove('ativo');
-    }, 0);
-  }
+  // Layout padrão sempre horizontal (tanto PC quanto celular)
+  // O usuário pode alternar manualmente usando os botões
 
   carregarTema();
   atualizarBotaoMod(); // mostra padrão
