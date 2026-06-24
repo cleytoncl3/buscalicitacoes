@@ -543,8 +543,8 @@
       <div id="resumo" class="resumo" style="margin-bottom:0"></div>
       <div class="layout-toggle" id="layoutToggle" style="display:none">
         <span style="font-size:.78rem;color:var(--text3)">Visualização:</span>
-        <button class="layout-btn ativo" id="btnLayoutCompacto" onclick="setLayout('compacto')">↕ Vertical</button>
-        <button class="layout-btn" id="btnLayoutExpandido" onclick="setLayout('expandido')">↔ Horizontal</button>
+        <button class="layout-btn" id="btnLayoutCompacto" onclick="setLayout('compacto')">↕ Vertical</button>
+        <button class="layout-btn ativo" id="btnLayoutExpandido" onclick="setLayout('expandido')">↔ Horizontal</button>
       </div>
     </div>
     <div id="resumo-spacer" style="height:10px"></div>
@@ -913,7 +913,7 @@
 
 
   // ===== LAYOUT =====
-  let layoutAtual = 'compacto';
+  let layoutAtual = 'expandido';
   let ultimosItens = [];
 
   function setLayout(tipo) {
@@ -1026,46 +1026,36 @@
       const data = await r.json();
       const todos = data.data || [];
 
-      // Filtra itens que contêm a(s) palavra-chave(s) buscada(s).
-      // A busca geral aceita múltiplos termos separados por ';'.
-      // Aqui, cada termo é ainda quebrado por espaço em palavras
-      // individuais (ex: "papel kraft" -> "papel" e "kraft"), e cada
-      // palavra é tratada como uma busca independente: o item entra
-      // na lista se a descrição contiver QUALQUER uma das palavras.
-      const normalizar = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      // Separa cada keyword por espaço E por ponto-e-vírgula
+      // "papel kraft" → ["papel","kraft"]  |  "papel kraft; bobina" → ["papel","kraft","bobina"]
       const kwRaw = document.getElementById('palavraChave').value.trim();
       const termos = kwRaw
-        ? normalizar(kwRaw).split(/[;\s]+/).map(t => t.trim()).filter(Boolean)
+        ? [...new Set(
+            kwRaw.split(';')
+              .flatMap(k => k.trim().split(/\s+/))
+              .map(t => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,''))
+              .filter(t => t.length > 2)   // ignora palavras curtas (de, ou, a, o...)
+          )]
         : [];
 
-      // Sem busca ativa -> mostra os primeiros itens só como amostra.
-      // Com busca ativa -> mostra SOMENTE os itens que realmente batem.
-      // Não há fallback para "primeiros itens" aqui: mostrar itens que
-      // não casam com a busca é o que gerava resultados sem sentido
-      // (ex: buscar "papel kraft" e a licitação devolver "concreto usinado").
-      const semBusca = termos.length === 0;
-      const filtrados = semBusca
-        ? todos.slice(0, 6)
-        : todos.filter(it => {
-            const desc = normalizar(it.descricao || '');
+      // Filtra apenas itens cujo nome contém QUALQUER das palavras da busca
+      const filtrados = termos.length
+        ? todos.filter(it => {
+            const desc = (it.descricao || '').toLowerCase()
+              .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
             return termos.some(t => desc.includes(t));
-          });
+          })
+        : [];
 
-      const toShow = filtrados.slice(0, 8);
-      const label = semBusca
-        ? 'Itens da licitação'
-        : `Itens encontrados (${filtrados.length})`;
-
-      if (!toShow.length) {
-        el.innerHTML = semBusca
-          ? '<div class="card-items-vazio">Sem itens</div>'
-          : '<div class="card-items-vazio">Nenhum item desta licitação corresponde à busca</div>';
+      // Sem fallback — só mostra itens realmente relacionados à busca
+      if (!filtrados.length) {
+        el.innerHTML = '<div class="card-items-vazio" style="font-size:.72rem;padding:8px 4px">Sem itens relacionados à busca</div>';
         return;
       }
 
       el.innerHTML = `
-        <div class="card-exp-items-titulo">${label}</div>
-        ${toShow.map(it => `
+        <div class="card-exp-items-titulo">Itens encontrados (${filtrados.length})</div>
+        ${filtrados.slice(0, 8).map(it => `
           <div class="card-item-prev">
             <span class="card-item-prev-num">#${it.numeroItem||'—'}</span>
             <span class="card-item-prev-nome">${(it.descricao||'').substring(0,38)}${(it.descricao||'').length>38?'…':''}</span>
