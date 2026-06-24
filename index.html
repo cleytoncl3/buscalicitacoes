@@ -1008,8 +1008,8 @@
     document.querySelectorAll('.neg-view').forEach(v=>v.classList.remove('ativo'));
     document.getElementById('tab'+aba.charAt(0).toUpperCase()+aba.slice(1)).classList.add('ativo');
     document.getElementById('neg'+aba.charAt(0).toUpperCase()+aba.slice(1)).classList.add('ativo');
-    if(aba==='funil'){fetchNegocios().then(()=>renderFunil());}
-    if(aba==='quadros'){fetchNegocios().then(()=>renderQuadros());}
+    if(aba==='funil'){renderFunil();fetchNegocios().then(d=>{if(d&&d.length>0)renderFunil();});}
+    if(aba==='quadros'){renderQuadros();fetchNegocios().then(d=>{if(d&&d.length>0)renderQuadros();});}
     if(aba==='agenda')renderAgenda();
   }
 
@@ -1328,7 +1328,21 @@
   // ===== NEGÓCIOS =====
   // Negócios: API compartilhada (todos os funcionários veem) + localStorage como cache
   async function fetchNegocios(){
-    try{const r=await fetch('/api/negocios');if(r.ok){const d=await r.json();localStorage.setItem(NEG_KEY,JSON.stringify(d));return d;}}catch{}
+    try{
+      const r=await fetch('/api/negocios');
+      if(r.ok){
+        const d=await r.json();
+        if(Array.isArray(d) && d.length>0){
+          // API tem dados reais — sincroniza com localStorage
+          localStorage.setItem(NEG_KEY,JSON.stringify(d));
+          return d;
+        }
+        // API retornou vazio (Upstash não configurado) — mantém dados locais
+        const local=getNegocios();
+        if(local.length>0) return local;
+        return d; // ambos vazios
+      }
+    }catch{}
     return getNegocios();
   }
   function getNegocios(){try{return JSON.parse(localStorage.getItem(NEG_KEY)||'[]')}catch{return[]}}
@@ -1348,7 +1362,9 @@
   function adicionarAosNegocios(){
     if(!itemAtualDrawer)return;
     const negs=getNegocios();
-    if(negs.find(n=>n.numero_controle===itemAtualDrawer.numero_controle_pncp)){alert('Já está nos seus negócios!');return}
+    if(negs.find(n=>n.numero_controle===itemAtualDrawer.numero_controle_pncp)){
+      alert('Já está no seu Pipeline!');return;
+    }
     const p=parseControle(itemAtualDrawer.numero_controle_pncp);
     const novoNeg={id:Date.now().toString(),titulo:itemAtualDrawer.title||'',objeto:itemAtualDrawer.description||'',orgao:itemAtualDrawer.orgao_nome||'',uf:itemAtualDrawer.uf||'',modalidade:itemAtualDrawer.modalidade_licitacao_nome||'',abertura:itemAtualDrawer.data_inicio_vigencia||'',encerramento:itemAtualDrawer.data_fim_vigencia||'',numero_controle:itemAtualDrawer.numero_controle_pncp||'',link_pncp:p?`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`:'',fase:'oportunidade',adicionado_em:new Date().toISOString(),itemData:JSON.stringify(itemAtualDrawer)};
     negs.unshift(novoNeg);
@@ -1563,7 +1579,7 @@
     btnA.style.display=direto?'flex':'none';
 
     // Botão negócios
-    const jaAdicionado=getNegocios().some(n=>n.numero_controle===item.numero_controle_pncp);
+    const jaAdicionado=getNegocios().some(n=>n.numero_controle===item.numero_controle_pncp||n.numero_controle===item.id);
     const btnNeg=document.getElementById('d-btn-negocio');
     btnNeg.textContent=jaAdicionado?'✅ Já nos seus negócios':'💼 Adicionar aos meus negócios';
     btnNeg.classList.toggle('adicionado',jaAdicionado);
