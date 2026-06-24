@@ -307,6 +307,15 @@
 
 
 
+
+    /* Chips de busca rápida no drawer */
+    .drawer-kw-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+    .drawer-kw-chip{background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:20px;padding:4px 12px;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s}
+    .drawer-kw-chip:hover{background:var(--primary);color:var(--accent)}
+    [data-tema="escuro"] .drawer-kw-chip{color:var(--accent)}
+    [data-tema="escuro"] .drawer-kw-chip:hover{background:var(--primary);color:var(--accent)}
+    .drawer-kw-chip.ativo{background:var(--primary);color:var(--accent)}
+
     /* Autocomplete customizado */
     .kw-wrapper{position:relative;flex:1}
     .kw-wrapper input{width:100%}
@@ -641,6 +650,7 @@
     <button class="drawer-btn drawer-btn-destaque" id="d-btn-negocio" onclick="adicionarAosNegocios()">💼 Adicionar aos meus negócios</button>
     <div class="drawer-section">
       <h3>Itens do pregão</h3>
+      <div class="drawer-kw-chips" id="drawerKwChips"></div>
       <input type="text" class="item-busca" id="buscaItem" placeholder="🔍 Buscar item dentro desta licitação..." oninput="filtrarItens()"/>
       <div id="d-itens"><div class="item-loading">⏳ Carregando itens...</div></div>
     </div>
@@ -1258,6 +1268,40 @@
     const t=document.getElementById('buscaItem').value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
     renderItens(t?todosItens.filter(it=>(it.descricao||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(t)):todosItens);
   }
+  function renderDrawerKwChips() {
+    const kwRaw = document.getElementById('palavraChave').value.trim();
+    const div = document.getElementById('drawerKwChips');
+    if (!kwRaw || !div) return;
+
+    // Extrai palavras únicas da busca (separa por ; e por espaço, ignora curtas)
+    const termos = [...new Set(
+      kwRaw.split(';')
+        .flatMap(k => k.trim().split(/\s+/))
+        .map(t => t.replace(/['"]/g, '').trim())
+        .filter(t => t.length > 2)
+    )];
+
+    if (!termos.length) { div.innerHTML = ''; return; }
+
+    div.innerHTML = termos.map(t =>
+      `<span class="drawer-kw-chip" onclick="filtrarDrawerPorChip('${t.replace(/'/g,"\\'")}', this)">${t}</span>`
+    ).join('');
+  }
+
+  function filtrarDrawerPorChip(termo, el) {
+    const input = document.getElementById('buscaItem');
+    // Toggle: se já está ativo, limpa. Se não, aplica.
+    if (el.classList.contains('ativo')) {
+      input.value = '';
+      document.querySelectorAll('.drawer-kw-chip').forEach(c => c.classList.remove('ativo'));
+    } else {
+      input.value = termo;
+      document.querySelectorAll('.drawer-kw-chip').forEach(c => c.classList.remove('ativo'));
+      el.classList.add('ativo');
+    }
+    filtrarItens();
+  }
+
   function abrirDrawer(item){
     itemAtualDrawer=item;
     const{direto}=buildLinks(item);const badge=statusBadge(item);
@@ -1281,6 +1325,7 @@
     btnNeg.textContent=jaAdicionado?'✅ Já nos seus negócios':'💼 Adicionar aos meus negócios';
     btnNeg.classList.toggle('adicionado',jaAdicionado);
     document.getElementById('buscaItem').value='';todosItens=[];
+    renderDrawerKwChips();
     document.getElementById('d-itens').innerHTML='<div class="item-loading">⏳ Carregando itens...</div>';
     document.getElementById('drawer').classList.add('ativo');
     document.getElementById('overlay').classList.add('ativo');
