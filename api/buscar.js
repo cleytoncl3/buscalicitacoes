@@ -61,17 +61,19 @@ export default async function handler(req, res) {
 
   // Filtro de data client-side (PNCP não suporta este filtro na /api/search/)
   // Lógica: inclui licitação se ela for RELEVANTE no período selecionado
-  // Filtra pela DATA DE DIVULGAÇÃO NO PNCP (data_publicacao_pncp)
-  // Equivalente ao campo "Data de divulgação no PNCP" que aparece na licitação individual
+  // Filtra pela DATA DE ENCERRAMENTO DE PROPOSTAS (data_fim_vigencia)
+  // Lógica: o usuário quer ver licitações cujo prazo de proposta cai dentro do período
+  // Ex: "Próximos 30 dias" = propostas que encerram nos próximos 30 dias (urgência)
+  // Isso é estável porque licitações abertas têm data_fim_vigencia no futuro próximo
   const filtrarData = (items) => {
     if (!dataInicial && !dataFinal) return items;
     const dI = dataInicial ? new Date(dataInicial + 'T00:00:00') : null;
     const dF = dataFinal   ? new Date(dataFinal   + 'T23:59:59') : null;
     return items.filter(i => {
-      const pub = i.data_publicacao_pncp ? new Date(i.data_publicacao_pncp) : null;
-      if (!pub) return true;
-      if (dI && pub < dI) return false;
-      if (dF && pub > dF) return false;
+      const fim = i.data_fim_vigencia ? new Date(i.data_fim_vigencia) : null;
+      if (!fim) return true;                  // sem data de encerramento: inclui
+      if (dI && fim < dI) return false;       // encerra antes do período: fora
+      if (dF && fim > dF) return false;       // encerra depois do período: fora
       return true;
     });
   };
