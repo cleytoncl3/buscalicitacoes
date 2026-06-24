@@ -205,53 +205,64 @@
     .kw-input-row input{flex:1}
     .btn-add-kw{background:var(--primary);color:var(--accent);border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:.85rem;white-space:nowrap}
 
-    /* DRAWER */
-    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s}
+    /* ═══ DRAWER REDESIGN ═══ */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s}
     .overlay.ativo{opacity:1;pointer-events:all}
-    .drawer{position:fixed;top:0;right:-660px;width:640px;max-width:95vw;height:100vh;background:var(--drawer-bg);z-index:101;box-shadow:-4px 0 24px rgba(0,0,0,.3);transition:right .3s ease;overflow-y:auto;display:flex;flex-direction:column;border-left:1px solid var(--border)}
+    .drawer{position:fixed;top:0;right:-640px;width:600px;max-width:96vw;height:100vh;background:var(--drawer-bg);z-index:101;box-shadow:-4px 0 30px rgba(0,0,0,.35);transition:right .3s ease;display:flex;flex-direction:column;border-left:1px solid var(--border)}
     .drawer.ativo{right:0}
-    .drawer-header{background:var(--primary);color:var(--accent);padding:20px 20px 16px;position:sticky;top:0;z-index:1}
-    .drawer-header h2{font-size:1rem;font-weight:700;margin-bottom:4px}
-    .drawer-sub{font-size:.8rem;color:#aaa}
-    .drawer-fechar{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+    /* Cabeçalho */
+    .drawer-header{background:var(--primary);padding:16px 20px 14px;position:sticky;top:0;z-index:2;flex-shrink:0}
+    .drawer-fechar{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
     .drawer-fechar:hover{background:rgba(255,255,255,.3)}
-    .drawer-body{padding:20px;flex:1}
-    .drawer-section{margin-bottom:20px}
-    .drawer-section h3{font-size:.8rem;text-transform:uppercase;color:var(--text3);letter-spacing:1px;margin-bottom:8px}
-    .drawer-desc{font-size:.9rem;color:var(--text);line-height:1.5}
-    .drawer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .drawer-campo{background:var(--surface2);border-radius:8px;padding:10px 12px;border:1px solid var(--border)}
-    .drawer-campo label{font-size:.72rem;color:var(--text3);display:block;margin-bottom:3px;text-transform:uppercase}
-    .drawer-campo span{font-size:.9rem;color:var(--text);font-weight:600}
-    .drawer-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
-    .drawer-tag{background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:20px;padding:3px 10px;font-size:.78rem;font-weight:600}
+    .d-fonte-badge{display:inline-block;background:rgba(255,255,255,.15);color:var(--accent);font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:6px;letter-spacing:.5px}
+    .d-num-header{font-size:.95rem;font-weight:700;color:#fff;padding-right:36px;line-height:1.3}
+
+    /* Corpo */
+    .drawer-body{padding:18px 20px;overflow-y:auto;flex:1}
+    .d-orgao-bloco{margin-bottom:14px}
+    .d-orgao-nome{font-size:.98rem;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.3}
+    .d-unidade-nome{font-size:.82rem;color:var(--text2);margin-bottom:2px}
+    .d-local{font-size:.78rem;color:var(--text3)}
+    .d-sep{height:1px;background:var(--border);margin:14px 0}
+    .d-objeto{font-size:.9rem;color:var(--text);line-height:1.55;margin-bottom:12px;font-weight:500}
+
+    /* Tags */
+    .drawer-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+    .drawer-tag{background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:20px;padding:3px 10px;font-size:.75rem;font-weight:600}
     [data-tema="escuro"] .drawer-tag{color:var(--accent)}
-    .drawer-btn{display:block;width:100%;padding:12px;background:var(--primary);color:var(--accent);border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:10px;text-align:center}
-    .drawer-btn:hover{background:var(--primary-hover)}
-    .drawer-btn-sec{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
-    .drawer-btn-sec:hover{background:var(--border)}
-    .drawer-btn-destaque{background:#b45309;color:#fff}
-    .drawer-btn-destaque:hover{background:#92400e}
-    .drawer-btn-destaque.adicionado{background:#166534;color:#fff}
+
+    /* Abertura em destaque */
+    .d-abertura-box{background:var(--chip-bg);border:1px solid var(--chip-border);border-radius:10px;padding:14px 16px;margin:4px 0 14px;text-align:center}
+    .d-abertura-label{font-size:.75rem;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+    .d-abertura-data{font-size:1.15rem;font-weight:700;color:var(--accent)}
+
+    /* Info grid */
+    .d-info-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+    .d-info-item{background:var(--surface2);border-radius:8px;padding:10px 12px;border:1px solid var(--border)}
+    .d-info-label{font-size:.7rem;color:var(--text3);display:block;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px}
+    .d-info-val{font-size:.88rem;font-weight:600;color:var(--text)}
+
+    /* Situação + modalidade */
+    .d-situacao-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+    .d-sit-badge{font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:20px;background:var(--badge-verde-bg);color:var(--badge-verde-txt)}
+    .d-mod-badge{font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:20px;background:var(--primary);color:var(--accent)}
+    [data-tema="claro"] .d-mod-badge{background:var(--chip-bg);color:var(--primary)}
+
+    /* Botões */
+    .d-acoes{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
+    .d-btn-acessar{background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:11px 16px;border-radius:8px;font-size:.92rem;cursor:pointer;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;transition:background .15s}
+    .d-btn-acessar:hover{background:var(--border)}
+    .d-btn-negocio{background:var(--primary);color:var(--accent);border:none;padding:12px 16px;border-radius:8px;font-size:.95rem;font-weight:700;cursor:pointer;text-align:center;transition:background .15s}
+    .d-btn-negocio:hover{background:var(--primary-hover)}
+    .d-btn-negocio.adicionado{background:#166534;color:#fff}
+
+    /* Itens */
+    .d-itens-titulo{font-size:.82rem;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
     .item-busca{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:.88rem;background:var(--surface2);color:var(--text);margin-bottom:10px;outline:none}
     .item-busca:focus{border-color:var(--primary)}
-    .item-lista{display:flex;flex-direction:column;gap:6px}
-    .item-accordion{border:1px solid var(--border);border-radius:8px;overflow:hidden}
-    .item-header{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:var(--surface2)}
-    .item-header:hover{filter:brightness(1.05)}
-    .item-num-badge{background:var(--primary);color:var(--accent);border-radius:6px;padding:2px 8px;font-size:.75rem;font-weight:700;white-space:nowrap;min-width:56px;text-align:center}
-    .item-resumo{flex:1}
-    .item-nome{font-size:.88rem;font-weight:600;color:var(--text)}
-    .item-qtd{font-size:.78rem;color:var(--text2);margin-top:2px}
-    .item-chevron{color:var(--text3);font-size:.85rem;transition:transform .2s;flex-shrink:0}
-    .item-chevron.aberto{transform:rotate(180deg)}
-    .item-detalhe{display:none;padding:14px;background:var(--surface);border-top:1px solid var(--border)}
-    .item-detalhe.aberto{display:block}
-    .item-detalhe-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
-    .item-detalhe-campo{background:var(--surface2);border-radius:6px;padding:8px 10px;border:1px solid var(--border)}
-    .item-detalhe-campo label{font-size:.7rem;color:var(--text3);display:block;text-transform:uppercase;margin-bottom:2px}
-    .item-detalhe-campo span{font-size:.85rem;font-weight:600;color:var(--text)}
-    .item-desc-full{font-size:.82rem;color:var(--text2);line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+
+        .item-desc-full{font-size:.82rem;color:var(--text2);line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
     .item-loading{text-align:center;padding:20px;color:var(--text3);font-size:.9rem}
 
     /* NEGÓCIOS */
@@ -1387,29 +1398,56 @@
 
   function abrirDrawer(item){
     itemAtualDrawer=item;
-    const{direto}=buildLinks(item);const badge=statusBadge(item);
-    document.getElementById('d-titulo').textContent=item.title||'Sem título';
-    document.getElementById('d-numero').textContent=item.numero_controle_pncp||'';
-    document.getElementById('d-objeto').textContent=item.description||'—';
+    const{direto}=buildLinks(item);
+    const badge=statusBadge(item);
+    const mod=fmtModalidade(item.modalidade_licitacao_nome)||'';
+    const num=extrairNumEdital(item);
+    const esfera=item.esfera_id==='F'?'Comprasnet':item.esfera_id==='E'?'Estadual':item.esfera_id==='M'?'Municipal':'PNCP';
+
+    // Header
+    document.getElementById('d-fonte-badge').textContent='🏛 '+esfera;
+    document.getElementById('d-num-header').textContent=(mod?mod+' ':'')+(num?'Nº '+num:'')+(item.uf?' — '+item.uf:'');
+
+    // Organização
     document.getElementById('d-orgao').textContent=item.orgao_nome||'—';
-    document.getElementById('d-unidade').textContent=item.unidade_nome||'—';
-    document.getElementById('d-uf').textContent=(item.uf||'—')+' · '+(item.municipio_nome||'');
-    document.getElementById('d-modalidade').textContent=fmtModalidade(item.modalidade_licitacao_nome)||'—';
+    document.getElementById('d-unidade').textContent=item.unidade_nome||'';
+    document.getElementById('d-uf').textContent=(item.municipio_nome||'')+(item.uf?' / '+item.uf:'');
+
+    // Objeto
+    document.getElementById('d-objeto').textContent=item.description||'—';
+
+    // Tags (categorias da licitação — se disponíveis)
+    document.getElementById('d-tags').innerHTML=
+      item.numero_controle_pncp?`<span class="drawer-tag">${item.numero_controle_pncp}</span>`:'';
+
+    // Datas e valores
     document.getElementById('d-abertura').textContent=fmt(item.data_inicio_vigencia);
     document.getElementById('d-encerramento').textContent=fmt(item.data_fim_vigencia);
     document.getElementById('d-valor').textContent=fmtVal(item.valor_global);
-    document.getElementById('d-situacao').textContent=badge.texto;
-    document.getElementById('d-tags').innerHTML=`<span class="drawer-tag">${fmtModalidade(item.modalidade_licitacao_nome)||'—'}</span><span class="drawer-tag badge ${badge.cls}">${badge.texto}</span>${item.esfera_nome?`<span class="drawer-tag">${item.esfera_nome}</span>`:''}`;
-    document.getElementById('d-btn-acessar').onclick=()=>window.open(direto,'_blank');
-    document.getElementById('d-btn-busca').onclick=()=>window.open(direto,'_blank');
-    document.getElementById('d-btn-acessar').style.display=direto?'block':'none';
+
+    // Situação e modalidade
+    const elSit=document.getElementById('d-situacao');
+    elSit.textContent=badge.texto;
+    elSit.className='d-sit-badge';
+    document.getElementById('d-modalidade').textContent=mod||'—';
+
+    // Botão acessar
+    const btnA=document.getElementById('d-btn-acessar');
+    btnA.onclick=()=>window.open(direto,'_blank');
+    btnA.style.display=direto?'flex':'none';
+
+    // Botão negócios
     const jaAdicionado=getNegocios().some(n=>n.numero_controle===item.numero_controle_pncp);
     const btnNeg=document.getElementById('d-btn-negocio');
     btnNeg.textContent=jaAdicionado?'✅ Já nos seus negócios':'💼 Adicionar aos meus negócios';
     btnNeg.classList.toggle('adicionado',jaAdicionado);
+
+    // Itens
     document.getElementById('buscaItem').value='';todosItens=[];
     renderDrawerKwChips();
     document.getElementById('d-itens').innerHTML='<div class="item-loading">⏳ Carregando itens...</div>';
+
+    // Abre
     document.getElementById('drawer').classList.add('ativo');
     document.getElementById('overlay').classList.add('ativo');
     document.body.style.overflow='hidden';
