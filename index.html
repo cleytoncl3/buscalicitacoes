@@ -370,7 +370,7 @@
     .footer-badge{font-size:.72rem;font-weight:600;color:var(--accent);background:var(--primary);padding:2px 8px;border-radius:4px;white-space:nowrap}
     [data-tema="claro"] .footer-badge{color:var(--primary);background:var(--chip-bg)}
 
-    .card-exp-items{padding:10px 12px;background:var(--surface);display:flex;flex-direction:column;gap:4px;border-left:1px solid var(--border)}
+    .card-exp-items{padding:10px 12px;background:var(--surface);display:flex;flex-direction:column;gap:4px;border-left:1px solid var(--border);overflow-y:auto;max-height:260px}
     .card-exp-items-titulo{font-size:.68rem;text-transform:uppercase;color:var(--text3);letter-spacing:.5px;font-weight:600;margin-bottom:2px}
     .card-item-prev{display:flex;align-items:baseline;gap:6px;padding:3px 0;border-bottom:1px solid var(--border)}
     .card-item-prev:last-child{border-bottom:none}
@@ -386,6 +386,18 @@
     .card-exp-footer span{font-size:.75rem;color:var(--text2)}
     .card-exp-footer .badge{font-size:.72rem}
 
+
+    /* Scrollbar discreta no painel de itens */
+    .card-exp-items::-webkit-scrollbar{width:4px}
+    .card-exp-items::-webkit-scrollbar-track{background:transparent}
+    .card-exp-items::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+    .card-exp-items::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+
+    /* Scrollbar discreta no painel de itens */
+    .card-exp-items::-webkit-scrollbar{width:4px}
+    .card-exp-items::-webkit-scrollbar-track{background:transparent}
+    .card-exp-items::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+    .card-exp-items::-webkit-scrollbar-thumb:hover{background:var(--text3)}
     /* ═══ TABLET/MOBILE (≤1024px) ═══ */
     @media(max-width:1024px){
       .card-exp-main{grid-template-columns:1fr}
@@ -1194,8 +1206,8 @@
     }
 
     el.innerHTML = `
-      <div class="card-exp-items-titulo">Itens encontrados (${filtrados.length})</div>
-      ${filtrados.slice(0, 8).map(it => `
+      <div class="card-exp-items-titulo">Prévia de itens (${filtrados.length})</div>
+      ${filtrados.map(it => `
         <div class="card-item-prev">
           <span class="card-item-prev-num">#${it.numeroItem||'—'}</span>
           <span class="card-item-prev-nome">${norm(it.descricao).substring(0,38)}${(it.descricao||'').length>38?'…':''}</span>
