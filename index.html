@@ -540,7 +540,7 @@
       </div>
       <!-- Linha 4: Data compacta -->
       <div class="data-row">
-        <span class="data-row-label">📅 Abertura:</span>
+        <span class="data-row-label">📅 Divulgação PNCP:</span>
         <input type="date" id="dataInicial"/>
         <span class="data-row-sep">até</span>
         <input type="date" id="dataFinal"/>
@@ -630,8 +630,8 @@
         <div class="drawer-campo"><label>Unidade</label><span id="d-unidade"></span></div>
         <div class="drawer-campo"><label>Estado</label><span id="d-uf"></span></div>
         <div class="drawer-campo"><label>Modalidade</label><span id="d-modalidade"></span></div>
-        <div class="drawer-campo"><label>Abertura</label><span id="d-abertura"></span></div>
-        <div class="drawer-campo"><label>Encerramento</label><span id="d-encerramento"></span></div>
+        <div class="drawer-campo"><label>Início de propostas</label><span id="d-abertura"></span></div>
+        <div class="drawer-campo"><label>Fim de propostas</label><span id="d-encerramento"></span></div>
         <div class="drawer-campo"><label>Valor estimado</label><span id="d-valor"></span></div>
         <div class="drawer-campo"><label>Situação</label><span id="d-situacao"></span></div>
       </div>
@@ -978,8 +978,9 @@
       <div class="card-vert-desc">${item.description||'—'}</div>
       <div class="card-vert-divider"></div>
       <div class="card-vert-datas">
-        <div class="card-vert-data"><span>📅 Abertura</span><span>${fmt(item.data_inicio_vigencia)}</span></div>
-        <div class="card-vert-data"><span>⏰ Encerra</span><span>${fmt(item.data_fim_vigencia)}</span></div>
+        <div class="card-vert-data"><span>📋 Divulgação</span><span>${fmt(item.data_publicacao_pncp)}</span></div>
+        <div class="card-vert-data"><span>📅 Início propostas</span><span>${fmt(item.data_inicio_vigencia)}</span></div>
+        <div class="card-vert-data"><span>⏰ Fim propostas</span><span>${fmt(item.data_fim_vigencia)}</span></div>
       </div>
       <div class="card-vert-footer">
         <span class="badge ${badge.cls}">${badge.texto}</span>
@@ -1018,8 +1019,9 @@
           <div class="card-exp-titulo">${titulo}</div>
           <div class="card-exp-desc">${item.description || '—'}</div>
           <div class="card-exp-meta">
-            <span>📅 Abertura: <strong>${fmt(item.data_inicio_vigencia)}</strong></span>
-            <span>⏰ Encerra: <strong>${fmt(item.data_fim_vigencia)}</strong></span>
+            <span>📋 Divulgação: <strong>${fmt(item.data_publicacao_pncp)}</strong></span>
+            <span>📅 Início propostas: <strong>${fmt(item.data_inicio_vigencia)}</strong></span>
+            <span>⏰ Fim propostas: <strong>${fmt(item.data_fim_vigencia)}</strong></span>
             ${item.modalidade_licitacao_nome ? `<span class="card-exp-badge card-exp-badge-mod">${fmtModalidade(item.modalidade_licitacao_nome)}</span>` : ''}
             ${esferaNome ? `<span class="card-exp-badge card-exp-badge-portal">${esferaNome}</span>` : ''}
           </div>
@@ -1031,8 +1033,8 @@
       <div class="card-exp-footer">
         <span class="badge ${badge.cls}">${badge.texto}</span>
         <span>📍 ${item.municipio_nome || '—'} / ${item.uf || '—'}</span>
-        <span>📅 ${fmt(item.data_inicio_vigencia)}</span>
-        <span>⏰ ${fmt(item.data_fim_vigencia)}</span>
+        <span>📅 Propostas: ${fmt(item.data_inicio_vigencia)}</span>
+        <span>⏰ Encerra: ${fmt(item.data_fim_vigencia)}</span>
       </div>
     </div>`;
   }
