@@ -306,9 +306,19 @@
 
 
 
-    /* Autocomplete */
-    #palavraChave::-webkit-calendar-picker-indicator{display:none !important}
-    datalist option{font-size:.9rem}
+
+    /* Autocomplete customizado */
+    .kw-wrapper{position:relative;flex:1}
+    .kw-wrapper input{width:100%}
+    .ac-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:350;display:none;max-height:240px;overflow-y:auto}
+    .ac-dropdown.aberto{display:block}
+    .ac-item{padding:9px 14px;font-size:.9rem;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border)}
+    .ac-item:last-child{border-bottom:none}
+    .ac-item:hover,.ac-item.selecionado{background:var(--chip-bg);color:var(--primary)}
+    [data-tema="escuro"] .ac-item:hover,[data-tema="escuro"] .ac-item.selecionado{color:var(--accent)}
+    .ac-item strong{color:var(--primary)}
+    [data-tema="escuro"] .ac-item strong{color:var(--accent)}
+
 
     /* ===== LAYOUT VERTICAL (smartphone style) ===== */
     .cards-vertical{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
@@ -508,61 +518,10 @@
 
       <!-- Linha 1: Keyword -->
       <div class="filtros-linha filtros-linha-busca">
-        <input type="text" id="palavraChave" list="kw-sugestoes" autocomplete="off" placeholder="Palavras-chave separadas por ; (ex: papel kraft; bobina; embalagem parda)"/>
-      <datalist id="kw-sugestoes">
-        <option value="papel kraft">
-        <option value="papel sulfite">
-        <option value="papel A4">
-        <option value="papel A3">
-        <option value="papel ofício">
-        <option value="papel pardo">
-        <option value="papel reciclado">
-        <option value="papel cartão">
-        <option value="papel offset">
-        <option value="papel vegetal">
-        <option value="papel alumínio">
-        <option value="papel térmico">
-        <option value="papel higiênico">
-        <option value="papel toalha">
-        <option value="bobina kraft">
-        <option value="bobina papel kraft">
-        <option value="bobina semi kraft">
-        <option value="bobina térmica">
-        <option value="semi kraft">
-        <option value="papel kraft natural">
-        <option value="papel kraft pardo">
-        <option value="papel para embalagem">
-        <option value="papel para impressão">
-        <option value="saco kraft">
-        <option value="envelope kraft">
-        <option value="caixa papelão">
-        <option value="caixa kraft">
-        <option value="resma papel">
-        <option value="resma sulfite">
-        <option value="material de escritório">
-        <option value="material de expediente">
-        <option value="material de papelaria">
-        <option value="caderno">
-        <option value="bloco de notas">
-        <option value="pasta arquivo">
-        <option value="pasta papelão">
-        <option value="etiqueta adesiva">
-        <option value="etiqueta papel">
-        <option value="fita adesiva">
-        <option value="fita crepe">
-        <option value="guardanapo">
-        <option value="papel A4 75g">
-        <option value="papel A4 90g">
-        <option value="papel sulfite A4">
-        <option value="papel sulfite A3">
-        <option value="papel couché">
-        <option value="papel jornal">
-        <option value="papelão">
-        <option value="papelão ondulado">
-        <option value="embalagem papel">
-        <option value="embalagem kraft">
-        <option value="material de limpeza">
-      </datalist>
+        <div class="kw-wrapper">
+          <input type="text" id="palavraChave" placeholder="Palavras-chave separadas por ; (ex: papel kraft; bobina; embalagem parda)" autocomplete="off"/>
+          <div class="ac-dropdown" id="acDropdown"></div>
+        </div>
         <button class="btn-buscar" id="btnBuscar" onclick="buscar(1)">Buscar</button>
         <button class="btn-limpar" onclick="limpar()">Limpar</button>
       </div>
@@ -1353,6 +1312,90 @@
     document.getElementById('paginacao').style.display='none';
   }
   document.getElementById('palavraChave').addEventListener('keydown',e=>{if(e.key==='Enter')buscar(1)});
+
+
+  // ===== AUTOCOMPLETE =====
+  const AC_SUGESTOES = [
+    'papel kraft','bobina kraft','bobina papel kraft','bobina semi kraft',
+    'papel sulfite','papel A4','papel A3','papel ofício','papel pardo',
+    'papel reciclado','papel cartão','papel offset','papel vegetal',
+    'papel alumínio','papel térmico','papel higiênico','papel toalha',
+    'papel kraft natural','papel kraft pardo','papel para embalagem',
+    'papel para impressão','papel A4 75g','papel A4 90g',
+    'papel sulfite A4','papel sulfite A3','papel couché','papel jornal',
+    'semi kraft','saco kraft','envelope kraft','caixa papelão','caixa kraft',
+    'resma papel','resma sulfite','material de escritório',
+    'material de expediente','material de papelaria','caderno',
+    'bloco de notas','pasta arquivo','pasta papelão','etiqueta adesiva',
+    'etiqueta papel','fita adesiva','fita crepe','guardanapo',
+    'papelão','papelão ondulado','embalagem papel','embalagem kraft',
+    'bobina plástica','rolo bobina','papel térmico 80mm',
+  ];
+
+  let acIdx = -1;
+
+  function acMostrar(filtradas) {
+    const dd = document.getElementById('acDropdown');
+    if (!filtradas.length) { dd.classList.remove('aberto'); return; }
+    dd.innerHTML = filtradas.map((s, i) =>
+      `<div class="ac-item" data-val="${s}" onmousedown="acEscolher('${s}')">${acDestaque(s)}</div>`
+    ).join('');
+    dd.classList.add('aberto');
+    acIdx = -1;
+  }
+
+  function acDestaque(texto) {
+    const inp = document.getElementById('palavraChave');
+    // pega a última palavra após o último ;
+    const partes = inp.value.split(';');
+    const termo = partes[partes.length - 1].trim();
+    if (!termo) return texto;
+    const re = new RegExp(`(${termo.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+    return texto.replace(re, '<strong>$1</strong>');
+  }
+
+  function acEscolher(val) {
+    const inp = document.getElementById('palavraChave');
+    const partes = inp.value.split(';');
+    partes[partes.length - 1] = ' ' + val;
+    inp.value = partes.join(';').replace(/^\s+/,'');
+    document.getElementById('acDropdown').classList.remove('aberto');
+    inp.focus();
+  }
+
+  function acFechar() {
+    setTimeout(() => document.getElementById('acDropdown').classList.remove('aberto'), 150);
+  }
+
+  document.getElementById('palavraChave').addEventListener('input', function() {
+    const partes = this.value.split(';');
+    const termo = partes[partes.length - 1].trim().toLowerCase();
+    if (!termo) { document.getElementById('acDropdown').classList.remove('aberto'); return; }
+    const filtradas = AC_SUGESTOES.filter(s => s.toLowerCase().includes(termo)).slice(0, 8);
+    acMostrar(filtradas);
+  });
+
+  document.getElementById('palavraChave').addEventListener('keydown', function(e) {
+    const dd = document.getElementById('acDropdown');
+    const itens = dd.querySelectorAll('.ac-item');
+    if (!dd.classList.contains('aberto') || !itens.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      acIdx = Math.min(acIdx + 1, itens.length - 1);
+      itens.forEach((el, i) => el.classList.toggle('selecionado', i === acIdx));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      acIdx = Math.max(acIdx - 1, 0);
+      itens.forEach((el, i) => el.classList.toggle('selecionado', i === acIdx));
+    } else if (e.key === 'Enter' && acIdx >= 0) {
+      e.preventDefault();
+      acEscolher(itens[acIdx].dataset.val);
+    } else if (e.key === 'Escape') {
+      dd.classList.remove('aberto');
+    }
+  });
+
+  document.getElementById('palavraChave').addEventListener('blur', acFechar);
 
   // ===== INIT =====
   carregarTema();
