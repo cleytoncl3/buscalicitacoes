@@ -687,9 +687,18 @@
     <button class="nav-btn ativo" id="navOportunidades" onclick="toggleDropdown('dropOportunidades')">
       <span class="nav-btn-icon">🔍</span> Pesquisar ▾
       <div class="dropdown" id="dropOportunidades">
-        <div class="dropdown-item" onclick="irParaView('busca')">🔍 Nova Pesquisa</div>
-        <div class="dropdown-sep"></div>
+        <div class="dropdown-item" onclick="irParaView('busca')">🔍 Buscar Licitações</div>
         <div class="dropdown-item" onclick="irParaView('jornais')">🔔 Meus Alertas</div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item" onclick="irParaView('orgaos')">🏛️ Órgãos Públicos</div>
+        <div class="dropdown-item" onclick="irParaView('buscarNum')">🔢 Buscar por Número</div>
+      </div>
+    </button>
+    <button class="nav-btn" id="navAnalise" onclick="toggleDropdown('dropAnalise')">
+      <span class="nav-btn-icon">📊</span> Análises ▾
+      <div class="dropdown" id="dropAnalise">
+        <div class="dropdown-item" onclick="irParaView('historico')">📈 Preços Praticados</div>
+        <div class="dropdown-item" onclick="irParaView('empresa')">🔎 Consultar Empresa</div>
       </div>
     </button>
     <button class="nav-btn" id="navNegocios" onclick="toggleDropdown('dropNegocios')">
@@ -698,6 +707,9 @@
         <div class="dropdown-item" onclick="irParaNegocios('funil')">📊 Por Etapa</div>
         <div class="dropdown-item" onclick="irParaNegocios('quadros')">🗂️ Visão Geral</div>
         <div class="dropdown-item" onclick="irParaNegocios('agenda')">📅 Calendário de Prazos</div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item" onclick="irParaView('minhaEmpresa')">🏢 Minha Empresa</div>
+        <div class="dropdown-item" onclick="irParaView('documentos')">📂 Documentos</div>
       </div>
     </button>
     <button class="nav-mobile-btn" id="navMobileBtn" onclick="toggleMobileMenu()">☰</button>
@@ -717,12 +729,19 @@
 
 <!-- MENU MOBILE -->
 <div class="mobile-menu" id="mobileMenu">
-  <div class="mobile-menu-item" onclick="irParaView('busca');fecharMobileMenu()">🔍 Nova Pesquisa</div>
+  <div class="mobile-menu-item" onclick="irParaView('busca');fecharMobileMenu()">🔍 Buscar Licitações</div>
   <div class="mobile-menu-item" onclick="irParaView('jornais');fecharMobileMenu()">🔔 Meus Alertas</div>
+  <div class="mobile-menu-item" onclick="irParaView('orgaos');fecharMobileMenu()">🏛️ Órgãos Públicos</div>
+  <div class="mobile-menu-item" onclick="irParaView('buscarNum');fecharMobileMenu()">🔢 Buscar por Número</div>
+  <div class="mobile-menu-sep"></div>
+  <div class="mobile-menu-item" onclick="irParaView('historico');fecharMobileMenu()">📈 Preços Praticados</div>
+  <div class="mobile-menu-item" onclick="irParaView('empresa');fecharMobileMenu()">🔎 Consultar Empresa</div>
   <div class="mobile-menu-sep"></div>
   <div class="mobile-menu-item" onclick="irParaNegocios('funil');fecharMobileMenu()">📊 Por Etapa</div>
   <div class="mobile-menu-item" onclick="irParaNegocios('quadros');fecharMobileMenu()">🗂️ Visão Geral</div>
   <div class="mobile-menu-item" onclick="irParaNegocios('agenda');fecharMobileMenu()">📅 Calendário de Prazos</div>
+  <div class="mobile-menu-item" onclick="irParaView('minhaEmpresa');fecharMobileMenu()">🏢 Minha Empresa</div>
+  <div class="mobile-menu-item" onclick="irParaView('documentos');fecharMobileMenu()">📂 Documentos</div>
   <div class="mobile-menu-sep"></div>
   <div class="mobile-menu-item" onclick="alternarTema();fecharMobileMenu()">🌓 Alternar tema</div>
 </div>
