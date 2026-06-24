@@ -642,19 +642,19 @@
 
   <nav class="nav">
     <button class="nav-btn ativo" id="navOportunidades" onclick="toggleDropdown('dropOportunidades')">
-      <span class="nav-btn-icon">🔍</span> Buscar ▾
+      <span class="nav-btn-icon">🔍</span> Pesquisar ▾
       <div class="dropdown" id="dropOportunidades">
         <div class="dropdown-item" onclick="irParaView('busca')">🔍 Buscar Licitações</div>
         <div class="dropdown-sep"></div>
-        <div class="dropdown-item" onclick="irParaView('jornais')">📰 Monitoramento</div>
+        <div class="dropdown-item" onclick="irParaView('jornais')">🔔 Meus Alertas</div>
       </div>
     </button>
     <button class="nav-btn" id="navNegocios" onclick="toggleDropdown('dropNegocios')">
-      <span class="nav-btn-icon">📊</span> Pipeline ▾
+      <span class="nav-btn-icon">📁</span> Meus Negócios ▾
       <div class="dropdown" id="dropNegocios">
-        <div class="dropdown-item" onclick="irParaNegocios('funil')">📊 Funil de Oportunidades</div>
-        <div class="dropdown-item" onclick="irParaNegocios('quadros')">🗂️ Quadro Kanban</div>
-        <div class="dropdown-item" onclick="irParaNegocios('agenda')">📅 Agenda de Prazos</div>
+        <div class="dropdown-item" onclick="irParaNegocios('funil')">📊 Por Etapa</div>
+        <div class="dropdown-item" onclick="irParaNegocios('quadros')">🗂️ Visão Geral</div>
+        <div class="dropdown-item" onclick="irParaNegocios('agenda')">📅 Calendário de Prazos</div>
       </div>
     </button>
     <button class="nav-mobile-btn" id="navMobileBtn" onclick="toggleMobileMenu()">☰</button>
@@ -674,12 +674,12 @@
 
 <!-- MENU MOBILE -->
 <div class="mobile-menu" id="mobileMenu">
-  <div class="mobile-menu-item" onclick="irParaView('busca');fecharMobileMenu()">🔍 Buscar Licitações</div>
-  <div class="mobile-menu-item" onclick="irParaView('jornais');fecharMobileMenu()">📰 Monitoramento</div>
+  <div class="mobile-menu-item" onclick="irParaView('busca');fecharMobileMenu()">🔍 Nova Pesquisa</div>
+  <div class="mobile-menu-item" onclick="irParaView('jornais');fecharMobileMenu()">🔔 Meus Alertas</div>
   <div class="mobile-menu-sep"></div>
-  <div class="mobile-menu-item" onclick="irParaNegocios('funil');fecharMobileMenu()">📊 Funil de Oportunidades</div>
-  <div class="mobile-menu-item" onclick="irParaNegocios('quadros');fecharMobileMenu()">🗂️ Quadro Kanban</div>
-  <div class="mobile-menu-item" onclick="irParaNegocios('agenda');fecharMobileMenu()">📅 Agenda de Prazos</div>
+  <div class="mobile-menu-item" onclick="irParaNegocios('funil');fecharMobileMenu()">📊 Por Etapa</div>
+  <div class="mobile-menu-item" onclick="irParaNegocios('quadros');fecharMobileMenu()">🗂️ Visão Geral</div>
+  <div class="mobile-menu-item" onclick="irParaNegocios('agenda');fecharMobileMenu()">📅 Calendário de Prazos</div>
   <div class="mobile-menu-sep"></div>
   <div class="mobile-menu-item" onclick="alternarTema();fecharMobileMenu()">🌓 Alternar tema</div>
 </div>
