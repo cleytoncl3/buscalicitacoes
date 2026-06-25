@@ -34,12 +34,14 @@ export default async function handler(req, res) {
         const js = await jsRes.text();
         bundlePreview = js.substring(0, 500);
         // Procura padrões de URL de API (strings com /api/, /rest/, /services/)
-        const urlPatterns = [...js.matchAll(/["'`](\/[a-z][a-z0-9\-_\/]*(?:api|rest|service|mensagem|compra|chat|mensagens)[a-z0-9\-_\/]*)["'`]/gi)];
-        apiUrls = [...new Set(urlPatterns.map(m => m[1]))].slice(0, 100);
-        // Busca contexto extra ao redor de comprasnet-mensagem
-        const idx = js.indexOf('comprasnet-mensagem');
-        if (idx >= 0) {
-          apiUrls.push('__CONTEXT__:' + js.substring(idx - 50, idx + 300));
+        // Pega todos os contextos onde comprasnet-mensagem aparece
+        let searchFrom = 0;
+        while (true) {
+          const idx = js.indexOf('comprasnet-mensagem', searchFrom);
+          if (idx < 0) break;
+          apiUrls.push('CTX:' + js.substring(Math.max(0, idx - 30), idx + 200));
+          searchFrom = idx + 1;
+          if (apiUrls.length > 30) break;
         }
       } catch(e) {
         bundlePreview = 'Erro ao buscar bundle: ' + e.message;
