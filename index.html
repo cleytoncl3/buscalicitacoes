@@ -2749,58 +2749,34 @@
     const pagina = chatPaginaAtual;
     const tam = CHAT_PAGE_SIZE;
 
-    // Endpoints Comprasnet (browser-side, sem proxy)
-    const base = 'https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-web/public';
-    const endpoints = [
-      `${base}/compras/${codigo}/mensagens?pagina=${pagina}&tamanhoPagina=${tam}`,
-      `${base}/compra/${codigo}/mensagens?pagina=${pagina}&tamanhoPagina=${tam}`,
-      `${base}/api/compras/${codigo}/mensagens?pagina=${pagina}&tamanhoPagina=${tam}`,
-      `${base}/compras/mensagens?compra=${codigo}&pagina=${pagina}&tamanhoPagina=${tam}`,
-    ];
-
-    let mensagens = null;
-    let total = 0;
-    let fonteOk = null;
-
-    for (const url of endpoints) {
-      try {
-        const r = await fetch(url, {
-          headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-          signal: AbortSignal.timeout(6000)
-        });
-        if (!r.ok) continue;
-        const ct = r.headers.get('content-type')||'';
-        if (!ct.includes('json')) continue;
+    // Usa proxy Vercel (browser → Comprasnet é bloqueado por CORS)
+    try {
+      const r = await fetch(`/api/mensagens?codigo=${codigo}&pagina=${pagina}&tam=${tam}`);
+      if (r.ok) {
         const d = await r.json();
-        // Normaliza resposta
-        const lista = Array.isArray(d) ? d
-          : (d.content||d.mensagens||d.data||d.items||d.result||[]);
-        if (lista.length >= 0) {
-          mensagens = lista;
-          total = d.totalElements||d.total||d.totalRegistros||lista.length;
-          fonteOk = url;
-          break;
+        if (d.ok && d.mensagens) {
+          renderizarMensagens(d.mensagens, d.total, d.fonte);
+          return;
         }
-      } catch {}
+        // Proxy chegou no Comprasnet mas não retornou msgs — mostra debug
+        if (d.debug) {
+          console.warn('Comprasnet debug:', d.debug);
+          // Verifica se algum endpoint retornou resposta (mesmo que não seja JSON)
+          const algumRetornou = d.debug.some(t => t.status && t.status < 500);
+          if (algumRetornou) {
+            renderizarMensagens([], 0, null, d.debug);
+            return;
+          }
+        }
+      }
+    } catch(e) {
+      console.warn('Erro proxy /api/mensagens:', e);
     }
 
-    // Fallback: tenta via /api/chat proxy
-    if (mensagens === null) {
-      try {
-        const r = await fetch(`/api/chat?codigo=${codigo}&pagina=${pagina}&tam=${tam}`);
-        if (r.ok) {
-          const d = await r.json();
-          mensagens = d.mensagens||[];
-          total = d.total||mensagens.length;
-          if (mensagens.length > 0) fonteOk = 'proxy';
-        }
-      } catch {}
-    }
-
-    renderizarMensagens(mensagens, total, fonteOk);
+    renderizarMensagens(null, 0, null);
   }
 
-  function renderizarMensagens(mensagens, total, fonte) {
+  function renderizarMensagens(mensagens, total, fonte, debug) {
     const lista = document.getElementById('chatMsgLista');
     const statusEl = document.getElementById('chatMsgStatus');
     const pagDiv = document.getElementById('chatMsgPag');
@@ -2808,15 +2784,21 @@
     if (!lista) return;
 
     if (mensagens === null) {
-      if (statusEl) statusEl.textContent = '❌ Não foi possível buscar mensagens do Comprasnet.';
+      if (statusEl) statusEl.textContent = '❌ Sem acesso ao Comprasnet.';
       lista.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text3)">
         <div style="font-size:2rem;margin-bottom:12px">🚫</div>
         <div style="font-weight:600;margin-bottom:8px">Acesso bloqueado</div>
-        <div style="font-size:.78rem;margin-bottom:16px">O Comprasnet não permite acesso automático às mensagens.<br>Acompanhe a sessão diretamente no site.</div>
+        <div style="font-size:.78rem;margin-bottom:16px">O Comprasnet está bloqueando o acesso às mensagens.<br>Acompanhe a sessão diretamente no site.</div>
         <a href="${chatAtual?.urlCN||'#'}" target="_blank" class="btn-primario" style="display:inline-block;text-decoration:none;padding:10px 20px">↗ Abrir no Compras.gov.br</a>
       </div>`;
       if (pagDiv) pagDiv.style.display='none';
       return;
+    }
+    if (debug) {
+      const respondeu = debug.find(t => t.status);
+      if (respondeu) {
+        if (statusEl) statusEl.textContent = `⚠️ Comprasnet respondeu HTTP ${respondeu.status} — sessão pode não ter iniciado ainda.`;
+      }
     }
 
     const now = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
