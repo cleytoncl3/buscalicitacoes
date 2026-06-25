@@ -34,8 +34,13 @@ export default async function handler(req, res) {
         const js = await jsRes.text();
         bundlePreview = js.substring(0, 500);
         // Procura padrões de URL de API (strings com /api/, /rest/, /services/)
-        const urlPatterns = [...js.matchAll(/["'`](\/[a-z][a-z0-9\-_\/]*(?:api|rest|service|mensagem|compra|chat)[a-z0-9\-_\/]*)["'`]/gi)];
-        apiUrls = [...new Set(urlPatterns.map(m => m[1]))].slice(0, 50);
+        const urlPatterns = [...js.matchAll(/["'`](\/[a-z][a-z0-9\-_\/]*(?:api|rest|service|mensagem|compra|chat|mensagens)[a-z0-9\-_\/]*)["'`]/gi)];
+        apiUrls = [...new Set(urlPatterns.map(m => m[1]))].slice(0, 100);
+        // Busca contexto extra ao redor de comprasnet-mensagem
+        const idx = js.indexOf('comprasnet-mensagem');
+        if (idx >= 0) {
+          apiUrls.push('__CONTEXT__:' + js.substring(idx - 50, idx + 300));
+        }
       } catch(e) {
         bundlePreview = 'Erro ao buscar bundle: ' + e.message;
       }
