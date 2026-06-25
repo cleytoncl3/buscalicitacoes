@@ -1466,7 +1466,7 @@
         <span class="footer-info">📅 ${fmt(item.data_inicio_vigencia)}</span>
         <span class="footer-info">⏰ ${fmt(item.data_fim_vigencia)}</span>
         ${mod ? `<span class="footer-badge">${mod}</span>` : ''}
-        ${esferaNome ? `<span class="footer-badge">${esferaNome}</span>` : ''}
+        ${esferaNome ? `<span class="footer-badge" title="Portal de origem">${item.esfera_id==='F'?'🌐 Compras.gov.br':item.esfera_id==='E'?'🌐 Portal Estadual':'🌐 Portal Municipal'}</span>` : ''}
       </div>
     </div>`;
   }
@@ -1861,6 +1861,13 @@
   function parseControle(c){if(!c)return null;const m=c.match(/^(\d+)-(\d+)-(\d+)\/(\d+)$/);if(!m)return null;return{cnpj:m[1],seqOrgao:m[2],seq:parseInt(m[3]),ano:m[4]}}
   function buildLinks(item){const p=parseControle(item.numero_controle_pncp);if(!p)return{direto:''};return{direto:`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`}}
 
+  function fmtPortalEsfera(esferaId, uf){
+    // Aproximação baseada na esfera — portal exato carregado no drawer
+    if(esferaId==='F') return 'Compras.gov.br';
+    if(esferaId==='E') return `Portal Estadual${uf?' ('+uf+')':''}`;
+    if(esferaId==='M') return `Portal Municipal${uf?' ('+uf+')':''}`;
+    return 'PNCP';
+  }
   function fmtModalidade(nome){if(!nome)return'';return nome.replace(' - ',' ')}
   function extrairNumEdital(item){
     if(item.numero_sequencial&&item.ano)return`${parseInt(item.numero_sequencial)}/${item.ano}`;
@@ -1939,8 +1946,25 @@
     const num=extrairNumEdital(item);
     const esfera=item.esfera_id==='F'?'Comprasnet':item.esfera_id==='E'?'Estadual':item.esfera_id==='M'?'Municipal':'PNCP';
 
-    // Header
-    document.getElementById('d-fonte-badge').textContent='🏛 '+esfera;
+    // Header — mostra portal aproximado, depois busca o exato
+    const portalAprox = fmtPortalEsfera(item.esfera_id, item.uf);
+    document.getElementById('d-fonte-badge').textContent='🌐 '+portalAprox;
+    // Busca portal exato em background
+    const pPortal = parseControle(item.numero_controle_pncp);
+    if(pPortal){
+      fetch(`/api/portal?cnpj=${pPortal.cnpj}&ano=${pPortal.ano}&seq=${pPortal.seq}`)
+        .then(r=>r.ok?r.json():null)
+        .then(pd=>{
+          if(pd?.nomePortal){
+            const el=document.getElementById('d-fonte-badge');
+            if(el) el.textContent='🌐 '+pd.nomePortal;
+            if(pd.linkSistemaOrigem){
+              const btnA=document.getElementById('d-btn-acessar');
+              if(btnA) btnA.onclick=()=>window.open(pd.linkSistemaOrigem,'_blank');
+            }
+          }
+        }).catch(()=>{});
+    }
     document.getElementById('d-num-header').textContent=(mod?mod+' ':'')+(num?'Nº '+num:'')+(item.uf?' — '+item.uf:'');
 
     // Organização
