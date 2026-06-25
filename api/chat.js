@@ -1,9 +1,11 @@
-// api/chat.js — Monitoramento de chats de sessão pública (Compras.gov.br)
-// Armazena certames monitorados no Upstash e busca mensagens do Comprasnet
+// api/chat.js — Monitoramento de chats de sessão pública (Compras.gov.br / Comprasnet)
+// Código da compra = UASG(6) + Modalidade(2) + Número(9)
+// Ex: UASG 986001 + Modalidade 06 + Nº 005942025 = 98600106005942025
+// URL pública: https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-web/public/compras/acompanhamento-compra?compra={codigo}
 
 const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
-const KEY_CHATS   = 'arantes_chats_monitorados_v1';
+const KEY_CHATS   = 'arantes_chats_monitorados_v2';
 
 async function redisGet(key) {
   if (!REDIS_URL) return null;
@@ -25,14 +27,29 @@ async function redisSet(key, data) {
   } catch {}
 }
 
-// Busca mensagens do chat da sessão pública no Comprasnet
-async function buscarMensagensComprasnet(uasg, numCompra) {
-  const hdrs = { Accept: 'application/json', 'User-Agent': 'Mozilla/5.0', Referer: 'https://www.comprasnet.gov.br/' };
+function buildCodigo(uasg, modalidade, numCompra) {
+  return uasg.padStart(6,'0') + modalidade + numCompra.padStart(9,'0');
+}
+
+// Tenta buscar mensagens via API do Comprasnet mobile
+async function buscarMensagensComprasnet(codigo, uasg, numCompra) {
+  const base = 'https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-web/public';
+  const hdrs = {
+    'Accept': 'application/json',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    'Referer': `${base}/compras/acompanhamento-compra?compra=${codigo}`,
+    'Origin': 'https://cnetmobile.estaleiro.serpro.gov.br'
+  };
+
+  // Endpoints prováveis do Comprasnet mobile API
   const endpoints = [
-    `https://www.comprasnet.gov.br/api/chat/${uasg}/${numCompra}/mensagens`,
-    `https://www.comprasnet.gov.br/api/v1/pregao/${uasg}/${numCompra}/chat`,
-    `https://www.comprasnet.gov.br/ConsultaLicitacoes/api/chat?uasg=${uasg}&numCompra=${numCompra}`,
+    `${base}/api/compras/${codigo}/mensagens`,
+    `${base}/api/chat/${codigo}`,
+    `${base}/compras/mensagens?compra=${codigo}`,
+    `${base}/api/compras/acompanhamento-compra/mensagens?compra=${codigo}`,
+    `${base}/api/chat?compra=${codigo}&uasg=${uasg}&numero=${numCompra}`,
   ];
+
   for (const url of endpoints) {
     try {
       const r = await fetch(url, { headers: hdrs });
@@ -40,29 +57,25 @@ async function buscarMensagensComprasnet(uasg, numCompra) {
         const ct = r.headers.get('content-type') || '';
         if (ct.includes('json')) {
           const data = await r.json();
-          const msgs = Array.isArray(data) ? data : (data.mensagens || data.data || data.content || []);
-          if (msgs.length > 0) return { msgs, fonte: url };
+          const msgs = Array.isArray(data) ? data : (data.mensagens||data.data||data.content||data.items||[]);
+          if (msgs.length > 0) return { msgs, fonte: url, ok: true };
         }
       }
     } catch {}
   }
-  return { msgs: [], fonte: null };
+
+  return { msgs: [], fonte: null, ok: false };
 }
 
-// Busca info da compra via PNCP (para validar UASG + número)
-async function buscarInfoCompra(uasg, numCompra) {
+// Busca info da compra via PNCP como fallback para enriquecer o registro
+async function buscarInfoPNCP(uasg, numCompra) {
   try {
-    // Busca pelo número no PNCP search
     const params = new URLSearchParams({ q: numCompra, tipos_documento: 'edital', pagina: 1, tam_pagina: 5 });
     const r = await fetch(`https://pncp.gov.br/api/search/?${params}`,
       { headers: { Accept: 'application/json', 'User-Agent': 'Mozilla/5.0' } });
     if (!r.ok) return null;
     const data = await r.json();
-    // Filtra por UASG no título ou órgão
-    const match = (data.items || []).find(i =>
-      i.title?.includes(numCompra) || i.orgao_nome?.includes(uasg) || i.numero_controle_pncp?.includes(uasg)
-    );
-    return match || (data.items || [])[0] || null;
+    return (data.items||[])[0] || null;
   } catch { return null; }
 }
 
@@ -74,40 +87,45 @@ export default async function handler(req, res) {
 
   const chats = (await redisGet(KEY_CHATS)) || [];
 
-  // GET /api/chat — lista certames monitorados
+  // GET sem params → lista todos monitorados
   if (req.method === 'GET' && !req.query.uasg) {
     return res.status(200).json(chats);
   }
 
-  // GET /api/chat?uasg=X&numCompra=Y — busca mensagens de um certame
+  // GET com params → busca mensagens
   if (req.method === 'GET' && req.query.uasg) {
-    const { uasg, numCompra } = req.query;
-    const { msgs, fonte } = await buscarMensagensComprasnet(uasg, numCompra);
-    // Cache das últimas mensagens no certame
-    const idx = chats.findIndex(c => c.uasg === uasg && c.numCompra === numCompra);
+    const { uasg, modalidade = '06', numCompra, codigo: codigoParam } = req.query;
+    const codigo = codigoParam || buildCodigo(uasg, modalidade, numCompra || '');
+    const { msgs, fonte, ok } = await buscarMensagensComprasnet(codigo, uasg, numCompra || '');
+
+    // Atualiza cache do certame
+    const idx = chats.findIndex(c => c.codigo === codigo || (c.uasg === uasg && c.numCompra === numCompra));
     if (idx >= 0) {
       chats[idx].ultimaVerificacao = new Date().toISOString();
       if (msgs.length > 0) chats[idx].totalMensagens = msgs.length;
       await redisSet(KEY_CHATS, chats);
     }
-    return res.status(200).json({ mensagens: msgs, total: msgs.length, fonte });
+
+    return res.status(200).json({ mensagens: msgs, total: msgs.length, fonte, apiDisponivel: ok });
   }
 
-  // POST /api/chat — adicionar certame para monitorar
+  // POST → adicionar certame
   if (req.method === 'POST') {
-    const { uasg, numCompra, descricao } = req.body;
+    const { uasg, modalidade = '06', numCompra, codigo: codigoParam } = req.body;
     if (!uasg || !numCompra) return res.status(400).json({ erro: 'uasg e numCompra obrigatórios' });
-    if (chats.find(c => c.uasg === uasg && c.numCompra === numCompra))
+    const codigo = codigoParam || buildCodigo(uasg, modalidade, numCompra);
+    if (chats.find(c => c.codigo === codigo))
       return res.status(200).json({ ok: true, ja_existe: true });
-    // Busca info da compra para enriquecer o registro
-    const info = await buscarInfoCompra(uasg, numCompra);
+
+    const info = await buscarInfoPNCP(uasg, numCompra);
     const novo = {
       id: Date.now().toString(),
-      uasg, numCompra,
-      descricao: descricao || info?.title || `UASG ${uasg} — Nº ${numCompra}`,
+      uasg, modalidade, numCompra, codigo,
+      descricao: info?.title || `UASG ${uasg} — Nº ${numCompra}`,
       objeto: info?.description || null,
       orgao: info?.orgao_nome || null,
       uf: info?.uf || null,
+      urlComprasnet: `https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-web/public/compras/acompanhamento-compra?compra=${codigo}`,
       adicionado_em: new Date().toISOString(),
       ultimaVerificacao: null,
       totalMensagens: 0,
@@ -117,11 +135,10 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, certame: novo });
   }
 
-  // DELETE /api/chat?id=X — remover certame
+  // DELETE → remover
   if (req.method === 'DELETE') {
     const { id } = req.query;
-    const novos = chats.filter(c => c.id !== id);
-    await redisSet(KEY_CHATS, novos);
+    await redisSet(KEY_CHATS, chats.filter(c => c.id !== id));
     return res.status(200).json({ ok: true });
   }
 
