@@ -1748,7 +1748,15 @@
         ${itens.length===0?'<div class="fase-vazio">Nenhuma licitação nesta fase.</div>':itens.map(n=>`<div class="neg-card" onclick="abrirDrawerNeg('${n.id}')">
           <div class="neg-card-titulo">${n.titulo}</div>
           <div class="neg-card-info"><span>📍 ${n.uf}</span><span>📋 ${n.modalidade}</span><span>⏰ ${n.encerramento?new Date(n.encerramento).toLocaleDateString('pt-BR'):'—'}</span></div>
-          ${n.itensInteresse?.length?`<div class="neg-card-info" style="margin-top:4px;flex-wrap:wrap;gap:4px">${n.itensInteresse.slice(0,3).map(i=>`<span style="background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:4px;padding:1px 7px;font-size:.7rem">#${i.numeroItem} ${(i.descricao||'').substring(0,25)}…</span>`).join('')}${n.itensInteresse.length>3?`<span style="font-size:.7rem;color:var(--text3)">+${n.itensInteresse.length-3} itens</span>`:''}</div>`:''}\`
+          ${n.itensInteresse?.length?`<div style="margin-top:8px;display:flex;flex-direction:column;gap:3px">
+            ${n.itensInteresse.slice(0,5).map(i=>`
+              <div style="display:flex;align-items:baseline;gap:6px;padding:4px 8px;background:var(--surface2);border-radius:5px;border:1px solid var(--border)">
+                <span style="font-size:.68rem;font-weight:700;color:var(--accent);white-space:nowrap;flex-shrink:0">#${i.numeroItem||'—'}</span>
+                <span style="font-size:.75rem;color:#fff;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(i.descricao||'Sem descrição').substring(0,40)}${(i.descricao||'').length>40?'…':''}</span>
+                <span style="font-size:.68rem;color:var(--text3);white-space:nowrap;flex-shrink:0"><strong style="color:#fff">${i.quantidade||'—'}</strong> ${i.unidadeMedida||''}</span>
+              </div>`).join('')}
+            ${n.itensInteresse.length>5?`<div style="font-size:.72rem;color:var(--text3);padding:2px 8px">+${n.itensInteresse.length-5} item(ns)</div>`:''}
+          </div>`:''}\`
           <div class="neg-card-actions" onclick="event.stopPropagation()">
             <select onchange="moverFase('${n.id}',this.value)" style="font-size:.75rem;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);cursor:pointer">
               ${FASES.map(f2=>`<option value="${f2.id}"${f2.id===n.fase?' selected':''}>${f2.emoji} ${f2.nome}</option>`).join('')}
