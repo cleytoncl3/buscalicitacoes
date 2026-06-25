@@ -1985,6 +1985,8 @@
         }).catch(()=>{});
     }
     document.getElementById('d-num-header').textContent=(mod?mod+' ':'')+(num?'Nº '+num:'')+(item.uf?' — '+item.uf:'');
+    // Reset UASG — preenchida quando itens carregarem
+    if(itemAtualDrawer){itemAtualDrawer._uasg=null;itemAtualDrawer._uasgLabel=null;}
 
     // Organização
     document.getElementById('d-orgao').textContent=item.orgao_nome||'—';
