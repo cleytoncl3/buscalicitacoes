@@ -1724,6 +1724,8 @@
     const novoNeg = {
       id: Date.now().toString(),
       titulo: itemAtualDrawer.title || '',
+      uasg: itemAtualDrawer._uasg || null,
+      uasgLabel: itemAtualDrawer._uasgLabel || null,
       objeto: itemAtualDrawer.description || '',
       orgao: itemAtualDrawer.orgao_nome || '',
       uf: itemAtualDrawer.uf || '',
@@ -1765,15 +1767,17 @@
           const m=n.numero_controle?.match(/-([0-9]+)\/([0-9]+)$/);
           const numFmt=m?`N\u00ba ${parseInt(m[1])}/${m[2]}`:'';
           const modFmt=(n.modalidade||'').replace(' - ',' ');
-          const tituloCard=[modFmt,numFmt].filter(Boolean).join(' ')+' — '+(n.orgao||'')+' / '+(n.uf||'');
+          const orgaoLabel=n.uasgLabel||n.orgao||'';
+          const tituloCard=[modFmt,numFmt].filter(Boolean).join(' ')+' — '+orgaoLabel+(orgaoLabel&&n.uf?' / ':'')+(!n.uasgLabel&&n.uf?n.uf:'');
           return`<div class="neg-card" onclick="abrirDrawerNeg('${n.id}')">
           <div style="display:grid;grid-template-columns:${n.itensInteresse?.length?'1fr 1fr':'1fr'};gap:0;margin-bottom:8px">
             <div style="padding-right:${n.itensInteresse?.length?'12px':'0'};${n.itensInteresse?.length?'border-right:1px solid var(--border)':''};">
               <div class="neg-card-titulo" style="font-size:.78rem;margin-bottom:5px">${tituloCard}</div>
               ${n.objeto?`<div style="font-size:.72rem;color:var(--text2);line-height:1.45;margin-bottom:8px">${n.objeto.substring(0,150)}${n.objeto.length>150?'…':''}</div>`:''}
               <div style="display:flex;flex-direction:column;gap:3px">
-                ${n.abertura?`<div style="font-size:.72rem;color:var(--text2)">📅 <span style="color:var(--text3)">Início propostas:</span> <strong style="color:var(--text)">${new Date(n.abertura).toLocaleDateString('pt-BR')}</strong></div>`:''}
-                ${n.encerramento?`<div style="font-size:.72rem;color:var(--text2)">⏰ <span style="color:var(--text3)">Encerramento:</span> <strong style="color:var(--text)">${new Date(n.encerramento).toLocaleDateString('pt-BR')}</strong></div>`:''}
+                ${n.uasg?`<div style="font-size:.7rem;color:var(--accent);font-weight:700;margin-bottom:2px">UASG ${n.uasg}</div>`:''}
+                ${n.abertura?`<div style="font-size:.72rem;color:var(--text2)">📅 <span style="color:var(--text3)">Início:</span> <strong style="color:var(--text)">${new Date(n.abertura).toLocaleDateString('pt-BR')}</strong></div>`:''}
+                ${n.encerramento?`<div style="font-size:.72rem;color:var(--text2)">⏰ <span style="color:var(--text3)">Encerra:</span> <strong style="color:var(--text)">${new Date(n.encerramento).toLocaleDateString('pt-BR')}</strong></div>`:''}
               </div>
             </div>
             ${n.itensInteresse?.length?`<div style="padding-left:12px;max-height:140px;overflow-y:auto;display:flex;flex-direction:column;gap:3px">
@@ -1861,6 +1865,21 @@
   function parseControle(c){if(!c)return null;const m=c.match(/^(\d+)-(\d+)-(\d+)\/(\d+)$/);if(!m)return null;return{cnpj:m[1],seqOrgao:m[2],seq:parseInt(m[3]),ano:m[4]}}
   function buildLinks(item){const p=parseControle(item.numero_controle_pncp);if(!p)return{direto:''};return{direto:`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`}}
 
+  function detectarPortalUrl(link){
+    if(!link)return null;
+    const l=link.toLowerCase();
+    if(l.includes('comprasnet')||l.includes('compras.gov'))return'Compras.gov.br';
+    if(l.includes('bll.org')||l.includes('bllcompras'))return'BLL Compras';
+    if(l.includes('portaldecompraspublicas')||l.includes('pcp.'))return'Portal de Compras Públicas';
+    if(l.includes('licitacoes-e')||l.includes('licitacoese'))return'Licitações-e (BB)';
+    if(l.includes('banrisul'))return'Banrisul';
+    if(l.includes('licitanet'))return'Licitanet';
+    if(l.includes('bnc.org'))return'BNC';
+    if(l.includes('banpara'))return'Banpará';
+    if(l.includes('pe-integrado'))return'PE Integrado';
+    if(l.includes('e-lic')||l.includes('elic'))return'e-Lic SC';
+    return null;
+  }
   function fmtPortalEsfera(esferaId, uf){
     // Aproximação baseada na esfera — portal exato carregado no drawer
     if(esferaId==='F') return 'Compras.gov.br';
@@ -2015,7 +2034,34 @@
   }
   function fecharDrawer(){document.getElementById('drawer').classList.remove('ativo');document.getElementById('overlay').classList.remove('ativo');document.body.style.overflow='';itemAtualDrawer=null}
   async function carregarItens(cnpj,ano,seq){
-    try{const r=await fetch(`/api/itens?cnpj=${cnpj}&ano=${ano}&sequencial=${seq}`);const data=await r.json();todosItens=data.data||[];renderItens(todosItens)}
+    try{
+      const r=await fetch(`/api/itens?cnpj=${cnpj}&ano=${ano}&sequencial=${seq}`);
+      const data=await r.json();
+      todosItens=data.data||[];
+      renderItens(todosItens);
+      // Popula UASG no drawer quando disponível
+      if(data.orgaoInfo){
+        const {uasgLabel,codigoUnidade,linkSistemaOrigem}=data.orgaoInfo;
+        // Atualiza campo unidade no drawer com UASG label
+        const elU=document.getElementById('d-unidade');
+        if(elU&&uasgLabel) elU.textContent=uasgLabel;
+        // Guarda UASG no item atual para salvar nos negócios
+        if(itemAtualDrawer&&codigoUnidade){
+          itemAtualDrawer._uasg=codigoUnidade;
+          itemAtualDrawer._uasgLabel=uasgLabel;
+        }
+        // Atualiza link do botão se tiver linkSistemaOrigem
+        if(linkSistemaOrigem){
+          const btnA=document.getElementById('d-btn-acessar');
+          if(btnA) btnA.onclick=()=>window.open(linkSistemaOrigem,'_blank');
+          const elFonte=document.getElementById('d-fonte-badge');
+          if(elFonte&&!elFonte.textContent.includes('BLL')&&!elFonte.textContent.includes('gov')){
+            const portalNome=detectarPortalUrl(linkSistemaOrigem);
+            if(portalNome) elFonte.textContent='🌐 '+portalNome;
+          }
+        }
+      }
+    }
     catch(e){document.getElementById('d-itens').innerHTML='<div class="item-loading">Erro ao carregar itens.</div>'}
   }
 
