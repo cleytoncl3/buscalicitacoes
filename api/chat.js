@@ -5,26 +5,27 @@ const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const KEY = 'arantes_chats_v3';
 
+async function redisSet(data) {
+  if (!REDIS_URL) { console.error('[Redis] UPSTASH_REDIS_REST_URL não configurado'); return; }
+  try {
+    const r = await fetch(`${REDIS_URL}/set/${KEY}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${REDIS_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(JSON.stringify(data))
+    });
+    if (!r.ok) console.error('[Redis] set falhou:', r.status, await r.text());
+  } catch(e) { console.error('[Redis] set erro:', e.message); }
+}
+
 async function redisGet() {
-  if (!REDIS_URL) return [];
+  if (!REDIS_URL) { console.error('[Redis] UPSTASH_REDIS_REST_URL não configurado'); return []; }
   try {
     const r = await fetch(`${REDIS_URL}/get/${KEY}`, {
       headers: { Authorization: `Bearer ${REDIS_TOKEN}` }
     });
     const { result } = await r.json();
     return result ? JSON.parse(result) : [];
-  } catch { return []; }
-}
-
-async function redisSet(data) {
-  if (!REDIS_URL) return;
-  try {
-    await fetch(`${REDIS_URL}/set/${KEY}`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${REDIS_TOKEN}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(JSON.stringify(data))
-    });
-  } catch {}
+  } catch(e) { console.error('[Redis] get erro:', e.message); return []; }
 }
 
 function buildCodigo(uasg, modalidade, num, ano) {
