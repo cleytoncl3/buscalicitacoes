@@ -1068,20 +1068,20 @@
     </div>
     <button class="chat-painel-fechar" onclick="fecharChatPainel()">✕</button>
   </div>
-  <div style="padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:8px;align-items:center">
-    <a id="chatBtnAbrirSessao" href="#" target="_blank" class="btn-primario" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;padding:9px 14px;font-size:.85rem">
-      ↗ Abrir no Compras.gov.br
-    </a>
-    <button class="btn-primario" style="padding:9px 12px;font-size:.8rem;background:var(--surface2);color:var(--text);border:1px solid var(--border)" onclick="recarregarIframeSessao()" title="Recarregar">↻</button>
+  <div style="padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:8px;align-items:center">
+    <span id="chatMsgStatus" style="flex:1;font-size:.78rem;color:var(--text3)">Carregando mensagens…</span>
+    <button class="btn-primario" style="padding:7px 12px;font-size:.8rem;background:var(--surface2);color:var(--text);border:1px solid var(--border)" onclick="buscarMensagensChat()" title="Atualizar">↻ Atualizar</button>
+    <a id="chatBtnAbrirSessao" href="#" target="_blank" class="btn-primario" style="text-decoration:none;padding:7px 12px;font-size:.8rem">↗ Compras.gov.br</a>
   </div>
-  <div id="chatIframeWrap" style="flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative">
-    <div id="chatIframeAviso" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;z-index:1;background:var(--bg)">
-      <div style="font-size:2rem;margin-bottom:12px">🔗</div>
-      <div style="font-size:.9rem;font-weight:600;margin-bottom:8px">Acompanhe a Sessão ao Vivo</div>
-      <div style="font-size:.78rem;color:var(--text3);margin-bottom:16px;max-width:320px">O Comprasnet pode bloquear a visualização embutida. Se a página não aparecer abaixo, use o botão acima para abrir em nova aba.</div>
-      <button onclick="iniciarIframeSessao()" class="btn-primario" style="padding:10px 20px">Carregar Sessão</button>
-    </div>
-    <iframe id="chatIframe" src="about:blank" style="flex:1;border:none;width:100%;min-height:0;display:none" title="Sessão Comprasnet" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
+  <!-- Mensagens -->
+  <div id="chatMsgLista" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+    <div class="info-vazia">Aguardando mensagens…</div>
+  </div>
+  <!-- Paginação -->
+  <div id="chatMsgPag" style="display:none;flex-shrink:0;padding:8px 14px;background:var(--surface2);border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;justify-content:center">
+    <button class="btn-pag" id="chatPagAnterior" onclick="chatMudarPagina(-1)">← Anterior</button>
+    <span id="chatPagInfo" style="font-size:.78rem;color:var(--text3)"></span>
+    <button class="btn-pag" id="chatPagProxima" onclick="chatMudarPagina(1)">Próxima →</button>
   </div>
 </div>
 
@@ -2714,6 +2714,11 @@
     carregarChatsMonitorados();
   }
 
+  let chatPaginaAtual = 1;
+  let chatTotalPaginas = 1;
+  let chatAutoRefreshTimer = null;
+  const CHAT_PAGE_SIZE = 20;
+
   async function abrirChatPainel(id, uasg, modalidade, numCompra, titulo, codigoPrebuilt) {
     const codigo = codigoPrebuilt || buildCodigoCompra(uasg, modalidade, numCompra);
     const urlCN  = buildUrlComprasnet(codigo);
@@ -2724,53 +2729,163 @@
     if (linkEl) linkEl.href = urlCN;
     const btnAbrir = document.getElementById('chatBtnAbrirSessao');
     if (btnAbrir) btnAbrir.href = urlCN;
-    // Reset iframe to aviso state
-    document.getElementById('chatIframeAviso').style.display='flex';
-    const iframe = document.getElementById('chatIframe');
-    iframe.src = 'about:blank';
-    iframe.style.display = 'none';
+    chatPaginaAtual = 1;
+    document.getElementById('chatMsgLista').innerHTML = '<div class="info-vazia">Carregando mensagens…</div>';
     document.getElementById('chatPainel').classList.add('aberto');
     document.getElementById('chatOverlay').classList.add('aberto');
     document.body.style.overflow='hidden';
+    await buscarMensagensChat();
+    // Auto-refresh a cada 30s
+    if (chatAutoRefreshTimer) clearInterval(chatAutoRefreshTimer);
+    chatAutoRefreshTimer = setInterval(() => buscarMensagensChat(false), 30000);
   }
 
-  function iniciarIframeSessao() {
+  async function buscarMensagensChat(mostraLoading=true) {
     if (!chatAtual) return;
-    const aviso = document.getElementById('chatIframeAviso');
-    const iframe = document.getElementById('chatIframe');
-    aviso.innerHTML = '<div style="color:var(--text3);font-size:.85rem">⏳ Carregando sessão...</div>';
-    iframe.style.display = 'block';
-    iframe.src = chatAtual.urlCN;
-    iframe.onload = () => { aviso.style.display = 'none'; };
-    // Se demorar mais de 5s sem carregar, mostra aviso de bloqueio
-    setTimeout(() => {
-      if (aviso.style.display !== 'none') {
-        aviso.innerHTML = `<div style="text-align:center;padding:20px">
-          <div style="font-size:1.5rem;margin-bottom:10px">🚫</div>
-          <div style="font-size:.88rem;font-weight:600;margin-bottom:8px">Visualização bloqueada pelo Comprasnet</div>
-          <div style="font-size:.75rem;color:var(--text3);margin-bottom:16px">O site não permite exibição incorporada.</div>
-          <a href="${chatAtual.urlCN}" target="_blank" class="btn-primario" style="display:inline-block;text-decoration:none;padding:10px 20px">↗ Abrir em Nova Aba</a>
-        </div>`;
-      }
-    }, 5000);
-  }
+    const statusEl = document.getElementById('chatMsgStatus');
+    if (mostraLoading && statusEl) statusEl.textContent = '⏳ Buscando mensagens…';
 
-  function recarregarIframeSessao() {
-    if (!chatAtual) return;
-    const iframe = document.getElementById('chatIframe');
-    if (iframe.src && iframe.src !== 'about:blank') {
-      iframe.src = iframe.src;
-    } else {
-      iniciarIframeSessao();
+    const codigo = chatAtual.codigo;
+    const pagina = chatPaginaAtual;
+    const tam = CHAT_PAGE_SIZE;
+
+    // Endpoints Comprasnet (browser-side, sem proxy)
+    const base = 'https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-web/public';
+    const endpoints = [
+      `${base}/compras/${codigo}/mensagens?pagina=${pagina}&tamanhoPagina=${tam}`,
+      `${base}/compra/${codigo}/mensagens?pagina=${pagina}&tamanhoPagina=${tam}`,
+      `${base}/api/compras/${codigo}/mensagens?pagina=${pagina}&tamanhoPagina=${tam}`,
+      `${base}/compras/mensagens?compra=${codigo}&pagina=${pagina}&tamanhoPagina=${tam}`,
+    ];
+
+    let mensagens = null;
+    let total = 0;
+    let fonteOk = null;
+
+    for (const url of endpoints) {
+      try {
+        const r = await fetch(url, {
+          headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+          signal: AbortSignal.timeout(6000)
+        });
+        if (!r.ok) continue;
+        const ct = r.headers.get('content-type')||'';
+        if (!ct.includes('json')) continue;
+        const d = await r.json();
+        // Normaliza resposta
+        const lista = Array.isArray(d) ? d
+          : (d.content||d.mensagens||d.data||d.items||d.result||[]);
+        if (lista.length >= 0) {
+          mensagens = lista;
+          total = d.totalElements||d.total||d.totalRegistros||lista.length;
+          fonteOk = url;
+          break;
+        }
+      } catch {}
     }
+
+    // Fallback: tenta via /api/chat proxy
+    if (mensagens === null) {
+      try {
+        const r = await fetch(`/api/chat?codigo=${codigo}&pagina=${pagina}&tam=${tam}`);
+        if (r.ok) {
+          const d = await r.json();
+          mensagens = d.mensagens||[];
+          total = d.total||mensagens.length;
+          if (mensagens.length > 0) fonteOk = 'proxy';
+        }
+      } catch {}
+    }
+
+    renderizarMensagens(mensagens, total, fonteOk);
+  }
+
+  function renderizarMensagens(mensagens, total, fonte) {
+    const lista = document.getElementById('chatMsgLista');
+    const statusEl = document.getElementById('chatMsgStatus');
+    const pagDiv = document.getElementById('chatMsgPag');
+
+    if (!lista) return;
+
+    if (mensagens === null) {
+      if (statusEl) statusEl.textContent = '❌ Não foi possível buscar mensagens do Comprasnet.';
+      lista.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text3)">
+        <div style="font-size:2rem;margin-bottom:12px">🚫</div>
+        <div style="font-weight:600;margin-bottom:8px">Acesso bloqueado</div>
+        <div style="font-size:.78rem;margin-bottom:16px">O Comprasnet não permite acesso automático às mensagens.<br>Acompanhe a sessão diretamente no site.</div>
+        <a href="${chatAtual?.urlCN||'#'}" target="_blank" class="btn-primario" style="display:inline-block;text-decoration:none;padding:10px 20px">↗ Abrir no Compras.gov.br</a>
+      </div>`;
+      if (pagDiv) pagDiv.style.display='none';
+      return;
+    }
+
+    const now = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    if (statusEl) statusEl.textContent = mensagens.length > 0
+      ? `${total} mensagem(ns) — atualizado ${now}`
+      : `Nenhuma mensagem ainda — atualizado ${now}`;
+
+    chatTotalPaginas = Math.max(1, Math.ceil(total / CHAT_PAGE_SIZE));
+
+    if (!mensagens.length) {
+      lista.innerHTML = '<div class="info-vazia">Nenhuma mensagem nesta sessão ainda.<br><small>A sessão pode ainda não ter iniciado.</small></div>';
+      if (pagDiv) pagDiv.style.display='none';
+      return;
+    }
+
+    lista.innerHTML = mensagens.map(m => {
+      const tipo = m.tipoMensagem||m.tipo||m.descricaoTipoMensagem||'Mensagem';
+      const remetente = m.nomeRemetente||m.remetente||m.nome||'—';
+      const cnpj = m.cpfCnpjRemetente||m.cnpj||m.cpf||'';
+      const texto = m.descricao||m.mensagem||m.texto||m.conteudo||'';
+      const dt = m.dataHoraEnvio||m.dataEnvio||m.data||m.createdAt||'';
+      const hora = dt ? new Date(dt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '';
+      const data = dt ? new Date(dt).toLocaleDateString('pt-BR') : '';
+
+      const isAviso = /aviso|sistema|encerr|reabr|suspens|prorrog/i.test(tipo);
+      const isFornec = /fornec|empresa|proposta|lance/i.test(tipo);
+      const bgColor = isAviso ? 'rgba(251,191,36,.08)' : isFornec ? 'rgba(99,102,241,.08)' : 'var(--surface2)';
+      const borderColor = isAviso ? 'rgba(251,191,36,.3)' : isFornec ? 'rgba(99,102,241,.3)' : 'var(--border)';
+      const emoji = isAviso ? '⚠️' : isFornec ? '🏢' : '💬';
+
+      return `<div style="background:${bgColor};border:1px solid ${borderColor};border-radius:8px;padding:10px 12px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px">
+          <span style="font-size:.72rem;font-weight:700;color:var(--accent);background:rgba(99,102,241,.12);border-radius:4px;padding:2px 6px">${emoji} ${tipo}</span>
+          <span style="font-size:.68rem;color:var(--text3);white-space:nowrap">${data} ${hora}</span>
+        </div>
+        <div style="font-size:.82rem;color:var(--text);line-height:1.4;margin-bottom:5px">${texto||'<em style="color:var(--text3)">sem conteúdo</em>'}</div>
+        ${remetente !== '—' ? `<div style="font-size:.7rem;color:var(--text3)">
+          <strong>${remetente}</strong>${cnpj ? ` · ${cnpj}` : ''}
+        </div>` : ''}
+      </div>`;
+    }).join('');
+
+    // Paginação
+    if (chatTotalPaginas > 1 && pagDiv) {
+      pagDiv.style.display='flex';
+      const infoEl = document.getElementById('chatPagInfo');
+      if (infoEl) infoEl.textContent = `Pág. ${chatPaginaAtual} / ${chatTotalPaginas}`;
+      const btnAnt = document.getElementById('chatPagAnterior');
+      const btnProx = document.getElementById('chatPagProxima');
+      if (btnAnt) btnAnt.disabled = chatPaginaAtual <= 1;
+      if (btnProx) btnProx.disabled = chatPaginaAtual >= chatTotalPaginas;
+    } else if (pagDiv) {
+      pagDiv.style.display='none';
+    }
+  }
+
+  function chatMudarPagina(delta) {
+    const nova = chatPaginaAtual + delta;
+    if (nova < 1 || nova > chatTotalPaginas) return;
+    chatPaginaAtual = nova;
+    buscarMensagensChat();
   }
 
   function fecharChatPainel() {
     document.getElementById('chatPainel').classList.remove('aberto');
     document.getElementById('chatOverlay').classList.remove('aberto');
     document.body.style.overflow='';
-    const iframe = document.getElementById('chatIframe');
-    if (iframe) { iframe.src = 'about:blank'; iframe.style.display = 'none'; }
+    if (chatAutoRefreshTimer) { clearInterval(chatAutoRefreshTimer); chatAutoRefreshTimer = null; }
+    chatAtual = null;
   }
 
   function toggleNotif(canal) {

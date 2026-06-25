@@ -31,7 +31,7 @@ function buildCodigo(uasg, modalidade, num, ano) {
   return String(uasg).padStart(6,'0') + String(modalidade) + String(num).padStart(5,'0') + String(ano||new Date().getFullYear());
 }
 
-async function fetchMensagens(codigo, uasg, num) {
+async function fetchMensagens(codigo, pagina=1, tam=20) {
   const base = 'https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-web/public';
   const hdrs = {
     'Accept': 'application/json',
@@ -39,22 +39,23 @@ async function fetchMensagens(codigo, uasg, num) {
     'Referer': `${base}/compras/acompanhamento-compra?compra=${codigo}`
   };
   const urls = [
-    `${base}/api/compras/${codigo}/mensagens`,
-    `${base}/api/chat/${codigo}`,
-    `${base}/compras/mensagens?compra=${codigo}`,
-    `${base}/api/compras/acompanhamento-compra/mensagens?compra=${codigo}`,
+    `${base}/compras/${codigo}/mensagens?pagina=${pagina}&tamanhoPagina=${tam}`,
+    `${base}/compra/${codigo}/mensagens?pagina=${pagina}&tamanhoPagina=${tam}`,
+    `${base}/api/compras/${codigo}/mensagens?pagina=${pagina}&tamanhoPagina=${tam}`,
+    `${base}/compras/mensagens?compra=${codigo}&pagina=${pagina}&tamanhoPagina=${tam}`,
   ];
   for (const url of urls) {
     try {
-      const r = await fetch(url, { headers: hdrs, signal: AbortSignal.timeout(4000) });
+      const r = await fetch(url, { headers: hdrs, signal: AbortSignal.timeout(5000) });
       if (r.ok && (r.headers.get('content-type')||'').includes('json')) {
         const d = await r.json();
-        const msgs = Array.isArray(d) ? d : (d.mensagens||d.data||d.items||[]);
-        if (msgs.length > 0) return { msgs, fonte: url };
+        const msgs = Array.isArray(d) ? d : (d.content||d.mensagens||d.data||d.items||d.result||[]);
+        const total = d.totalElements||d.total||d.totalRegistros||msgs.length;
+        return { msgs, total, fonte: url };
       }
     } catch {}
   }
-  return { msgs: [], fonte: null };
+  return { msgs: [], total: 0, fonte: null };
 }
 
 export default async function handler(req, res) {
@@ -70,19 +71,21 @@ export default async function handler(req, res) {
 
   // ── BUSCAR MENSAGENS ──────────────────────────────────
   if (req.method === 'GET' && (req.query.codigo || req.query.uasg)) {
-    const { uasg='', modalidade='06', numCompra='', ano='', codigo: cp } = req.query;
+    const { uasg='', modalidade='06', numCompra='', ano='', codigo: cp, pagina='1', tam='20' } = req.query;
     const codigo = cp || buildCodigo(uasg, modalidade, numCompra, ano);
-    const { msgs, fonte } = await fetchMensagens(codigo, uasg, numCompra);
+    const { msgs, total, fonte } = await fetchMensagens(codigo, Number(pagina)||1, Number(tam)||20);
     // Atualiza totalMensagens no Redis sem bloquear a resposta
-    redisGet().then(chats => {
-      const idx = chats.findIndex(c => c.codigo === codigo);
-      if (idx >= 0 && msgs.length > 0) {
-        chats[idx].totalMensagens = msgs.length;
-        chats[idx].ultimaVerificacao = new Date().toISOString();
-        redisSet(chats);
-      }
-    });
-    return res.status(200).json({ mensagens: msgs, total: msgs.length, fonte });
+    if (msgs.length > 0) {
+      redisGet().then(chats => {
+        const idx = chats.findIndex(c => c.codigo === codigo);
+        if (idx >= 0) {
+          chats[idx].totalMensagens = total;
+          chats[idx].ultimaVerificacao = new Date().toISOString();
+          redisSet(chats);
+        }
+      });
+    }
+    return res.status(200).json({ mensagens: msgs, total, fonte });
   }
 
   // ── ADICIONAR ─────────────────────────────────────────
