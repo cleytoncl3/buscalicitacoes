@@ -1225,8 +1225,16 @@
     if(view==='jornais')renderJornais();
     if(view==='minhaEmpresa')renderMinhaEmpresa();
     if(view==='documentos')renderDocumentos();
+    // Persiste a view atual no hash e localStorage
+    location.hash = view;
+    localStorage.setItem('arantes_view_atual', view);
   }
-  function irParaNegocios(aba){irParaView('negocios');mudarAbaNegocios(aba)}
+  function irParaNegocios(aba){
+    irParaView('negocios');
+    mudarAbaNegocios(aba);
+    location.hash = 'negocios_'+aba;
+    localStorage.setItem('arantes_view_atual', 'negocios_'+aba);
+  }
   function mudarAbaNegocios(aba){
     document.querySelectorAll('.neg-tab').forEach(t=>t.classList.remove('ativo'));
     document.querySelectorAll('.neg-view').forEach(v=>v.classList.remove('ativo'));
@@ -2400,10 +2408,32 @@
   // O usuário pode alternar manualmente usando os botões
 
   carregarTema();
-  atualizarBotaoMod(); // mostra padrão
-  renderHistorico();
+  atualizarBotaoMod();
   renderNotificacoes();
+  // Restaura view ao dar F5
+  (function(){
+    const saved=location.hash.replace('#','')||localStorage.getItem('arantes_view_atual')||'busca';
+    if(saved.startsWith('negocios_')){
+      irParaView('negocios',false);
+      setTimeout(()=>mudarAbaNegocios(saved.replace('negocios_','')),0);
+    } else {
+      irParaView(saved,false);
+    }
+  })();
+  fetchNegocios().then(()=>{});
   setTimeout(()=>verificarTodosJornais(),2000);
+  // Restaura a view onde o usuário estava antes do F5
+  (function(){
+    const saved=location.hash.replace('#','')||localStorage.getItem('arantes_view_atual')||'busca';
+    if(saved.startsWith('negocios_')){
+      const aba=saved.replace('negocios_','');
+      irParaView('negocios',false);
+      setTimeout(()=>mudarAbaNegocios(aba),0);
+    } else {
+      irParaView(saved,false);
+    }
+  })();
+  fetchNegocios().then(()=>{});
 </script>
 </body>
 </html>
