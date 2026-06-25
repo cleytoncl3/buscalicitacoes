@@ -479,6 +479,55 @@
     .btn-salvar-neg:hover{background:var(--primary-hover)}
     .modal-itens-loading{text-align:center;padding:30px;color:var(--text3)}
 
+
+    /* ═══ CHAT MONITOR ═══ */
+    .chat-abas{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px}
+    .chat-aba{padding:10px 20px;font-size:.88rem;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s}
+    .chat-aba.ativo{color:var(--accent);border-bottom-color:var(--accent)}
+    .chat-aba:hover{color:var(--text)}
+    .chat-aba-content{display:none}
+    .chat-aba-content.ativo{display:block}
+    .chat-form{background:var(--surface);border-radius:12px;padding:20px;border:1px solid var(--border);margin-bottom:16px}
+    .chat-form-grid{display:grid;grid-template-columns:180px 1fr auto;gap:10px;align-items:end}
+    .chat-form label{display:block;font-size:.75rem;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px}
+    .chat-form input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.9rem;background:var(--surface2);color:var(--text);outline:none}
+    .chat-form input:focus{border-color:var(--primary)}
+    .chat-card{background:var(--surface);border-radius:10px;padding:16px;border:2px solid rgba(255,255,255,.1);margin-bottom:10px;display:flex;align-items:center;gap:14px}
+    .chat-card-info{flex:1}
+    .chat-card-titulo{font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:4px}
+    .chat-card-sub{font-size:.75rem;color:var(--text2);display:flex;gap:12px;flex-wrap:wrap}
+    .chat-card-badge{background:var(--primary);color:var(--accent);border-radius:20px;padding:2px 10px;font-size:.7rem;font-weight:700}
+    .chat-card-acoes{display:flex;gap:6px;flex-shrink:0}
+    .chat-icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+    .chat-icon-btn:hover{background:var(--primary);color:var(--accent);border-color:var(--primary)}
+    .chat-icon-btn.perigo:hover{background:#dc2626;color:#fff;border-color:#dc2626}
+    /* Painel de mensagens */
+    .chat-painel{position:fixed;top:0;right:-520px;width:480px;max-width:95vw;height:100vh;background:var(--surface);z-index:300;box-shadow:-4px 0 30px rgba(0,0,0,.3);transition:right .3s ease;display:flex;flex-direction:column;border-left:1px solid var(--border)}
+    .chat-painel.aberto{right:0}
+    .chat-painel-header{background:var(--primary);padding:16px 18px;display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0}
+    .chat-painel-titulo{font-size:.85rem;font-weight:700;color:var(--accent);line-height:1.3}
+    .chat-painel-sub{font-size:.72rem;color:rgba(255,255,255,.6);margin-top:3px}
+    .chat-painel-fechar{background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.9rem;flex-shrink:0}
+    .chat-msg-lista{flex:1;overflow-y:auto;padding:12px}
+    .chat-msg{background:var(--surface2);border-radius:8px;padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--primary)}
+    .chat-msg-remetente{font-size:.72rem;font-weight:700;color:var(--accent);margin-bottom:4px}
+    .chat-msg-texto{font-size:.82rem;color:var(--text);line-height:1.5}
+    .chat-msg-hora{font-size:.68rem;color:var(--text3);margin-top:5px;text-align:right}
+    .chat-msg-vazio{text-align:center;padding:40px 20px;color:var(--text3);font-size:.9rem}
+    .chat-atualizar{padding:10px 16px;border-top:1px solid var(--border);flex-shrink:0;display:flex;gap:8px;align-items:center}
+    .chat-status{font-size:.75rem;color:var(--text3);flex:1}
+    .chat-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:299;display:none}
+    .chat-overlay.aberto{display:block}
+    .chat-notif-box{background:var(--surface);border-radius:12px;padding:20px;border:1px solid var(--border)}
+    .chat-notif-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+    .chat-notif-item:last-child{border-bottom:none}
+    .chat-notif-label{font-size:.88rem;font-weight:600}
+    .chat-notif-sub{font-size:.75rem;color:var(--text3);margin-top:2px}
+    .toggle-switch{width:40px;height:22px;border-radius:11px;background:var(--border);border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+    .toggle-switch.on{background:var(--primary)}
+    .toggle-switch::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s}
+    .toggle-switch.on::after{left:21px}
+
     /* ═══ NOVAS VIEWS ═══ */
     .page-header{margin-bottom:20px}
     .page-header h2{font-size:1.2rem;font-weight:700;margin-bottom:4px}
@@ -886,6 +935,124 @@
   </div>
 </div>
 
+
+
+<!-- VIEW SESSÕES AO VIVO (CHAT MONITOR) -->
+<div class="view" id="viewChatMonitor">
+  <div class="container">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+      <div>
+        <h2>💬 Sessões ao Vivo</h2>
+        <p>Acompanhe em tempo real as mensagens das sessões públicas de pregões no Compras.gov.br.</p>
+      </div>
+    </div>
+
+    <!-- Abas -->
+    <div class="chat-abas">
+      <div class="chat-aba ativo" id="chatAba-buscar" onclick="mudarChatAba('buscar')">🔍 Adicionar Certame</div>
+      <div class="chat-aba" id="chatAba-monitorados" onclick="mudarChatAba('monitorados')">📡 Chats Monitorados <span id="chatBadgeCount" style="background:var(--primary);color:var(--accent);border-radius:10px;padding:1px 8px;font-size:.7rem;margin-left:4px">0</span></div>
+      <div class="chat-aba" id="chatAba-notif" onclick="mudarChatAba('notif')">🔔 Notificações</div>
+    </div>
+
+    <!-- ABA: Buscar -->
+    <div class="chat-aba-content ativo" id="chatContent-buscar">
+      <div class="chat-form">
+        <p style="font-size:.83rem;color:var(--text2);margin-bottom:14px">Informe o <strong>site</strong>, a <strong>UASG</strong> do órgão e o <strong>número da compra</strong> para começar a monitorar.</p>
+        <div class="chat-form-grid">
+          <div>
+            <label>Site</label>
+            <select id="chatSite" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:.88rem;background:var(--surface2);color:var(--text)">
+              <option value="comprasnet">Compras.gov.br</option>
+            </select>
+          </div>
+          <div>
+            <label>UASG (Unidade Compradora)</label>
+            <input type="text" id="chatUasg" placeholder="Ex: 985891" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')"/>
+          </div>
+          <div>
+            <label>Número da Compra</label>
+            <input type="text" id="chatNumCompra" placeholder="Ex: 90062" maxlength="9"/>
+          </div>
+          <button class="btn-primario" onclick="adicionarChatMonitor()" style="height:42px">🔍 Monitorar</button>
+        </div>
+        <div id="chatBuscarStatus" style="margin-top:12px;font-size:.82rem;color:var(--text3)"></div>
+      </div>
+      <div style="background:var(--surface2);border-radius:10px;padding:16px;border:1px solid var(--border)">
+        <p style="font-size:.82rem;font-weight:700;margin-bottom:8px">ℹ️ Como funciona</p>
+        <ul style="font-size:.78rem;color:var(--text2);display:flex;flex-direction:column;gap:5px;padding-left:16px">
+          <li>Informe a UASG e o número do pregão que você quer acompanhar</li>
+          <li>O sistema busca as mensagens do chat da sessão pública automaticamente</li>
+          <li>Clique no ícone <strong>💬</strong> para ver as mensagens em tempo real</li>
+          <li>Clique no ícone <strong>🕐</strong> para ver os itens da licitação</li>
+          <li>Ative as notificações para receber alertas durante a sessão</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ABA: Monitorados -->
+    <div class="chat-aba-content" id="chatContent-monitorados">
+      <div id="chatListaMonitorados"><div class="info-vazia">Carregando...</div></div>
+    </div>
+
+    <!-- ABA: Notificações -->
+    <div class="chat-aba-content" id="chatContent-notif">
+      <div class="chat-notif-box">
+        <p style="font-size:.85rem;font-weight:700;margin-bottom:4px">Configurar canais de alerta</p>
+        <p style="font-size:.78rem;color:var(--text3);margin-bottom:16px">Receba avisos quando houver mensagens novas nas sessões monitoradas.</p>
+        <div class="chat-notif-item">
+          <div>
+            <div class="chat-notif-label">🔔 Notificações do navegador</div>
+            <div class="chat-notif-sub">Alertas pop-up enquanto o site estiver aberto</div>
+          </div>
+          <button class="toggle-switch" id="toggleNotifBrowser" onclick="toggleNotif('browser')"></button>
+        </div>
+        <div class="chat-notif-item">
+          <div>
+            <div class="chat-notif-label">📧 E-mail</div>
+            <div class="chat-notif-sub">Em breve — integração via SMTP</div>
+          </div>
+          <button class="toggle-switch" id="toggleNotifEmail" disabled style="opacity:.4"></button>
+        </div>
+        <div class="chat-notif-item">
+          <div>
+            <div class="chat-notif-label">📱 WhatsApp</div>
+            <div class="chat-notif-sub">Em breve — integração via API WhatsApp</div>
+          </div>
+          <button class="toggle-switch" id="toggleNotifWA" disabled style="opacity:.4"></button>
+        </div>
+      </div>
+      <div style="background:var(--surface2);border-radius:10px;padding:14px;border:1px solid var(--border);margin-top:12px">
+        <p style="font-size:.78rem;font-weight:700;color:var(--accent);margin-bottom:6px">⚠️ Atenção operacional</p>
+        <ul style="font-size:.75rem;color:var(--text2);display:flex;flex-direction:column;gap:4px;padding-left:14px">
+          <li>Ative as notificações do navegador antes da sessão iniciar</li>
+          <li>O site deve estar aberto durante a sessão para receber alertas</li>
+          <li>Verifique manualmente o painel de mensagens a cada 2-3 minutos durante a disputa</li>
+          <li>Tenha o Compras.gov.br aberto em aba paralela para ação imediata</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAINEL DE MENSAGENS (Chat) -->
+<div class="chat-overlay" id="chatOverlay" onclick="fecharChatPainel()"></div>
+<div class="chat-painel" id="chatPainel">
+  <div class="chat-painel-header">
+    <div>
+      <div class="chat-painel-titulo" id="chatPainelTitulo">Mensagens da Sessão</div>
+      <div class="chat-painel-sub" id="chatPainelSub">Sessão Pública — Compras.gov.br</div>
+    </div>
+    <button class="chat-painel-fechar" onclick="fecharChatPainel()">✕</button>
+  </div>
+  <div class="chat-msg-lista" id="chatMsgLista">
+    <div class="chat-msg-vazio">Selecione um certame para ver as mensagens.</div>
+  </div>
+  <div class="chat-atualizar">
+    <span class="chat-status" id="chatStatus">—</span>
+    <button class="btn-primario" style="padding:7px 16px;font-size:.8rem" onclick="atualizarMensagens()">↻ Atualizar</button>
+    <button class="btn-primario" style="padding:7px 12px;font-size:.8rem;background:var(--surface2);color:var(--text);border:1px solid var(--border)" id="chatAutoBtn" onclick="toggleAutoAtualizar()">⏱ Auto</button>
+  </div>
+</div>
 
 <!-- VIEW ÓRGÃOS PÚBLICOS -->
 <div class="view" id="viewOrgaos">
@@ -2372,6 +2539,211 @@
     docs.splice(i, 1);
     localStorage.setItem(DOC_KEY, JSON.stringify(docs));
     renderDocumentos();
+  }
+
+
+  // ═══════════════════════════════════════════════════
+  // CHAT MONITOR — Sessões ao Vivo
+  // ═══════════════════════════════════════════════════
+  let chatAtual = null;        // certame com painel aberto
+  let chatAutoTimer = null;    // timer de auto-atualização
+  let chatNotifBrowser = false;
+  const CHAT_NOTIF_KEY = 'arantes_chat_notif';
+
+  function iniciarChatMonitor() {
+    carregarChatsMonitorados();
+    // Restaurar prefs de notificação
+    const prefs = JSON.parse(localStorage.getItem(CHAT_NOTIF_KEY) || '{}');
+    chatNotifBrowser = prefs.browser || false;
+    atualizarToggleNotif('browser', chatNotifBrowser);
+  }
+
+  function mudarChatAba(aba) {
+    document.querySelectorAll('.chat-aba').forEach(b => b.classList.remove('ativo'));
+    document.querySelectorAll('.chat-aba-content').forEach(x => x.classList.remove('ativo'));
+    document.getElementById('chatAba-' + aba)?.classList.add('ativo');
+    document.getElementById('chatContent-' + aba)?.classList.add('ativo');
+    if (aba === 'monitorados') carregarChatsMonitorados();
+  }
+
+  async function carregarChatsMonitorados() {
+    const div = document.getElementById('chatListaMonitorados');
+    if (!div) return;
+    div.innerHTML = '<div class="loading-box">⏳ Carregando...</div>';
+    try {
+      const r = await fetch('/api/chat');
+      const chats = await r.json();
+      const badge = document.getElementById('chatBadgeCount');
+      if (badge) badge.textContent = chats.length;
+      if (!chats.length) {
+        div.innerHTML = '<div class="info-vazia">Nenhum certame monitorado ainda.<br><small>Use a aba "Adicionar Certame" para começar.</small></div>';
+        return;
+      }
+      div.innerHTML = chats.map(ch => `
+        <div class="chat-card">
+          <div style="flex-shrink:0;font-size:1.5rem">📡</div>
+          <div class="chat-card-info">
+            <div class="chat-card-titulo">${ch.descricao || 'Certame ' + ch.numCompra}</div>
+            <div class="chat-card-sub">
+              <span>UASG: <strong>${ch.uasg}</strong></span>
+              <span>Nº ${ch.numCompra}</span>
+              ${ch.orgao ? `<span>🏛️ ${ch.orgao}</span>` : ''}
+              ${ch.uf ? `<span>📍 ${ch.uf}</span>` : ''}
+            </div>
+            <div class="chat-card-sub" style="margin-top:4px">
+              ${ch.totalMensagens > 0 ? `<span class="chat-card-badge">💬 ${ch.totalMensagens} msg</span>` : '<span style="color:var(--text3);font-size:.7rem">Sem mensagens ainda</span>'}
+              ${ch.ultimaVerificacao ? `<span>Verificado: ${new Date(ch.ultimaVerificacao).toLocaleTimeString('pt-BR')}</span>` : ''}
+            </div>
+          </div>
+          <div class="chat-card-acoes">
+            <button class="chat-icon-btn" title="Mensagens da sessão" onclick="abrirChatPainel('${ch.id}','${ch.uasg}','${ch.numCompra}','${(ch.descricao||'').replace(/'/g,'')}')">💬</button>
+            <button class="chat-icon-btn" title="Informações da compra" onclick="verItensCertame('${ch.uasg}','${ch.numCompra}')">🕐</button>
+            <button class="chat-icon-btn perigo" title="Parar de acompanhar" onclick="removerChatMonitor('${ch.id}')">🔕</button>
+          </div>
+        </div>`).join('');
+    } catch {
+      div.innerHTML = '<div class="info-vazia">Erro ao carregar certames.</div>';
+    }
+  }
+
+  async function adicionarChatMonitor() {
+    const uasg = document.getElementById('chatUasg').value.trim();
+    const numCompra = document.getElementById('chatNumCompra').value.trim();
+    const statusEl = document.getElementById('chatBuscarStatus');
+    if (!uasg || !numCompra) { statusEl.textContent = '⚠️ Preencha a UASG e o número da compra.'; return; }
+    statusEl.innerHTML = '⏳ Buscando informações do certame...';
+    try {
+      const r = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uasg, numCompra })
+      });
+      const data = await r.json();
+      if (data.ja_existe) {
+        statusEl.innerHTML = '⚠️ Este certame já está sendo monitorado.';
+      } else if (data.ok) {
+        statusEl.innerHTML = `✅ Certame adicionado: <strong>${data.certame?.descricao || `UASG ${uasg} — Nº ${numCompra}`}</strong>`;
+        document.getElementById('chatUasg').value = '';
+        document.getElementById('chatNumCompra').value = '';
+        setTimeout(() => mudarChatAba('monitorados'), 1500);
+      }
+    } catch {
+      statusEl.textContent = '❌ Erro ao adicionar certame.';
+    }
+  }
+
+  async function removerChatMonitor(id) {
+    if (!confirm('Parar de monitorar este certame?')) return;
+    await fetch('/api/chat?id=' + id, { method: 'DELETE' });
+    carregarChatsMonitorados();
+  }
+
+  async function abrirChatPainel(id, uasg, numCompra, titulo) {
+    chatAtual = { id, uasg, numCompra, titulo };
+    document.getElementById('chatPainelTitulo').textContent = titulo || `UASG ${uasg} — Nº ${numCompra}`;
+    document.getElementById('chatPainelSub').textContent = `UASG ${uasg} · Compra Nº ${numCompra} · Compras.gov.br`;
+    document.getElementById('chatPainel').classList.add('aberto');
+    document.getElementById('chatOverlay').classList.add('aberto');
+    document.body.style.overflow = 'hidden';
+    await atualizarMensagens();
+  }
+
+  function fecharChatPainel() {
+    document.getElementById('chatPainel').classList.remove('aberto');
+    document.getElementById('chatOverlay').classList.remove('aberto');
+    document.body.style.overflow = '';
+    if (chatAutoTimer) { clearInterval(chatAutoTimer); chatAutoTimer = null; }
+    document.getElementById('chatAutoBtn').textContent = '⏱ Auto';
+    document.getElementById('chatAutoBtn').style.background = '';
+  }
+
+  async function atualizarMensagens() {
+    if (!chatAtual) return;
+    const lista = document.getElementById('chatMsgLista');
+    const status = document.getElementById('chatStatus');
+    status.textContent = '⏳ Buscando mensagens...';
+    try {
+      const r = await fetch(`/api/chat?uasg=${chatAtual.uasg}&numCompra=${chatAtual.numCompra}`);
+      const data = await r.json();
+      const msgs = data.mensagens || [];
+      status.textContent = `${msgs.length} mensagem(ns) · ${new Date().toLocaleTimeString('pt-BR')}`;
+      if (!msgs.length) {
+        lista.innerHTML = '<div class="chat-msg-vazio">💬 Nenhuma mensagem encontrada.<br><small>A sessão pode ainda não ter iniciado ou as mensagens não estão disponíveis no Compras.gov.br.</small></div>';
+        return;
+      }
+      lista.innerHTML = msgs.map(m => `
+        <div class="chat-msg">
+          <div class="chat-msg-remetente">${m.remetente || m.tipoMensagem || 'Mensagem do Comprador'}</div>
+          <div class="chat-msg-texto">${m.texto || m.mensagem || m.conteudo || JSON.stringify(m)}</div>
+          <div class="chat-msg-hora">${m.dataCriacao || m.dataHora || m.timestamp || ''}</div>
+        </div>`).join('');
+      // Notificação browser se houver novas mensagens
+      if (chatNotifBrowser && Notification.permission === 'granted' && msgs.length > 0) {
+        new Notification(`💬 ${msgs.length} mensagem(ns) — ${chatAtual.titulo}`, {
+          body: msgs[0]?.texto?.substring(0, 100) || 'Nova mensagem na sessão pública',
+          icon: '/favicon.ico'
+        });
+      }
+    } catch {
+      status.textContent = '❌ Erro ao buscar mensagens';
+      lista.innerHTML = '<div class="chat-msg-vazio">❌ Não foi possível buscar as mensagens.<br><small>Verifique se a UASG e o número estão corretos.</small></div>';
+    }
+  }
+
+  function toggleAutoAtualizar() {
+    const btn = document.getElementById('chatAutoBtn');
+    if (chatAutoTimer) {
+      clearInterval(chatAutoTimer);
+      chatAutoTimer = null;
+      btn.textContent = '⏱ Auto';
+      btn.style.background = '';
+    } else {
+      chatAutoTimer = setInterval(() => atualizarMensagens(), 30000); // a cada 30s
+      btn.textContent = '⏹ Stop';
+      btn.style.background = 'var(--primary)';
+      btn.style.color = 'var(--accent)';
+    }
+  }
+
+  function verItensCertame(uasg, numCompra) {
+    // Abre busca por número com os dados já preenchidos
+    irParaView('buscarNum');
+    setTimeout(() => {
+      document.getElementById('bnAno').value = new Date().getFullYear();
+      document.getElementById('bnSeq').value = numCompra;
+      // UASG → CNPJ não é direto, então mostramos instrução
+      document.getElementById('buscarNumResultado').innerHTML =
+        `<div style="padding:14px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);margin-top:12px;font-size:.82rem;color:var(--text2)">
+          💡 Preencha o CNPJ do órgão (UASG <strong>${uasg}</strong>) para buscar. O CNPJ está disponível no Compras.gov.br.
+        </div>`;
+    }, 300);
+  }
+
+  function toggleNotif(canal) {
+    if (canal === 'browser') {
+      if (!chatNotifBrowser) {
+        Notification.requestPermission().then(perm => {
+          chatNotifBrowser = perm === 'granted';
+          atualizarToggleNotif('browser', chatNotifBrowser);
+          salvarPrefsNotif();
+          if (perm === 'denied') alert('Notificações bloqueadas. Habilite nas configurações do navegador.');
+        });
+      } else {
+        chatNotifBrowser = false;
+        atualizarToggleNotif('browser', false);
+        salvarPrefsNotif();
+      }
+    }
+  }
+
+  function atualizarToggleNotif(canal, estado) {
+    const el = document.getElementById('toggleNotif' + canal.charAt(0).toUpperCase() + canal.slice(1));
+    if (!el) return;
+    el.classList.toggle('on', estado);
+  }
+
+  function salvarPrefsNotif() {
+    localStorage.setItem(CHAT_NOTIF_KEY, JSON.stringify({ browser: chatNotifBrowser }));
   }
 
   // ===== AUTOCOMPLETE =====
