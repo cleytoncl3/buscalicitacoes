@@ -1751,7 +1751,7 @@
           const modFmt=(n.modalidade||'').replace(' - ',' ');
           const tituloCard=[modFmt,numFmt].filter(Boolean).join(' ')+' — '+(n.orgao||'')+' / '+(n.uf||'');
           return`<div class="neg-card" onclick="abrirDrawerNeg('${n.id}')">
-          <div style="display:grid;grid-template-columns:${n.itensInteresse?.length?'280px 1fr':'1fr'};gap:0;margin-bottom:8px">
+          <div style="display:grid;grid-template-columns:${n.itensInteresse?.length?'1fr 1fr':'1fr'};gap:0;margin-bottom:8px">
             <div style="padding-right:${n.itensInteresse?.length?'12px':'0'};${n.itensInteresse?.length?'border-right:1px solid var(--border)':''};">
               <div class="neg-card-titulo" style="font-size:.78rem;margin-bottom:5px">${tituloCard}</div>
               ${n.objeto?`<div style="font-size:.72rem;color:var(--text2);line-height:1.45;margin-bottom:8px">${n.objeto.substring(0,150)}${n.objeto.length>150?'…':''}</div>`:''}
