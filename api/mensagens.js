@@ -16,25 +16,35 @@ export default async function handler(req, res) {
   const base = 'https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-web/public';
 
   const tentativas = [];
+  const root = 'https://cnetmobile.estaleiro.serpro.gov.br';
   const endpoints = [
+    // Com X-Requested-With (Angular faz XHR — backend diferencia HTML vs JSON)
     `${base}/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
     `${base}/compra/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
     `${base}/api/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
     `${base}/compras/mensagens?compra=${codigo}&pagina=${pg}&tamanhoPagina=${sz}`,
     `${base}/compras/${codigo}/chat/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
     `${base}/api/acompanhamento-compra/mensagens?compra=${codigo}&pagina=${pg}&tamanhoPagina=${sz}`,
+    // Sem /public/ — API backend direta
+    `${root}/comprasnet-web/api/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
+    `${root}/comprasnet-web/rest/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
+    // Raiz sem /comprasnet-web/
+    `${root}/api/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
   ];
+
+  const xhrHeaders = {
+    'Accept': 'application/json, text/plain, */*',
+    'X-Requested-With': 'XMLHttpRequest',
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Referer': `${base}/compras/acompanhamento-compra?compra=${codigo}`,
+    'Origin': 'https://cnetmobile.estaleiro.serpro.gov.br',
+  };
 
   for (const url of endpoints) {
     const tentativa = { url, status: null, ct: null, erro: null, dados: null };
     try {
       const r = await fetch(url, {
-        headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Referer': `${base}/compras/acompanhamento-compra?compra=${codigo}`,
-          'Origin': 'https://cnetmobile.estaleiro.serpro.gov.br',
-        },
+        headers: xhrHeaders,
         signal: AbortSignal.timeout(7000),
       });
       tentativa.status = r.status;
