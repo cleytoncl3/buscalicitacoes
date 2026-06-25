@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><title>Probe Comprasnet API</title>
+<style>body{font-family:monospace;background:#111;color:#0f0;padding:20px}pre{background:#000;padding:10px;border-radius:4px;overflow:auto;max-height:300px;font-size:.8rem}h3{color:#ff0}.ok{color:#0f0}.err{color:#f44}.warn{color:#fa0}input{background:#222;color:#fff;border:1px solid #555;padding:6px 10px;font-family:monospace;width:300px}button{background:#333;color:#fff;border:1px solid #555;padding:6px 14px;cursor:pointer;margin-left:8px}</style>
+</head>
+<body>
+<h2>🔍 Comprasnet API Probe</h2>
+<p>Abra esta página, cole o código e clique em Testar. Copie o resultado e manda aqui.</p>
+<div style="margin-bottom:20px">
+  <input type="text" id="codigo" value="92595805900622026" placeholder="Código (17 dígitos)"/>
+  <button onclick="probe()">▶ Testar Todos Endpoints</button>
+</div>
+<div id="resultado"></div>
+
+<script>
+const base = 'https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-web/public';
+
+async function testarUrl(url, label) {
+  const div = document.getElementById('resultado');
+  const id = 'ep_' + Math.random().toString(36).slice(2);
+  div.innerHTML += `<h3>${label}</h3><div style="color:#888;font-size:.75rem;word-break:break-all">${url}</div><div id="${id}">⏳ Tentando...</div><hr style="border-color:#333">`;
+  try {
+    const r = await fetch(url, {
+      headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      signal: AbortSignal.timeout(8000)
+    });
+    const ct = r.headers.get('content-type') || '';
+    if (ct.includes('json')) {
+      const d = await r.json();
+      const body = JSON.stringify(d, null, 2);
+      document.getElementById(id).innerHTML = `<span class="ok">✅ HTTP ${r.status} — ${ct}</span><pre>${body.substring(0,3000)}</pre>`;
+    } else {
+      const body = await r.text();
+      document.getElementById(id).innerHTML = `<span class="warn">⚠️ HTTP ${r.status} — ${ct} (não JSON)</span><pre>${body.substring(0,300)}</pre>`;
+    }
+  } catch(e) {
+    document.getElementById(id).innerHTML = `<span class="err">❌ ERRO: ${e.message}</span>`;
+  }
+}
+
+async function probe() {
+  const codigo = document.getElementById('codigo').value.trim();
+  document.getElementById('resultado').innerHTML = '';
+  const urls = [
+    [`${base}/compras/${codigo}/mensagens?pagina=1&tamanhoPagina=20`, 'Endpoint 1: /compras/{codigo}/mensagens'],
+    [`${base}/compra/${codigo}/mensagens?pagina=1&tamanhoPagina=20`, 'Endpoint 2: /compra/{codigo}/mensagens'],
+    [`${base}/api/compras/${codigo}/mensagens?pagina=1&tamanhoPagina=20`, 'Endpoint 3: /api/compras/{codigo}/mensagens'],
+    [`${base}/compras/mensagens?compra=${codigo}&pagina=1&tamanhoPagina=20`, 'Endpoint 4: /compras/mensagens?compra='],
+    [`${base}/api/chat/${codigo}`, 'Endpoint 5: /api/chat/{codigo}'],
+    [`${base}/compras/${codigo}/chat/mensagens?pagina=1&tamanhoPagina=20`, 'Endpoint 6: /compras/{codigo}/chat/mensagens'],
+    [`${base}/api/acompanhamento-compra/mensagens?compra=${codigo}&pagina=1&tamanhoPagina=20`, 'Endpoint 7: /api/acompanhamento-compra/mensagens'],
+  ];
+  for (const [url, label] of urls) {
+    await testarUrl(url, label);
+    await new Promise(r => setTimeout(r, 500));
+  }
+}
+</script>
+</body>
+</html>
