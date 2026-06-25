@@ -15,21 +15,31 @@ export default async function handler(req, res) {
   const sz = Number(tam) || 20;
   const base = 'https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-web/public';
 
+  // Se pedir os api-docs, retorna direto
+  if (req.query.apidocs === '1') {
+    try {
+      const r = await fetch('https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-mensagem/v3/api-docs', {
+        headers: { Accept: 'application/json', 'User-Agent': 'Mozilla/5.0' },
+        signal: AbortSignal.timeout(10000),
+      });
+      const d = await r.json();
+      return res.status(200).json(d);
+    } catch(e) { return res.status(500).json({ erro: e.message }); }
+  }
+
   const tentativas = [];
   const root = 'https://cnetmobile.estaleiro.serpro.gov.br';
   const msgBase = `${root}/comprasnet-mensagem`;
-  // codigo = UASG(6)+MOD(2)+NUM(5)+ANO(4) = 92595805900622026
-  // Tenta variações de path para o Spring Boot da comprasnet-mensagem
+  // OpenAPI mostrou: /v1/mensagens/{id} e /v1/mensagens (403 — precisa auth)
+  // Tenta variações de path público sem auth
   const endpoints = [
-    `${msgBase}/v1/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
-    `${msgBase}/api/v1/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
+    `${msgBase}/v1/mensagens/compra/${codigo}?pagina=${pg}&tamanhoPagina=${sz}`,
     `${msgBase}/v1/mensagens?codigoCompra=${codigo}&pagina=${pg}&tamanhoPagina=${sz}`,
-    `${msgBase}/v1/mensagens?compra=${codigo}&pagina=${pg}&tamanhoPagina=${sz}`,
-    `${msgBase}/mensagens/compra/${codigo}?pagina=${pg}&tamanhoPagina=${sz}`,
-    // Swagger/OpenAPI para descobrir os paths reais
-    `${msgBase}/v3/api-docs`,
-    `${msgBase}/swagger-ui.html`,
-    `${msgBase}/actuator/mappings`,
+    `${msgBase}/v1/mensagens?numeroCompra=${codigo}&pagina=${pg}&tamanhoPagina=${sz}`,
+    `${msgBase}/v1/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
+    `${msgBase}/v1/acompanhamento/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
+    `${msgBase}/v1/chat/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
+    `${msgBase}/v1/sessoes/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
   ];
 
   const xhrHeaders = {
