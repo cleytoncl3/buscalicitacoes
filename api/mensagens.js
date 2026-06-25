@@ -17,19 +17,19 @@ export default async function handler(req, res) {
 
   const tentativas = [];
   const root = 'https://cnetmobile.estaleiro.serpro.gov.br';
+  // Contexto real descoberto no bundle Angular: /comprasnet-mensagem
+  const msgBase = `${root}/comprasnet-mensagem`;
   const endpoints = [
-    // Com X-Requested-With (Angular faz XHR — backend diferencia HTML vs JSON)
+    // Contexto /comprasnet-mensagem — endpoint real da API
+    `${msgBase}/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
+    `${msgBase}/compra/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
+    `${msgBase}/mensagens?compra=${codigo}&pagina=${pg}&tamanhoPagina=${sz}`,
+    `${msgBase}/api/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
+    `${msgBase}/public/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
+    `${msgBase}/compras/${codigo}?pagina=${pg}&tamanhoPagina=${sz}`,
+    // Paths antigos como fallback
     `${base}/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
-    `${base}/compra/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
     `${base}/api/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
-    `${base}/compras/mensagens?compra=${codigo}&pagina=${pg}&tamanhoPagina=${sz}`,
-    `${base}/compras/${codigo}/chat/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
-    `${base}/api/acompanhamento-compra/mensagens?compra=${codigo}&pagina=${pg}&tamanhoPagina=${sz}`,
-    // Sem /public/ — API backend direta
-    `${root}/comprasnet-web/api/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
-    `${root}/comprasnet-web/rest/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
-    // Raiz sem /comprasnet-web/
-    `${root}/api/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
   ];
 
   const xhrHeaders = {
