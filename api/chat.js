@@ -27,8 +27,8 @@ async function redisSet(data) {
   } catch {}
 }
 
-function buildCodigo(uasg, modalidade, num) {
-  return String(uasg).padStart(6,'0') + String(modalidade) + String(num).padStart(9,'0');
+function buildCodigo(uasg, modalidade, num, ano) {
+  return String(uasg).padStart(6,'0') + String(modalidade) + String(num).padStart(5,'0') + String(ano||new Date().getFullYear());
 }
 
 async function fetchMensagens(codigo, uasg, num) {
@@ -70,8 +70,8 @@ export default async function handler(req, res) {
 
   // ── BUSCAR MENSAGENS ──────────────────────────────────
   if (req.method === 'GET' && (req.query.codigo || req.query.uasg)) {
-    const { uasg='', modalidade='06', numCompra='', codigo: cp } = req.query;
-    const codigo = cp || buildCodigo(uasg, modalidade, numCompra);
+    const { uasg='', modalidade='06', numCompra='', ano='', codigo: cp } = req.query;
+    const codigo = cp || buildCodigo(uasg, modalidade, numCompra, ano);
     const { msgs, fonte } = await fetchMensagens(codigo, uasg, numCompra);
     // Atualiza totalMensagens no Redis sem bloquear a resposta
     redisGet().then(chats => {
@@ -91,12 +91,14 @@ export default async function handler(req, res) {
     const uasg       = String(body.uasg || '').trim();
     const modalidade  = String(body.modalidade || '06').trim();
     const numCompra   = String(body.numCompra || '').trim();
+    const ano        = String(body.ano || new Date().getFullYear()).trim();
     const descricao   = body.descricao || null;
 
     if (!uasg || !numCompra)
       return res.status(400).json({ erro: 'uasg e numCompra são obrigatórios' });
 
-    const codigo = buildCodigo(uasg, modalidade, numCompra);
+    // Prefer the pre-built codigo from frontend (already includes year); fallback to buildCodigo
+    const codigo = body.codigo || buildCodigo(uasg, modalidade, numCompra, ano);
     const chats  = await redisGet();
 
     if (chats.find(c => c.codigo === codigo))
@@ -105,7 +107,7 @@ export default async function handler(req, res) {
     // Salva IMEDIATAMENTE — sem esperar PNCP
     const novo = {
       id: Date.now().toString(),
-      uasg, modalidade, numCompra, codigo,
+      uasg, modalidade, numCompra, ano, codigo,
       descricao: descricao || `UASG ${uasg} — Nº ${numCompra}`,
       objeto: null, orgao: null, uf: null,
       urlComprasnet: `https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-web/public/compras/acompanhamento-compra?compra=${codigo}`,

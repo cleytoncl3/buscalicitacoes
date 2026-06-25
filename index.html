@@ -959,7 +959,7 @@
       <div class="chat-form">
         <p style="font-size:.83rem;color:var(--text2);margin-bottom:14px">
           Informe os dados do pregão para monitorar. O código da compra é formado por:<br>
-          <code style="background:var(--surface2);padding:2px 8px;border-radius:4px;font-size:.82rem">UASG (6 dígitos) + Modalidade (2 dígitos) + Número (9 dígitos)</code>
+          <code style="background:var(--surface2);padding:2px 8px;border-radius:4px;font-size:.82rem">UASG (6 dígitos) + Modalidade (2 dígitos) + Número (5 dígitos) + Ano (4 dígitos) = 17 dígitos</code>
         </p>
         <div style="display:grid;grid-template-columns:160px 200px 1fr;gap:10px;align-items:end;flex-wrap:wrap">
           <div>
@@ -1068,13 +1068,20 @@
     </div>
     <button class="chat-painel-fechar" onclick="fecharChatPainel()">✕</button>
   </div>
-  <div class="chat-msg-lista" id="chatMsgLista">
-    <div class="chat-msg-vazio">Carregando mensagens...</div>
+  <div style="padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:8px;align-items:center">
+    <a id="chatBtnAbrirSessao" href="#" target="_blank" class="btn-primario" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;padding:9px 14px;font-size:.85rem">
+      ↗ Abrir no Compras.gov.br
+    </a>
+    <button class="btn-primario" style="padding:9px 12px;font-size:.8rem;background:var(--surface2);color:var(--text);border:1px solid var(--border)" onclick="recarregarIframeSessao()" title="Recarregar">↻</button>
   </div>
-  <div class="chat-atualizar">
-    <span class="chat-status" id="chatStatus">—</span>
-    <button class="btn-primario" style="padding:7px 14px;font-size:.8rem" onclick="atualizarMensagens()">↻ Atualizar</button>
-    <button class="btn-primario" id="chatAutoBtn" style="padding:7px 12px;font-size:.8rem;background:var(--surface2);color:var(--text);border:1px solid var(--border)" onclick="toggleAutoAtualizar()">⏱ Auto</button>
+  <div id="chatIframeWrap" style="flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative">
+    <div id="chatIframeAviso" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;z-index:1;background:var(--bg)">
+      <div style="font-size:2rem;margin-bottom:12px">🔗</div>
+      <div style="font-size:.9rem;font-weight:600;margin-bottom:8px">Acompanhe a Sessão ao Vivo</div>
+      <div style="font-size:.78rem;color:var(--text3);margin-bottom:16px;max-width:320px">O Comprasnet pode bloquear a visualização embutida. Se a página não aparecer abaixo, use o botão acima para abrir em nova aba.</div>
+      <button onclick="iniciarIframeSessao()" class="btn-primario" style="padding:10px 20px">Carregar Sessão</button>
+    </div>
+    <iframe id="chatIframe" src="about:blank" style="flex:1;border:none;width:100%;min-height:0;display:none" title="Sessão Comprasnet" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
   </div>
 </div>
 
@@ -2652,8 +2659,8 @@
             </div>
           </div>
           <div class="chat-card-acoes">
-            <button class="chat-icon-btn" title="Ver mensagens da sessão"
-              onclick="abrirChatPainel('${ch.id}','${ch.uasg}','${ch.modalidade||'06'}','${ch.numCompra}','${(ch.descricao||'').replace(/'/g,'')}')">💬</button>
+            <button class="chat-icon-btn" title="Ver sessão ao vivo"
+              onclick="abrirChatPainel('${ch.id}','${ch.uasg}','${ch.modalidade||'06'}','${ch.numCompra}','${(ch.descricao||'').replace(/'/g,'')}','${codigo}')">💬</button>
             <a href="${urlCN}" target="_blank" class="chat-icon-btn" title="Abrir no Compras.gov.br" style="text-decoration:none;display:flex;align-items:center;justify-content:center">🔗</a>
             <button class="chat-icon-btn perigo" title="Parar de monitorar" onclick="removerChatMonitor('${ch.id}')">🔕</button>
           </div>
@@ -2697,74 +2704,63 @@
     carregarChatsMonitorados();
   }
 
-  async function abrirChatPainel(id, uasg, modalidade, numCompra, titulo) {
-    const codigo = buildCodigoCompra(uasg, modalidade, numCompra);
+  async function abrirChatPainel(id, uasg, modalidade, numCompra, titulo, codigoPrebuilt) {
+    const codigo = codigoPrebuilt || buildCodigoCompra(uasg, modalidade, numCompra);
     const urlCN  = buildUrlComprasnet(codigo);
-    chatAtual = { id, uasg, modalidade, numCompra, codigo, titulo };
+    chatAtual = { id, uasg, modalidade, numCompra, codigo, titulo, urlCN };
     document.getElementById('chatPainelTitulo').textContent = titulo||`UASG ${uasg} — Nº ${numCompra}`;
     document.getElementById('chatPainelSub').textContent = `Código: ${codigo}`;
     const linkEl = document.getElementById('chatLinkSessao');
     if (linkEl) linkEl.href = urlCN;
+    const btnAbrir = document.getElementById('chatBtnAbrirSessao');
+    if (btnAbrir) btnAbrir.href = urlCN;
+    // Reset iframe to aviso state
+    document.getElementById('chatIframeAviso').style.display='flex';
+    const iframe = document.getElementById('chatIframe');
+    iframe.src = 'about:blank';
+    iframe.style.display = 'none';
     document.getElementById('chatPainel').classList.add('aberto');
     document.getElementById('chatOverlay').classList.add('aberto');
     document.body.style.overflow='hidden';
-    await atualizarMensagens();
+  }
+
+  function iniciarIframeSessao() {
+    if (!chatAtual) return;
+    const aviso = document.getElementById('chatIframeAviso');
+    const iframe = document.getElementById('chatIframe');
+    aviso.innerHTML = '<div style="color:var(--text3);font-size:.85rem">⏳ Carregando sessão...</div>';
+    iframe.style.display = 'block';
+    iframe.src = chatAtual.urlCN;
+    iframe.onload = () => { aviso.style.display = 'none'; };
+    // Se demorar mais de 5s sem carregar, mostra aviso de bloqueio
+    setTimeout(() => {
+      if (aviso.style.display !== 'none') {
+        aviso.innerHTML = `<div style="text-align:center;padding:20px">
+          <div style="font-size:1.5rem;margin-bottom:10px">🚫</div>
+          <div style="font-size:.88rem;font-weight:600;margin-bottom:8px">Visualização bloqueada pelo Comprasnet</div>
+          <div style="font-size:.75rem;color:var(--text3);margin-bottom:16px">O site não permite exibição incorporada.</div>
+          <a href="${chatAtual.urlCN}" target="_blank" class="btn-primario" style="display:inline-block;text-decoration:none;padding:10px 20px">↗ Abrir em Nova Aba</a>
+        </div>`;
+      }
+    }, 5000);
+  }
+
+  function recarregarIframeSessao() {
+    if (!chatAtual) return;
+    const iframe = document.getElementById('chatIframe');
+    if (iframe.src && iframe.src !== 'about:blank') {
+      iframe.src = iframe.src;
+    } else {
+      iniciarIframeSessao();
+    }
   }
 
   function fecharChatPainel() {
     document.getElementById('chatPainel').classList.remove('aberto');
     document.getElementById('chatOverlay').classList.remove('aberto');
     document.body.style.overflow='';
-    if (chatAutoTimer) { clearInterval(chatAutoTimer); chatAutoTimer=null; }
-    const btn=document.getElementById('chatAutoBtn');
-    if(btn){btn.textContent='⏱ Auto';btn.style.background='';btn.style.color='';}
-  }
-
-  async function atualizarMensagens() {
-    if (!chatAtual) return;
-    const lista=document.getElementById('chatMsgLista');
-    const status=document.getElementById('chatStatus');
-    status.textContent='⏳ Buscando mensagens...';
-    try {
-      const r = await fetch(`/api/chat?uasg=${chatAtual.uasg}&modalidade=${chatAtual.modalidade}&numCompra=${chatAtual.numCompra}&codigo=${chatAtual.codigo}`);
-      const data = await r.json();
-      const msgs = data.mensagens||[];
-      const hora = new Date().toLocaleTimeString('pt-BR');
-      status.textContent=`${msgs.length} mensagem(ns) · ${hora}`;
-      if (!msgs.length) {
-        lista.innerHTML=`<div class="chat-msg-vazio">
-          💬 Nenhuma mensagem encontrada.<br><br>
-          <small>A sessão pode não ter iniciado ainda, ou o Comprasnet não está disponível via API.<br><br>
-          <a href="${buildUrlComprasnet(chatAtual.codigo)}" target="_blank" style="color:var(--accent)">
-            ↗ Abrir diretamente no Compras.gov.br
-          </a></small>
-        </div>`;
-        return;
-      }
-      lista.innerHTML=msgs.map(m=>`
-        <div class="chat-msg">
-          <div class="chat-msg-remetente">${m.remetente||m.tipoMensagem||m.tipo||'Comprador'}</div>
-          <div class="chat-msg-texto">${m.texto||m.mensagem||m.conteudo||m.descricao||JSON.stringify(m).substring(0,200)}</div>
-          <div class="chat-msg-hora">${m.dataCriacao||m.dataHora||m.timestamp||''}</div>
-        </div>`).join('');
-      if (chatNotifBrowser && Notification.permission==='granted')
-        new Notification(`💬 ${msgs.length} msg — ${chatAtual.titulo}`,
-          {body:msgs[0]?.texto?.substring(0,100)||'Nova mensagem'});
-    } catch {
-      status.textContent='❌ Erro';
-      lista.innerHTML=`<div class="chat-msg-vazio">❌ Não foi possível buscar.<br><a href="${buildUrlComprasnet(chatAtual.codigo)}" target="_blank" style="color:var(--accent)">↗ Abrir no Compras.gov.br</a></div>`;
-    }
-  }
-
-  function toggleAutoAtualizar() {
-    const btn=document.getElementById('chatAutoBtn');
-    if (chatAutoTimer) {
-      clearInterval(chatAutoTimer); chatAutoTimer=null;
-      btn.textContent='⏱ Auto'; btn.style.background=''; btn.style.color='';
-    } else {
-      chatAutoTimer=setInterval(()=>atualizarMensagens(),30000);
-      btn.textContent='⏹ Stop'; btn.style.background='var(--primary)'; btn.style.color='var(--accent)';
-    }
+    const iframe = document.getElementById('chatIframe');
+    if (iframe) { iframe.src = 'about:blank'; iframe.style.display = 'none'; }
   }
 
   function toggleNotif(canal) {
