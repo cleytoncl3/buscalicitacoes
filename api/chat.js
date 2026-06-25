@@ -1,31 +1,39 @@
 // api/chat.js — Monitoramento de sessões públicas Compras.gov.br
-// Código = UASG(6) + Modalidade(2) + Número(9) → ex: 98600106005942025
+// SEM Upstash: usa memória (dados resetam ao redeployar)
+// COM Upstash: dados persistem entre dispositivos
+// Setup: vercel.com/dashboard → Integrations → Upstash → New Redis
 
 const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const KEY = 'arantes_chats_v3';
 
+// Fallback em memória quando Upstash não está configurado
+const memCache = { data: null };
+
 async function redisSet(data) {
-  if (!REDIS_URL) { console.error('[Redis] UPSTASH_REDIS_REST_URL não configurado'); return; }
+  memCache.data = data;
+  if (!REDIS_URL) return;
   try {
     const r = await fetch(`${REDIS_URL}/set/${KEY}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${REDIS_TOKEN}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(JSON.stringify(data))
     });
-    if (!r.ok) console.error('[Redis] set falhou:', r.status, await r.text());
+    if (!r.ok) console.error('[Redis] set falhou:', r.status);
   } catch(e) { console.error('[Redis] set erro:', e.message); }
 }
 
 async function redisGet() {
-  if (!REDIS_URL) { console.error('[Redis] UPSTASH_REDIS_REST_URL não configurado'); return []; }
+  if (!REDIS_URL) return memCache.data || [];
   try {
     const r = await fetch(`${REDIS_URL}/get/${KEY}`, {
       headers: { Authorization: `Bearer ${REDIS_TOKEN}` }
     });
     const { result } = await r.json();
-    return result ? JSON.parse(result) : [];
-  } catch(e) { console.error('[Redis] get erro:', e.message); return []; }
+    const data = result ? JSON.parse(result) : (memCache.data || []);
+    memCache.data = data;
+    return data;
+  } catch(e) { return memCache.data || []; }
 }
 
 function buildCodigo(uasg, modalidade, num, ano) {
