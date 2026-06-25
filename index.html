@@ -707,15 +707,19 @@
         <div class="dropdown-item" onclick="irParaNegocios('funil')">📊 Por Etapa</div>
         <div class="dropdown-item" onclick="irParaNegocios('quadros')">🗂️ Visão Geral</div>
         <div class="dropdown-item" onclick="irParaNegocios('agenda')">📅 Calendário de Prazos</div>
-        <div class="dropdown-sep"></div>
-        <div class="dropdown-item" onclick="irParaView('minhaEmpresa')">🏢 Minha Empresa</div>
-        <div class="dropdown-item" onclick="irParaView('documentos')">📂 Documentos</div>
       </div>
     </button>
     <button class="nav-mobile-btn" id="navMobileBtn" onclick="toggleMobileMenu()">☰</button>
   </nav>
 
   <div class="header-right">
+    <button class="nav-btn" id="navMinhaEmpresa" onclick="toggleDropdown('dropMinhaEmpresa')" style="font-size:.82rem">
+      🏢 Minha Empresa ▾
+      <div class="dropdown" id="dropMinhaEmpresa" style="right:0;left:auto">
+        <div class="dropdown-item" onclick="irParaView('minhaEmpresa')">🏢 CNPJ</div>
+        <div class="dropdown-item" onclick="irParaView('documentos')">📂 Documentos</div>
+      </div>
+    </button>
     <div class="notif-wrapper">
       <button class="btn-sino" onclick="toggleNotificacoes()">🔔<span class="sino-badge" id="sinoBadge">0</span></button>
       <div class="notif-panel" id="notifPanel">
@@ -740,7 +744,8 @@
   <div class="mobile-menu-item" onclick="irParaNegocios('funil');fecharMobileMenu()">📊 Por Etapa</div>
   <div class="mobile-menu-item" onclick="irParaNegocios('quadros');fecharMobileMenu()">🗂️ Visão Geral</div>
   <div class="mobile-menu-item" onclick="irParaNegocios('agenda');fecharMobileMenu()">📅 Calendário de Prazos</div>
-  <div class="mobile-menu-item" onclick="irParaView('minhaEmpresa');fecharMobileMenu()">🏢 Minha Empresa</div>
+  <div class="mobile-menu-sep"></div>
+  <div class="mobile-menu-item" onclick="irParaView('minhaEmpresa');fecharMobileMenu()">🏢 CNPJ</div>
   <div class="mobile-menu-item" onclick="irParaView('documentos');fecharMobileMenu()">📂 Documentos</div>
   <div class="mobile-menu-sep"></div>
   <div class="mobile-menu-item" onclick="alternarTema();fecharMobileMenu()">🌓 Alternar tema</div>
@@ -1159,7 +1164,8 @@
     if(el)el.classList.add('ativo');
     if(['busca','jornais','orgaos','buscarNum'].includes(view))document.getElementById('navOportunidades').classList.add('ativo');
     if(['historico','empresa'].includes(view))document.getElementById('navAnalise').classList.add('ativo');
-    if(['negocios','minhaEmpresa','documentos'].includes(view))document.getElementById('navNegocios').classList.add('ativo');
+    if(['negocios'].includes(view))document.getElementById('navNegocios').classList.add('ativo');
+    if(['minhaEmpresa','documentos'].includes(view)){const el=document.getElementById('navMinhaEmpresa');if(el)el.classList.add('ativo');}
     if(view==='jornais')renderJornais();
     if(view==='minhaEmpresa')renderMinhaEmpresa();
     if(view==='documentos')renderDocumentos();
