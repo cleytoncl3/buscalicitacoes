@@ -449,6 +449,36 @@
     .btn-topo:hover{background:var(--primary-hover)}
 
 
+
+    /* Modal seleção de itens */
+    .modal-itens-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:700;display:none;align-items:center;justify-content:center}
+    .modal-itens-overlay.aberto{display:flex}
+    .modal-itens{background:var(--surface);border-radius:14px;width:640px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .modal-itens-header{background:var(--primary);padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+    .modal-itens-header h3{color:var(--accent);font-size:.95rem;font-weight:700}
+    .modal-itens-sub{font-size:.75rem;color:rgba(255,255,255,.6);margin-top:2px}
+    .modal-itens-fechar{background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center}
+    .modal-itens-busca{padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .modal-itens-busca input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:.88rem;background:var(--surface2);color:var(--text);outline:none}
+    .modal-itens-lista{overflow-y:auto;flex:1;padding:8px}
+    .modal-item-linha{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;border:1px solid transparent;transition:all .15s}
+    .modal-item-linha:hover{background:var(--surface2)}
+    .modal-item-linha.selecionado{background:var(--chip-bg);border-color:var(--chip-border)}
+    .modal-item-linha input[type=checkbox]{margin-top:2px;accent-color:var(--primary);width:16px;height:16px;cursor:pointer;flex-shrink:0}
+    .modal-item-info{flex:1}
+    .modal-item-num{font-size:.72rem;font-weight:700;color:var(--primary);margin-bottom:2px}
+    [data-tema="escuro"] .modal-item-num{color:var(--accent)}
+    .modal-item-nome{font-size:.85rem;color:var(--text);line-height:1.3}
+    .modal-item-qtd{font-size:.75rem;color:var(--text3);margin-top:2px}
+    .modal-itens-footer{padding:14px 16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;flex-wrap:wrap;gap:8px}
+    .modal-itens-sel-count{font-size:.82rem;color:var(--text2)}
+    .modal-itens-acoes{display:flex;gap:8px}
+    .btn-sel-todos{padding:7px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:.8rem;cursor:pointer}
+    .btn-sel-todos:hover{background:var(--chip-bg)}
+    .btn-salvar-neg{background:var(--primary);color:var(--accent);border:none;padding:9px 22px;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer}
+    .btn-salvar-neg:hover{background:var(--primary-hover)}
+    .modal-itens-loading{text-align:center;padding:30px;color:var(--text3)}
+
     /* ═══ NOVAS VIEWS ═══ */
     .page-header{margin-bottom:20px}
     .page-header h2{font-size:1.2rem;font-weight:700;margin-bottom:4px}
@@ -951,6 +981,32 @@
   </div>
 </div>
 
+<!-- MODAL SELEÇÃO DE ITENS DO NEGÓCIO -->
+<div class="modal-itens-overlay" id="modalItensOverlay">
+  <div class="modal-itens">
+    <div class="modal-itens-header">
+      <div>
+        <h3>💼 Selecionar itens de interesse</h3>
+        <div class="modal-itens-sub" id="modalItensSubtitulo">Marque os itens que sua empresa tem interesse em fornecer</div>
+      </div>
+      <button class="modal-itens-fechar" onclick="fecharModalItens()">✕</button>
+    </div>
+    <div class="modal-itens-busca">
+      <input type="text" id="modalItensBusca" placeholder="🔍 Filtrar itens..." oninput="filtrarModalItens()"/>
+    </div>
+    <div class="modal-itens-lista" id="modalItensLista">
+      <div class="modal-itens-loading">⏳ Carregando itens...</div>
+    </div>
+    <div class="modal-itens-footer">
+      <span class="modal-itens-sel-count" id="modalItensCount">0 itens selecionados</span>
+      <div class="modal-itens-acoes">
+        <button class="btn-sel-todos" onclick="toggleSelecionarTodos()">Selecionar todos</button>
+        <button class="btn-salvar-neg" onclick="confirmarSalvarNegocio()">💾 Salvar nos Negócios</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- DRAWER -->
 <div class="overlay" id="overlay" onclick="fecharDrawer()"></div>
 <div class="drawer" id="drawer">
@@ -998,7 +1054,7 @@
 
     <div class="d-acoes">
       <button class="d-btn-acessar" id="d-btn-acessar">📄 Acessar edital no PNCP</button>
-      <button class="d-btn-negocio" id="d-btn-negocio" onclick="adicionarAosNegocios()">💼 Adicionar aos meus negócios</button>
+      <button class="d-btn-negocio" id="d-btn-negocio" onclick="abrirModalItensNegocio()">💼 Adicionar aos meus negócios</button>
     </div>
 
     <div class="d-sep"></div>
@@ -1543,6 +1599,139 @@
     setTimeout(()=>{btn.textContent='💼 Adicionar aos meus negócios';btn.classList.remove('adicionado')},2500);
   }
 
+
+  // ═══════════════════════════════════════════════════
+  // MODAL DE SELEÇÃO DE ITENS DO NEGÓCIO
+  // ═══════════════════════════════════════════════════
+  let modalTodosItens = [];
+  let modalItensSelecionados = new Set();
+
+  async function abrirModalItensNegocio() {
+    if (!itemAtualDrawer) return;
+    const jaAdicionado = getNegocios().some(n => n.numero_controle === itemAtualDrawer.numero_controle_pncp);
+    if (jaAdicionado) { alert('Esta licitação já está nos seus Negócios!'); return; }
+
+    const mod = fmtModalidade(itemAtualDrawer.modalidade_licitacao_nome) || '';
+    const num = extrairNumEdital(itemAtualDrawer);
+    document.getElementById('modalItensSubtitulo').textContent =
+      (mod + (num ? ' Nº ' + num : '') + ' — ' + (itemAtualDrawer.orgao_nome || '')).substring(0, 80);
+
+    document.getElementById('modalItensLista').innerHTML = '<div class="modal-itens-loading">⏳ Carregando itens da licitação...</div>';
+    document.getElementById('modalItensBusca').value = '';
+    modalTodosItens = [];
+    modalItensSelecionados = new Set();
+    atualizarContadorItens();
+    document.getElementById('modalItensOverlay').classList.add('aberto');
+    document.body.style.overflow = 'hidden';
+
+    // Carrega itens
+    const p = parseControle(itemAtualDrawer.numero_controle_pncp);
+    if (!p) { document.getElementById('modalItensLista').innerHTML = '<div class="modal-itens-loading">Sem itens disponíveis.</div>'; return; }
+
+    // Tenta cache primeiro
+    const cacheKey = `pncp_itens_${p.cnpj}_${p.ano}_${p.seq}`;
+    let itens = null;
+    try {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) { const { d, ts } = JSON.parse(cached); if (Date.now() - ts < 3600000) itens = d; }
+    } catch {}
+
+    if (!itens) {
+      try {
+        const r = await fetch(`/api/itens?cnpj=${p.cnpj}&ano=${p.ano}&sequencial=${p.seq}`);
+        itens = (await r.json()).data || [];
+        try { localStorage.setItem(cacheKey, JSON.stringify({ d: itens, ts: Date.now() })); } catch {}
+      } catch { itens = []; }
+    }
+
+    modalTodosItens = itens;
+    renderModalItens(itens);
+  }
+
+  function renderModalItens(itens) {
+    const div = document.getElementById('modalItensLista');
+    if (!itens.length) { div.innerHTML = '<div class="modal-itens-loading">Nenhum item encontrado.</div>'; return; }
+    div.innerHTML = itens.map(it => `
+      <div class="modal-item-linha${modalItensSelecionados.has(it.numeroItem)?  ' selecionado':''}"
+           onclick="toggleItemNeg(${it.numeroItem}, this)">
+        <input type="checkbox" ${modalItensSelecionados.has(it.numeroItem)?'checked':''} onclick="event.stopPropagation();toggleItemNeg(${it.numeroItem}, this.closest('.modal-item-linha'))"/>
+        <div class="modal-item-info">
+          <div class="modal-item-num">Item ${it.numeroItem || '—'}</div>
+          <div class="modal-item-nome">${it.descricao || 'Sem descrição'}</div>
+          <div class="modal-item-qtd">Qtd: <strong>${it.quantidade || '—'} ${it.unidadeMedida || ''}</strong>
+            ${it.valorUnitarioEstimado ? ` · R$ ${Number(it.valorUnitarioEstimado).toLocaleString('pt-BR',{minimumFractionDigits:2})}` : ''}
+          </div>
+        </div>
+      </div>`).join('');
+    atualizarContadorItens();
+  }
+
+  function toggleItemNeg(numeroItem, el) {
+    if (modalItensSelecionados.has(numeroItem)) {
+      modalItensSelecionados.delete(numeroItem);
+      el?.classList.remove('selecionado');
+      el?.querySelector('input')?.removeAttribute('checked');
+    } else {
+      modalItensSelecionados.add(numeroItem);
+      el?.classList.add('selecionado');
+      el?.querySelector('input')?.setAttribute('checked','');
+    }
+    atualizarContadorItens();
+  }
+
+  function toggleSelecionarTodos() {
+    const todos = document.querySelectorAll('.modal-item-linha');
+    const todosSelecionados = modalItensSelecionados.size === modalTodosItens.length;
+    modalItensSelecionados = todosSelecionados ? new Set() : new Set(modalTodosItens.map(i => i.numeroItem));
+    renderModalItens(modalTodosItens);
+  }
+
+  function filtrarModalItens() {
+    const t = document.getElementById('modalItensBusca').value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    renderModalItens(t ? modalTodosItens.filter(i => (i.descricao||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(t)) : modalTodosItens);
+  }
+
+  function atualizarContadorItens() {
+    document.getElementById('modalItensCount').textContent = `${modalItensSelecionados.size} item(ns) selecionado(s)`;
+  }
+
+  function fecharModalItens() {
+    document.getElementById('modalItensOverlay').classList.remove('aberto');
+    document.body.style.overflow = '';
+  }
+
+  async function confirmarSalvarNegocio() {
+    if (!itemAtualDrawer) return;
+    const p = parseControle(itemAtualDrawer.numero_controle_pncp);
+    const itensSelecionados = modalTodosItens.filter(i => modalItensSelecionados.has(i.numeroItem));
+    const negs = getNegocios();
+    const novoNeg = {
+      id: Date.now().toString(),
+      titulo: itemAtualDrawer.title || '',
+      objeto: itemAtualDrawer.description || '',
+      orgao: itemAtualDrawer.orgao_nome || '',
+      uf: itemAtualDrawer.uf || '',
+      modalidade: itemAtualDrawer.modalidade_licitacao_nome || '',
+      abertura: itemAtualDrawer.data_inicio_vigencia || '',
+      encerramento: itemAtualDrawer.data_fim_vigencia || '',
+      numero_controle: itemAtualDrawer.numero_controle_pncp || '',
+      link_pncp: p ? `https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}` : '',
+      fase: 'oportunidade',
+      adicionado_em: new Date().toISOString(),
+      itemData: JSON.stringify(itemAtualDrawer),
+      itensInteresse: itensSelecionados,  // itens selecionados pelo usuário
+    };
+    negs.unshift(novoNeg);
+    salvarNegocios(negs);
+    apiSalvarNegocio(novoNeg);
+    fecharModalItens();
+
+    // Feedback no drawer
+    const btn = document.getElementById('d-btn-negocio');
+    if (btn) { btn.textContent = '✅ Salvo nos Negócios!'; btn.classList.add('adicionado'); }
+    alert(`✅ Licitação salva com ${itensSelecionados.length} item(ns) de interesse!`);
+  }
+
   function abrirDrawerNeg(id){
     const n=getNegocios().find(x=>x.id===id);
     if(!n||!n.itemData)return;
@@ -1559,6 +1748,7 @@
         ${itens.length===0?'<div class="fase-vazio">Nenhuma licitação nesta fase.</div>':itens.map(n=>`<div class="neg-card" onclick="abrirDrawerNeg('${n.id}')">
           <div class="neg-card-titulo">${n.titulo}</div>
           <div class="neg-card-info"><span>📍 ${n.uf}</span><span>📋 ${n.modalidade}</span><span>⏰ ${n.encerramento?new Date(n.encerramento).toLocaleDateString('pt-BR'):'—'}</span></div>
+          ${n.itensInteresse?.length?`<div class="neg-card-info" style="margin-top:4px;flex-wrap:wrap;gap:4px">${n.itensInteresse.slice(0,3).map(i=>`<span style="background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:4px;padding:1px 7px;font-size:.7rem">#${i.numeroItem} ${(i.descricao||'').substring(0,25)}…</span>`).join('')}${n.itensInteresse.length>3?`<span style="font-size:.7rem;color:var(--text3)">+${n.itensInteresse.length-3} itens</span>`:''}</div>`:''}\`
           <div class="neg-card-actions" onclick="event.stopPropagation()">
             <select onchange="moverFase('${n.id}',this.value)" style="font-size:.75rem;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);cursor:pointer">
               ${FASES.map(f2=>`<option value="${f2.id}"${f2.id===n.fase?' selected':''}>${f2.emoji} ${f2.nome}</option>`).join('')}
