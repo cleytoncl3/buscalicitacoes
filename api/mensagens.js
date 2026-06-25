@@ -17,19 +17,19 @@ export default async function handler(req, res) {
 
   const tentativas = [];
   const root = 'https://cnetmobile.estaleiro.serpro.gov.br';
-  // Contexto real descoberto no bundle Angular: /comprasnet-mensagem
   const msgBase = `${root}/comprasnet-mensagem`;
+  // codigo = UASG(6)+MOD(2)+NUM(5)+ANO(4) = 92595805900622026
+  // Tenta variações de path para o Spring Boot da comprasnet-mensagem
   const endpoints = [
-    // Contexto /comprasnet-mensagem — endpoint real da API
-    `${msgBase}/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
-    `${msgBase}/compra/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
-    `${msgBase}/mensagens?compra=${codigo}&pagina=${pg}&tamanhoPagina=${sz}`,
-    `${msgBase}/api/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
-    `${msgBase}/public/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
-    `${msgBase}/compras/${codigo}?pagina=${pg}&tamanhoPagina=${sz}`,
-    // Paths antigos como fallback
-    `${base}/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
-    `${base}/api/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
+    `${msgBase}/v1/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
+    `${msgBase}/api/v1/compras/${codigo}/mensagens?pagina=${pg}&tamanhoPagina=${sz}`,
+    `${msgBase}/v1/mensagens?codigoCompra=${codigo}&pagina=${pg}&tamanhoPagina=${sz}`,
+    `${msgBase}/v1/mensagens?compra=${codigo}&pagina=${pg}&tamanhoPagina=${sz}`,
+    `${msgBase}/mensagens/compra/${codigo}?pagina=${pg}&tamanhoPagina=${sz}`,
+    // Swagger/OpenAPI para descobrir os paths reais
+    `${msgBase}/v3/api-docs`,
+    `${msgBase}/swagger-ui.html`,
+    `${msgBase}/actuator/mappings`,
   ];
 
   const xhrHeaders = {
