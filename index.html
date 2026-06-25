@@ -2634,7 +2634,7 @@
     if (!div) return;
     div.innerHTML = '<div class="loading-box">⏳ Carregando...</div>';
     try {
-      const r = await fetch('/api/chat');
+      const r = await fetch('/api/chat', { cache: 'no-store' });
       const chats = r.ok ? await r.json() : [];
       const badge = document.getElementById('chatBadgeCount');
       if (badge) badge.textContent = chats.length;
