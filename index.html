@@ -2672,30 +2672,40 @@
   }
 
   async function adicionarChatMonitor() {
-    const uasg = (document.getElementById('chatUasg').value||'').trim();
-    const mod  = document.getElementById('chatModalidade').value||'06';
-    const num  = (document.getElementById('chatNumCompra').value||'').trim();
-    const statusEl = document.getElementById('chatBuscarStatus');
-    const ano  = (document.getElementById('chatAno')?.value||String(new Date().getFullYear())).trim();
-    if (!uasg||!num||!ano) { statusEl.textContent='⚠️ Preencha UASG, número e ano.'; return; }
-    const codigo = buildCodigoCompra(uasg, mod, num, ano);
-    statusEl.innerHTML = '⏳ Adicionando certame...';
+    const setStatus = (html) => {
+      const el = document.getElementById('chatBuscarStatus');
+      if (el) el.innerHTML = html;
+    };
     try {
+      const uasg = (document.getElementById('chatUasg')?.value||'').trim();
+      const mod  = document.getElementById('chatModalidade')?.value||'06';
+      const num  = (document.getElementById('chatNumCompra')?.value||'').trim();
+      const ano  = (document.getElementById('chatAno')?.value||String(new Date().getFullYear())).trim();
+      if (!uasg||!num||!ano) { setStatus('⚠️ Preencha UASG, número e ano.'); return; }
+      const codigo = buildCodigoCompra(uasg, mod, num, ano);
+      setStatus('⏳ Adicionando certame...');
       const r = await fetch('/api/chat', {
         method: 'POST', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ uasg, modalidade: mod, numCompra: num, ano, codigo })
       });
       const data = await r.json();
       if (data.ja_existe) {
-        statusEl.innerHTML = '⚠️ Este certame já está sendo monitorado.';
+        setStatus('⚠️ Este certame já está sendo monitorado.');
       } else if (data.ok) {
-        statusEl.innerHTML = `✅ Adicionado! Código: <strong style="font-family:monospace;color:var(--accent)">${codigo}</strong>`;
+        setStatus(`✅ Adicionado! Código: <strong style="font-family:monospace;color:var(--accent)">${codigo}</strong>`);
         document.getElementById('chatUasg').value='';
         document.getElementById('chatNumCompra').value='';
-        document.getElementById('chatCodigoPreview').style.display='none';
+        const prev = document.getElementById('chatCodigoPreview');
+        if (prev) prev.style.display='none';
         setTimeout(()=>mudarChatAba('monitorados'), 1500);
+      } else {
+        setStatus('❌ Erro: ' + JSON.stringify(data));
       }
-    } catch { statusEl.textContent='❌ Erro ao adicionar.'; }
+    } catch(e) {
+      console.error('adicionarChatMonitor erro:', e);
+      const el = document.getElementById('chatBuscarStatus');
+      if (el) el.textContent = '❌ Erro: ' + e.message;
+    }
   }
 
   async function removerChatMonitor(id) {
