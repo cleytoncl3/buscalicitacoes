@@ -286,7 +286,7 @@
     [data-tema="escuro"] .fase-classificacao{background:#1e1040;color:#c4b5fd}
     [data-tema="escuro"] .fase-contrato{background:#0a2e1a;color:#6ee7b7}
     .fase-count{font-size:.78rem;color:var(--text3)}
-    .neg-card{background:var(--surface);border-radius:8px;padding:14px 16px;box-shadow:var(--card-shadow);border:1px solid var(--border);margin-bottom:8px;cursor:pointer;transition:box-shadow .15s,border-color .15s}
+    .neg-card{background:var(--surface);border-radius:8px;padding:14px 16px;box-shadow:var(--card-shadow);border:2px solid rgba(255,255,255,0.12);margin-bottom:10px;cursor:pointer;transition:box-shadow .15s,border-color .15s}
     .neg-card:hover{box-shadow:var(--card-shadow-hover);border-color:var(--accent)}
     .neg-card-titulo{font-size:.9rem;font-weight:600;color:var(--text);margin-bottom:4px}
     .neg-card-info{font-size:.78rem;color:var(--text2);display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
@@ -1563,16 +1563,24 @@
     try{
       const r=await fetch('/api/negocios');
       if(r.ok){
-        const d=await r.json();
-        if(Array.isArray(d) && d.length>0){
-          // API tem dados reais — sincroniza com localStorage
-          localStorage.setItem(NEG_KEY,JSON.stringify(d));
-          return d;
-        }
-        // API retornou vazio (Upstash não configurado) — mantém dados locais
+        const apiData=await r.json();
         const local=getNegocios();
-        if(local.length>0) return local;
-        return d; // ambos vazios
+        if(Array.isArray(apiData)){
+          // Merge: combina API + local por numero_controle (sem duplicatas)
+          const map={};
+          [...apiData,...local].forEach(n=>{
+            const k=n.numero_controle||n.id;
+            if(k&&!map[k])map[k]=n;
+          });
+          const merged=Object.values(map);
+          localStorage.setItem(NEG_KEY,JSON.stringify(merged));
+          // Se local tinha itens que a API não tinha, sincroniza de volta
+          if(merged.length>apiData.length){
+            merged.filter(m=>!apiData.find(a=>a.numero_controle===m.numero_controle))
+              .forEach(n=>fetch('/api/negocios',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(n)}).catch(()=>{}));
+          }
+          return merged;
+        }
       }
     }catch{}
     return getNegocios();
