@@ -11,13 +11,15 @@ export default async function handler(req, res) {
 
   try {
     // Busca itens e info do órgão em paralelo
-    // O endpoint de detalhe retorna 301 — usamos a search API como fallback
     const numeroControle = `${cnpj}-1-${String(seq).padStart(6,'0')}/${ano}`;
-    const searchUrl = `https://pncp.gov.br/api/search/?tipos_documento=edital&q=${encodeURIComponent(numeroControle)}&tam_pagina=1`;
+    const searchUrl   = `https://pncp.gov.br/api/search/?tipos_documento=edital&q=${encodeURIComponent(numeroControle)}&tam_pagina=1`;
+    // Endpoint consulta usado pela interface do PNCP
+    const consultaUrl = `https://pncp.gov.br/api/pncp/v1/contratacoes/publicacao?numeroCnpj=${cnpj}&anoCompra=${ano}&sequencialCompra=${seq}`;
 
-    const [itensRes, searchRes] = await Promise.all([
+    const [itensRes, searchRes, consultaRes] = await Promise.all([
       fetch(`${base}/itens?pagina=1&tamanhoPagina=100`, { headers: hdrs }),
       fetch(searchUrl, { headers: hdrs }),
+      fetch(consultaUrl, { headers: hdrs }),
     ]);
 
     // Processa itens
@@ -56,15 +58,25 @@ export default async function handler(req, res) {
             }
           }
 
-          // Tenta número Comprasnet direto do item da search
-          const numCompraSearch = item.numero_compra || item.numero_sequencial_compra || null;
+          // Tenta número Comprasnet via endpoint consulta
+          let numCompraSearch = null, anoCompraConsulta = null;
+          try {
+            if (consultaRes.ok) {
+              const cd = await consultaRes.json();
+              const ci = Array.isArray(cd) ? cd[0] : cd;
+              numCompraSearch  = ci?.numeroCompra || ci?.numero_compra || null;
+              anoCompraConsulta = ci?.anoCompra   || ci?.ano_compra   || null;
+            }
+          } catch {}
+          // Fallback: campo direto do item da search
+          if (!numCompraSearch) numCompraSearch = item.numero_compra || item.numero_sequencial_compra || null;
 
           orgaoInfo = {
             codigoUnidade:    codUnidade || null,
             nomeUnidade:      nomeUnidade || null,
             linkSistemaOrigem: linkOrigem,
             numeroCompra:     numeroComprasnet || numCompraSearch || null,
-            anoCompra:        anoComprasnet || item.ano || null,
+            anoCompra:        anoComprasnet || anoCompraConsulta || item.ano || null,
             uasgLabel: codUnidade && nomeUnidade ? `${codUnidade} - ${nomeUnidade}` : nomeUnidade || null,
           };
         }
