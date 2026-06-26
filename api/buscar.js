@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     return null;
   };
 
-  const buildUrl = (kw, paginaReq, tamPagina = TAM) => {
+  const buildUrl = (kw, paginaReq, tamPagina = TAM, comStatus = false) => {
     const p = new URLSearchParams({
       tipos_documento: 'edital',
       ordenacao:       '-data',
@@ -54,6 +54,9 @@ export default async function handler(req, res) {
     if (ufs.length)     p.append('ufs',         ufs.join('|'));
     if (mods.length)    p.append('modalidades', mods.join('|'));
     if (esferas.length) p.append('esferas',     esferas.join('|'));
+    // status=recebendo_proposta reduz o pool a só licitações ativas,
+    // tornando o over-fetch viável dentro do timeout da Vercel.
+    if (comStatus)      p.append('status',      'recebendo_proposta');
     return `https://pncp.gov.br/api/search/?${p}`;
   };
 
@@ -69,20 +72,19 @@ export default async function handler(req, res) {
     });
   };
 
-  // Com filtro de datas: over-fetch 10 páginas e filtra por data_fim_vigencia
+  // Com filtro de datas: busca com status=recebendo_proposta (pool menor ~270),
+  // over-fetch 3 páginas de 50, filtra por data_fim_vigencia.
   const buscarComFiltroData = async (kw) => {
-    const primeiro = await fetchJSON(buildUrl(kw, 1, 50));
+    const primeiro = await fetchJSON(buildUrl(kw, 1, 50, true));
     if (!primeiro) return { items: [], total: 0 };
 
     const totalPncp = primeiro.total || 0;
-    // Busca mais 2 páginas em paralelo (total 150 itens) — suficiente para
-    // capturar licitações com prazo ativo publicadas nos últimos ~2 meses.
     let allItems = [...(primeiro.items || [])];
 
     if (totalPncp > 50) {
       const extras = await Promise.all([
-        fetchJSON(buildUrl(kw, 2, 50)),
-        fetchJSON(buildUrl(kw, 3, 50)),
+        fetchJSON(buildUrl(kw, 2, 50, true)),
+        fetchJSON(buildUrl(kw, 3, 50, true)),
       ]);
       extras.forEach(d => { if (d?.items) allItems = allItems.concat(d.items); });
     }
