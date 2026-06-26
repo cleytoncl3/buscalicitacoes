@@ -56,15 +56,16 @@ export default async function handler(req, res) {
             }
           }
 
-          // Debug: retorna todos os campos do item da search para inspeção
+          // Tenta número Comprasnet direto do item da search
+          const numCompraSearch = item.numero_compra || item.numero_sequencial_compra || null;
+
           orgaoInfo = {
             codigoUnidade:    codUnidade || null,
             nomeUnidade:      nomeUnidade || null,
             linkSistemaOrigem: linkOrigem,
-            numeroCompra:     numeroComprasnet || null,
-            anoCompra:        anoComprasnet || null,
+            numeroCompra:     numeroComprasnet || numCompraSearch || null,
+            anoCompra:        anoComprasnet || item.ano || null,
             uasgLabel: codUnidade && nomeUnidade ? `${codUnidade} - ${nomeUnidade}` : nomeUnidade || null,
-            _searchFields: Object.keys(item), // debug: lista campos disponíveis
           };
         }
       }
