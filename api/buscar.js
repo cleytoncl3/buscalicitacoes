@@ -72,24 +72,13 @@ export default async function handler(req, res) {
     });
   };
 
-  // Com filtro de datas: busca com status=recebendo_proposta (pool menor ~270),
-  // over-fetch 3 páginas de 50, filtra por data_fim_vigencia.
-  const buscarComFiltroData = async (kw) => {
-    const primeiro = await fetchJSON(buildUrl(kw, 1, 50, true));
-    if (!primeiro) return { items: [], total: 0 };
-
-    const totalPncp = primeiro.total || 0;
-    let allItems = [...(primeiro.items || [])];
-
-    if (totalPncp > 50) {
-      const extras = await Promise.all([
-        fetchJSON(buildUrl(kw, 2, 50, true)),
-        fetchJSON(buildUrl(kw, 3, 50, true)),
-      ]);
-      extras.forEach(d => { if (d?.items) allItems = allItems.concat(d.items); });
-    }
-
-    return { items: filtrarPorData(allItems), total: totalPncp };
+  // Com filtro de datas: uma única requisição com status=recebendo_proposta,
+  // filtra client-side por data_fim_vigencia para o intervalo pedido.
+  const buscarComFiltroData = async (kw, paginaReq) => {
+    const data = await fetchJSON(buildUrl(kw, paginaReq, TAM, true));
+    if (!data) return { items: [], total: 0 };
+    const filtrados = filtrarPorData(data.items || []);
+    return { items: filtrados, total: data.total || 0 };
   };
 
   try {
@@ -125,9 +114,9 @@ export default async function handler(req, res) {
       });
     }
 
-    // COM filtro de datas: over-fetch e filtra por data_fim_vigencia
+    // COM filtro de datas: status=recebendo_proposta + filtro por data_fim_vigencia
     const kwList = keywords.slice(0, 5);
-    const resultados = await Promise.all(kwList.map(kw => buscarComFiltroData(kw)));
+    const resultados = await Promise.all(kwList.map(kw => buscarComFiltroData(kw, pg)));
 
     const seen = new Set();
     let merged = [];
@@ -138,21 +127,12 @@ export default async function handler(req, res) {
       })
     );
 
-    // Ordena por data_fim_vigencia crescente (mais urgente primeiro)
-    merged.sort((a, b) => {
-      const fa = a.data_fim_vigencia ? new Date(a.data_fim_vigencia) : Infinity;
-      const fb = b.data_fim_vigencia ? new Date(b.data_fim_vigencia) : Infinity;
-      return fa - fb;
-    });
-
-    const total = merged.length;
-    const inicio = (pg - 1) * TAM;
-    const pagina_items = merged.slice(inicio, inicio + TAM);
+    const totalEst = resultados[0]?.total || merged.length;
 
     return res.status(200).json({
-      data:           pagina_items,
-      totalRegistros: total,
-      totalPaginas:   Math.ceil(total / TAM) || 1,
+      data:           merged,
+      totalRegistros: totalEst,
+      totalPaginas:   Math.ceil(totalEst / TAM) || 1,
     });
 
   } catch (err) {
