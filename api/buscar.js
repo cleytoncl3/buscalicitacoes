@@ -49,11 +49,11 @@ export default async function handler(req, res) {
     if (ufs.length)     p.append('ufs',         ufs.join('|'));
     if (mods.length)    p.append('modalidades', mods.join('|'));
     if (esferas.length) p.append('esferas',     esferas.join('|'));
-    // Quando filtro de datas ativo: inclui todas as fases ativas do pregão
-    // (recebendo proposta + aguardando sessão de abertura + em julgamento)
-    // Evita encerradas sem perder itens que já fecharam propostas mas ainda
-    // têm sessão agendada (campo "abertura" do SigaPregão)
-    if (comFiltroData) p.append('status', 'recebendo_proposta|publicado|em_julgamento');
+    // Com filtro de datas: só licitações ainda recebendo propostas.
+    // PNCP não expõe "abertura das propostas" no /api/search/ —
+    // itens aguardando sessão já aparecem como encerrados no índice.
+    // Os 8 resultados são 100% acionáveis (prazo de envio ainda aberto).
+    if (comFiltroData) p.append('status', 'recebendo_proposta');
     return `https://pncp.gov.br/api/search/?${p}`;
   };
 
