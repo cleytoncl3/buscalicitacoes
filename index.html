@@ -75,7 +75,7 @@
     .busca-titulo{font-size:1.35rem;font-weight:800;color:var(--text);margin-bottom:2px}
     .busca-subtitulo{font-size:.82rem;color:var(--text3);margin-bottom:14px}
 
-    .filtros{background:var(--surface);border-radius:12px;padding:20px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:0;border:1px solid var(--border)}
+    .filtros{background:var(--surface);border-radius:12px;padding:20px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:0;border:1px solid var(--border);overflow:visible}
 
     /* Linha de busca principal */
     .filtros-linha-busca{display:flex;gap:10px;align-items:stretch;margin-bottom:14px}
@@ -92,10 +92,12 @@
     .periodo-panel{position:absolute;top:calc(100% + 6px);left:0;right:0;min-width:320px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.35);z-index:400;padding:16px;display:none;flex-direction:column;gap:12px}
     .periodo-panel.aberto{display:flex}
     .periodo-panel-titulo{font-size:.75rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
-    .periodo-inputs{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-    .periodo-inputs input[type=date]{padding:8px 10px;font-size:.85rem;border:1px solid var(--border);border-radius:7px;background:var(--surface2);color:var(--text);flex:1;min-width:120px}
+    .periodo-inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .periodo-campo{display:flex;flex-direction:column;gap:4px}
+    .periodo-campo-label{font-size:.72rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
+    .periodo-inputs input[type=date]{padding:8px 10px;font-size:.85rem;border:1px solid var(--border);border-radius:7px;background:var(--surface2);color:var(--text);width:100%;box-sizing:border-box}
     .periodo-inputs input[type=date]:focus{outline:none;border-color:var(--primary)}
-    .periodo-sep{font-size:.8rem;color:var(--text3)}
+    .periodo-sep{display:none}
     .periodo-atalhos{display:flex;gap:8px;flex-wrap:wrap}
     .periodo-atalho{font-size:.78rem;color:var(--text);cursor:pointer;background:var(--surface2);border:1px solid var(--border);padding:6px 12px;border-radius:7px;white-space:nowrap;font-weight:500}
     .periodo-atalho:hover{border-color:var(--primary);color:var(--primary)}
@@ -142,7 +144,7 @@
     .filtros-ativos-limpar:hover{text-decoration:underline}
     .btn-limpar{display:none} /* escondemos o antigo botão limpar */
 
-    .kw-hint{font-size:.75rem;color:var(--text3);padding-top:2px}
+    .kw-hint{font-size:.75rem;color:var(--text3);padding-bottom:10px}
 
     /* MODAL UF */
     .modal-uf-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:600;display:none;align-items:center;justify-content:center}
@@ -883,7 +885,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v1.6</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v1.7</span>
   </div>
 </header>
 
@@ -920,6 +922,9 @@
     </div>
     <div class="filtros">
 
+      <!-- Dica de busca -->
+      <div class="kw-hint">💡 Separe com <strong>;</strong> para múltiplos termos · Use <strong>"aspas"</strong> para busca exata · Ex: papel kraft; "bobina kraft"</div>
+
       <!-- Linha 1: Campo de busca + botões -->
       <div class="filtros-linha-busca">
         <div class="kw-wrapper">
@@ -929,7 +934,6 @@
         </div>
         <button class="btn-buscar" id="btnBuscar" onclick="buscar(1)">🔍 Buscar licitações</button>
       </div>
-      <div class="kw-hint">💡 Separe com <strong>;</strong> para múltiplos termos · Use <strong>"aspas"</strong> para busca exata · Ex: papel kraft; "bobina kraft"</div>
 
       <!-- Linha 2: Filtros rápidos com label -->
       <div class="filtros-linha-selects">
@@ -962,11 +966,15 @@
               <span style="color:var(--text3);font-size:.72rem;flex-shrink:0">▼</span>
             </button>
             <div class="periodo-panel" id="periodoPanel">
-              <div class="periodo-panel-titulo">Encerramento de propostas</div>
               <div class="periodo-inputs">
-                <input type="date" id="dataInicial" placeholder="De" onchange="atualizarPeriodoTrigger()"/>
-                <span class="periodo-sep">até</span>
-                <input type="date" id="dataFinal" placeholder="Até" onchange="atualizarPeriodoTrigger()"/>
+                <div class="periodo-campo">
+                  <div class="periodo-campo-label">Início</div>
+                  <input type="date" id="dataInicial" onchange="atualizarPeriodoTrigger()"/>
+                </div>
+                <div class="periodo-campo">
+                  <div class="periodo-campo-label">Encerramento de proposta</div>
+                  <input type="date" id="dataFinal" onchange="atualizarPeriodoTrigger()"/>
+                </div>
               </div>
               <div class="periodo-atalhos">
                 <span class="periodo-atalho" onclick="setDateRange('year')">📆 Até o fim do ano</span>
