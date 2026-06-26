@@ -49,9 +49,8 @@ export default async function handler(req, res) {
     if (ufs.length)     p.append('ufs',         ufs.join('|'));
     if (mods.length)    p.append('modalidades', mods.join('|'));
     if (esferas.length) p.append('esferas',     esferas.join('|'));
-    // Passa datas para o PNCP filtrar server-side (tipoPeriodo abertura)
-    if (dataInicial)    p.append('dataInicial', dataInicial);
-    if (dataFinal)      p.append('dataFinal',   dataFinal);
+    // Quando filtro de datas ativo: só licitações abertas (evita encerradas)
+    if (comFiltroData)  p.append('status', 'recebendo_proposta');
     return `https://pncp.gov.br/api/search/?${p}`;
   };
 
