@@ -36,6 +36,8 @@ export default async function handler(req, res) {
           nomeUnidade:   nomeUnidade || null,
           cnpj:          d.orgaoEntidade?.cnpj || cnpj,
           linkSistemaOrigem: linkOrigem,
+          numeroCompra:  d.numeroCompra || null,
+          anoCompra:     d.anoCompra || null,
           // Label formatado: "153167 - COLEGIO PEDRO II/REITORIA"
           uasgLabel: codUnidade && nomeUnidade ? `${codUnidade} - ${nomeUnidade}` : nomeUnidade || null,
         };

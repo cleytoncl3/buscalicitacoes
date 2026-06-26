@@ -886,7 +886,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.6</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.7</span>
   </div>
 </header>
 
@@ -2550,10 +2550,16 @@
       renderItens(todosItens);
       // Popula UASG no drawer quando disponível
       if(data.orgaoInfo){
-        const {uasgLabel,codigoUnidade,linkSistemaOrigem}=data.orgaoInfo;
-        // Atualiza UASG no cabeçalho do drawer
+        const {uasgLabel,codigoUnidade,linkSistemaOrigem,numeroCompra,anoCompra}=data.orgaoInfo;
+        // Atualiza número real (Comprasnet) + UASG no cabeçalho
+        if(numeroCompra&&itemAtualDrawer){
+          const mod=fmtModalidade(itemAtualDrawer.modalidade_licitacao_nome)||'';
+          const numReal=`${parseInt(numeroCompra)}/${anoCompra||itemAtualDrawer.ano||''}`;
+          const elNum=document.getElementById('d-num-header');
+          if(elNum) elNum.textContent=(mod?mod+' ':'')+'Nº '+numReal+(itemAtualDrawer.uf?' — '+itemAtualDrawer.uf:'');
+        }
         const elUasgH=document.getElementById('d-uasg-header');
-        if(elUasgH&&codigoUnidade) elUasgH.textContent='UASG '+codigoUnidade;
+        if(elUasgH&&codigoUnidade) elUasgH.textContent='UASG '+codigoUnidade+(uasgLabel?' — '+uasgLabel.split(' - ').slice(1).join(' - '):'');
         // Atualiza campo unidade no drawer com UASG label
         const elU=document.getElementById('d-unidade');
         if(elU&&uasgLabel) elU.textContent=uasgLabel;
