@@ -76,16 +76,15 @@ export default async function handler(req, res) {
     if (!primeiro) return { items: [], total: 0 };
 
     const totalPncp = primeiro.total || 0;
-    const paginasNecessarias = Math.min(Math.ceil(totalPncp / 50), 10);
-
+    // Busca mais 2 páginas em paralelo (total 150 itens) — suficiente para
+    // capturar licitações com prazo ativo publicadas nos últimos ~2 meses.
     let allItems = [...(primeiro.items || [])];
 
-    if (paginasNecessarias > 1) {
-      const extras = await Promise.all(
-        Array.from({ length: paginasNecessarias - 1 }, (_, i) =>
-          fetchJSON(buildUrl(kw, i + 2, 50))
-        )
-      );
+    if (totalPncp > 50) {
+      const extras = await Promise.all([
+        fetchJSON(buildUrl(kw, 2, 50)),
+        fetchJSON(buildUrl(kw, 3, 50)),
+      ]);
       extras.forEach(d => { if (d?.items) allItems = allItems.concat(d.items); });
     }
 
