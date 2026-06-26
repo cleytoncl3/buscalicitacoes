@@ -264,11 +264,11 @@
     .drawer.ativo{right:0}
 
     /* Cabeçalho */
-    .drawer-header{background:var(--primary);padding:16px 20px 14px;position:sticky;top:0;z-index:2;flex-shrink:0}
+    .drawer-header{background:var(--primary);padding:16px 20px 14px;position:sticky;top:0;z-index:2;flex-shrink:0;text-align:center}
     .drawer-fechar{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
     .drawer-fechar:hover{background:rgba(255,255,255,.3)}
     .d-fonte-badge{display:inline-block;background:rgba(255,255,255,.15);color:var(--accent);font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:6px;letter-spacing:.5px}
-    .d-num-header{font-size:.95rem;font-weight:700;color:#fff;padding-right:36px;line-height:1.3}
+    .d-num-header{font-size:.95rem;font-weight:700;color:#fff;line-height:1.3}
 
     /* Corpo */
     .drawer-body{padding:18px 20px;overflow-y:auto;flex:1}
@@ -885,7 +885,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.3</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.4</span>
   </div>
 </header>
 
@@ -1348,6 +1348,8 @@
     <div class="d-abertura-box">
       <div class="d-abertura-label">📅 Início de recebimento de propostas</div>
       <div class="d-abertura-data" id="d-abertura">—</div>
+      <div class="d-abertura-label" style="margin-top:10px">🌐 Portal de compras</div>
+      <div class="d-abertura-data" id="d-portal-compras" style="font-size:.95rem">—</div>
     </div>
 
     <div class="d-info-row">
@@ -2467,6 +2469,7 @@
     // Header — mostra portal aproximado, depois busca o exato
     const portalAprox = fmtPortalEsfera(item.esfera_id, item.uf);
     document.getElementById('d-fonte-badge').textContent='🌐 '+portalAprox;
+    document.getElementById('d-portal-compras').textContent=portalAprox;
     // Busca portal exato em background
     const pPortal = parseControle(item.numero_controle_pncp);
     if(pPortal){
@@ -2476,6 +2479,8 @@
           if(pd?.nomePortal){
             const el=document.getElementById('d-fonte-badge');
             if(el) el.textContent='🌐 '+pd.nomePortal;
+            const elP=document.getElementById('d-portal-compras');
+            if(elP) elP.textContent=pd.nomePortal;
             if(pd.linkSistemaOrigem){
               const btnA=document.getElementById('d-btn-acessar');
               if(btnA) btnA.onclick=()=>window.open(pd.linkSistemaOrigem,'_blank');
