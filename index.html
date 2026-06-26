@@ -8,7 +8,7 @@
     :root{
       --bg:#f4f6f8;--surface:#fff;--surface2:#f8f9fa;--border:#e0e0e0;
       --text:#222;--text2:#555;--text3:#888;--text4:#999;
-      --primary:#1a3d2b;--primary-hover:#245239;--accent:#d4a825;
+      --primary:#1a3d2b;--primary-hover:#245239;--accent:#d4a825;--btn-text:#fff;
       --chip-bg:#eef5f1;--chip-border:#c5ddd0;
       --card-shadow:0 2px 6px rgba(0,0,0,.06);--card-shadow-hover:0 4px 14px rgba(0,0,0,.12);
       --drawer-bg:#fff;
@@ -18,7 +18,7 @@
       --erro-bg:#fff3f3;--erro-border:#f5c6c6;--erro-txt:#c0392b;
     }
     [data-tema="escuro"]{
-      --bg:#0d1117;--surface:#161b27;--surface2:#1e2538;--border:#2a3050;
+      --bg:#0d1117;--surface:#161b27;--surface2:#1e2538;--border:#2a3050;--btn-text:#fff;
       --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--text4:#475569;
       --chip-bg:#1e2d24;--chip-border:#2d4a38;
       --card-shadow:0 2px 6px rgba(0,0,0,.3);--card-shadow-hover:0 4px 14px rgba(0,0,0,.5);
@@ -84,13 +84,27 @@
     #palavraChave{width:100%;padding:11px 14px 11px 40px;border:1px solid var(--border);border-radius:9px;font-size:.95rem;background:var(--surface2);color:var(--text);box-sizing:border-box}
     #palavraChave:focus{outline:none;border-color:var(--primary)}
     #palavraChave::placeholder{color:var(--text3)}
-    .btn-buscar{background:var(--primary);color:var(--accent);border:none;padding:11px 24px;border-radius:9px;font-size:.92rem;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:7px}
+    .btn-buscar{background:var(--primary);color:var(--btn-text);border:none;padding:11px 24px;border-radius:9px;font-size:.92rem;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:7px}
     .btn-buscar:hover{background:var(--primary-hover)}
     .btn-buscar:disabled{background:var(--text3);cursor:wait}
-    .btn-busca-avancada{background:transparent;color:var(--text2);border:1px solid var(--border);padding:11px 16px;border-radius:9px;font-size:.88rem;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px}
-    .btn-busca-avancada:hover{background:var(--surface2);color:var(--text)}
-    .btn-busca-avancada.ativo{background:var(--chip-bg);border-color:var(--primary);color:var(--primary)}
-    [data-tema="escuro"] .btn-busca-avancada.ativo{color:var(--accent);border-color:var(--accent)}
+    /* Período dropdown */
+    .periodo-wrapper{position:relative}
+    .periodo-panel{position:absolute;top:calc(100% + 6px);left:0;right:0;min-width:320px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.35);z-index:400;padding:16px;display:none;flex-direction:column;gap:12px}
+    .periodo-panel.aberto{display:flex}
+    .periodo-panel-titulo{font-size:.75rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
+    .periodo-inputs{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .periodo-inputs input[type=date]{padding:8px 10px;font-size:.85rem;border:1px solid var(--border);border-radius:7px;background:var(--surface2);color:var(--text);flex:1;min-width:120px}
+    .periodo-inputs input[type=date]:focus{outline:none;border-color:var(--primary)}
+    .periodo-sep{font-size:.8rem;color:var(--text3)}
+    .periodo-atalhos{display:flex;gap:8px;flex-wrap:wrap}
+    .periodo-atalho{font-size:.78rem;color:var(--text);cursor:pointer;background:var(--surface2);border:1px solid var(--border);padding:6px 12px;border-radius:7px;white-space:nowrap;font-weight:500}
+    .periodo-atalho:hover{border-color:var(--primary);color:var(--primary)}
+    [data-tema="escuro"] .periodo-atalho:hover{color:var(--accent);border-color:var(--accent)}
+    .periodo-footer{display:flex;justify-content:space-between;align-items:center;padding-top:4px;border-top:1px solid var(--border)}
+    .periodo-limpar{font-size:.78rem;color:var(--text3);cursor:pointer;background:none;border:none;padding:0}
+    .periodo-limpar:hover{color:var(--text)}
+    .periodo-confirmar{background:var(--primary);color:var(--btn-text);border:none;padding:7px 18px;border-radius:7px;font-size:.82rem;font-weight:700;cursor:pointer}
+    .periodo-confirmar:hover{background:var(--primary-hover)}
 
     /* Linha de filtros rápidos */
     .filtros-linha-selects{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:0}
@@ -135,7 +149,7 @@
     .modal-uf-overlay.aberto{display:flex}
     .modal-uf{background:var(--surface);border-radius:16px;width:580px;max-width:95vw;max-height:90vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);display:flex;flex-direction:column}
     .modal-uf-header{background:var(--primary);padding:18px 20px;display:flex;justify-content:space-between;align-items:center}
-    .modal-uf-header h3{color:var(--accent);font-size:1rem;font-weight:700}
+    .modal-uf-header h3{color:var(--btn-text);font-size:1rem;font-weight:700}
     .modal-uf-fechar{background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center}
     .modal-uf-fechar:hover{background:rgba(255,255,255,.3)}
     .modal-uf-body{padding:20px;overflow-y:auto;flex:1}
@@ -148,30 +162,34 @@
     .uf-pills{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px}
     .uf-pill{padding:5px 14px;border-radius:20px;font-size:.82rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);transition:all .15s}
     .uf-pill:hover{border-color:var(--primary);color:var(--primary)}
-    .uf-pill.selecionado{background:var(--primary);color:var(--accent);border-color:var(--primary)}
+    .uf-pill.selecionado{background:var(--primary);color:var(--btn-text);border-color:var(--primary)}
     [data-tema="escuro"] .uf-pill:hover{color:var(--accent);border-color:var(--accent)}
     .modal-uf-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px}
     .modal-uf-footer-left{display:flex;gap:8px;flex-wrap:wrap}
     .uf-footer-btn{padding:7px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:.82rem;cursor:pointer}
     .uf-footer-btn:hover{background:var(--chip-bg);color:var(--primary)}
-    .btn-confirmar-modal{background:var(--primary);color:var(--accent);border:none;padding:9px 22px;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer}
+    .btn-confirmar-modal{background:var(--primary);color:var(--btn-text);border:none;padding:9px 22px;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer}
     .btn-confirmar-modal:hover{background:var(--primary-hover)}
 
     /* MODAL MODALIDADE */
     .mod-pills{display:flex;flex-wrap:wrap;gap:8px;padding:20px}
     .mod-pill{padding:8px 16px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);transition:all .15s}
     .mod-pill:hover{border-color:var(--primary);color:var(--primary)}
-    .mod-pill.selecionado{background:var(--primary);color:var(--accent);border-color:var(--primary)}
+    .mod-pill.selecionado{background:var(--primary);color:var(--btn-text);border-color:var(--primary)}
     [data-tema="escuro"] .mod-pill:hover{color:var(--accent);border-color:var(--accent)}
 
     /* HISTÓRICO */
     .historico-box{background:var(--surface);border-radius:10px;padding:12px 16px;box-shadow:var(--card-shadow);margin-bottom:16px;display:none;border:1px solid var(--border)}
-    .historico-label{font-size:.78rem;color:var(--text4);margin-bottom:8px;display:flex;justify-content:space-between}
-    .historico-label button{background:none;border:none;color:#ef4444;font-size:.78rem;cursor:pointer}
-    .historico-chips{display:flex;flex-wrap:wrap;gap:8px}
-    .chip{background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:20px;padding:4px 12px;font-size:.82rem;cursor:pointer;display:flex;align-items:center;gap:6px}
-    [data-tema="escuro"] .chip{color:var(--accent)}
-    .chip-x{color:var(--text3);font-size:.75rem;cursor:pointer}
+    .historico-box{background:var(--surface);border-radius:10px;padding:10px 14px;box-shadow:var(--card-shadow);margin-bottom:12px;display:none;border:1px solid var(--border)}
+    .historico-label{font-size:.72rem;color:var(--text3);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+    .historico-label button{background:none;border:none;color:var(--text3);font-size:.72rem;cursor:pointer}
+    .historico-label button:hover{color:#ef4444}
+    .historico-chips{display:flex;flex-wrap:wrap;gap:6px}
+    .chip{background:var(--surface2);color:#fff;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.78rem;cursor:pointer;display:flex;align-items:center;gap:5px;font-weight:500}
+    [data-tema="claro"] .chip{color:var(--text)}
+    .chip:hover{border-color:var(--primary);background:var(--chip-bg)}
+    .chip-x{color:var(--text3);font-size:.75rem;cursor:pointer;margin-left:2px}
+    .chip-x:hover{color:#ef4444}
 
     /* CARDS */
     .resumo{font-size:.9rem;color:var(--text2);margin-bottom:14px}
@@ -199,7 +217,7 @@
     /* JORNAIS */
     .jornais-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
     .jornais-header h2{font-size:1.1rem;font-weight:700}
-    .btn-novo-jornal{background:var(--primary);color:var(--accent);border:none;padding:10px 18px;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer}
+    .btn-novo-jornal{background:var(--primary);color:var(--btn-text);border:none;padding:10px 18px;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer}
     .btn-novo-jornal:hover{background:var(--primary-hover)}
     .jornais-lista{display:flex;flex-direction:column;gap:12px}
     .jornal-card{background:var(--surface);border-radius:10px;padding:18px 20px;box-shadow:var(--card-shadow);border:1px solid var(--border);border-left:5px solid var(--accent)}
@@ -213,7 +231,7 @@
     .jornal-btn{font-size:.8rem;padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer}
     .jornal-btn:hover{background:var(--chip-bg);color:var(--primary)}
     .jornal-btn-danger{color:#ef4444;border-color:#fca5a5}
-    .jornal-btn-primary{background:var(--primary);color:var(--accent);border-color:var(--primary)}
+    .jornal-btn-primary{background:var(--primary);color:var(--btn-text);border-color:var(--primary)}
     .jornal-resultado{font-size:.82rem;font-weight:600;color:var(--badge-verde-txt);background:var(--badge-verde-bg);border-radius:20px;padding:3px 10px}
 
     /* MODAL JORNAL */
@@ -231,11 +249,11 @@
     .kw-chip span:hover{color:#ef4444}
     .modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
     .modal-btn{padding:10px 20px;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text)}
-    .modal-btn-primary{background:var(--primary);color:var(--accent);border-color:var(--primary)}
+    .modal-btn-primary{background:var(--primary);color:var(--btn-text);border-color:var(--primary)}
     .modal-btn-primary:hover{background:var(--primary-hover)}
     .kw-input-row{display:flex;gap:8px}
     .kw-input-row input{flex:1}
-    .btn-add-kw{background:var(--primary);color:var(--accent);border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:.85rem;white-space:nowrap}
+    .btn-add-kw{background:var(--primary);color:var(--btn-text);border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:.85rem;white-space:nowrap}
 
     /* ═══ DRAWER REDESIGN ═══ */
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:199;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -278,14 +296,14 @@
     /* Situação + modalidade */
     .d-situacao-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
     .d-sit-badge{font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:20px;background:var(--badge-verde-bg);color:var(--badge-verde-txt)}
-    .d-mod-badge{font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:20px;background:var(--primary);color:var(--accent)}
+    .d-mod-badge{font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:20px;background:var(--primary);color:var(--btn-text)}
     [data-tema="claro"] .d-mod-badge{background:var(--chip-bg);color:var(--primary)}
 
     /* Botões */
     .d-acoes{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
     .d-btn-acessar{background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:11px 16px;border-radius:8px;font-size:.92rem;cursor:pointer;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;transition:background .15s}
     .d-btn-acessar:hover{background:var(--border)}
-    .d-btn-negocio{background:var(--primary);color:var(--accent);border:none;padding:12px 16px;border-radius:8px;font-size:.95rem;font-weight:700;cursor:pointer;text-align:center;transition:background .15s}
+    .d-btn-negocio{background:var(--primary);color:var(--btn-text);border:none;padding:12px 16px;border-radius:8px;font-size:.95rem;font-weight:700;cursor:pointer;text-align:center;transition:background .15s}
     .d-btn-negocio:hover{background:var(--primary-hover)}
     .d-btn-negocio.adicionado{background:#166534;color:#fff}
 
@@ -345,7 +363,7 @@
     .cal-dia.hoje{border-color:var(--primary);background:var(--chip-bg)}
     .cal-dia.outro-mes{opacity:.4}
     .cal-dia-num{font-weight:600;color:var(--text2);margin-bottom:2px}
-    .cal-evento{background:var(--primary);color:var(--accent);border-radius:3px;padding:1px 4px;font-size:.65rem;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cal-evento{background:var(--primary);color:var(--btn-text);border-radius:3px;padding:1px 4px;font-size:.65rem;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .cal-evento.encerramento{background:#7f1d1d;color:#fca5a5}
     [data-tema="escuro"] .cal-evento{background:#245239}
 
@@ -412,7 +430,7 @@
     [data-tema="claro"] .card-exp-badge-portal{background:var(--chip-bg);color:var(--primary)}
     [data-tema="claro"] .card-exp-badge-mod{color:var(--primary)}
     /* Footer badges com accent */
-    .footer-badge{font-size:.72rem;font-weight:600;color:var(--accent);background:var(--primary);padding:2px 8px;border-radius:4px;white-space:nowrap}
+    .footer-badge{font-size:.72rem;font-weight:600;color:var(--btn-text);background:var(--primary);padding:2px 8px;border-radius:4px;white-space:nowrap}
     [data-tema="claro"] .footer-badge{color:var(--primary);background:var(--chip-bg)}
 
     .card-exp-items{padding:10px 12px;background:var(--surface);display:flex;flex-direction:column;gap:4px;border-left:1px solid var(--border);overflow-y:auto;max-height:260px}
@@ -429,9 +447,10 @@
 
     .card-exp-footer{background:var(--surface2);border-top:2px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
     .card-exp-footer span{font-size:.74rem;color:var(--text2)}
+    .card-exp-footer-badges{display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:wrap}
     .footer-info{font-size:.74rem;color:var(--text2)}
     .footer-badge{font-size:.72rem;font-weight:700;color:var(--accent) !important;background:var(--primary);padding:3px 9px;border-radius:4px;white-space:nowrap}
-    .badge-status{font-size:.72rem;font-weight:700;color:var(--accent) !important;background:var(--primary);padding:3px 9px;border-radius:4px}
+    .badge-status{font-size:.72rem;font-weight:700;color:var(--btn-text) !important;background:var(--primary);padding:3px 9px;border-radius:4px}
     [data-tema="claro"] .footer-badge,[data-tema="claro"] .badge-status{color:var(--primary) !important;background:var(--chip-bg)}
 
 
@@ -632,7 +651,6 @@
       /* Linha de busca — tudo em coluna */
       .filtros-linha-busca{flex-direction:column;gap:8px;margin-bottom:10px}
       .btn-buscar{width:100%;padding:12px;font-size:1rem;justify-content:center}
-      .btn-busca-avancada{width:100%;justify-content:center;padding:10px}
 
       /* Filtros rápidos — 2 colunas no mobile */
       .filtros-linha-selects{grid-template-columns:1fr 1fr;gap:8px}
@@ -865,7 +883,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v1.4</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v1.5</span>
   </div>
 </header>
 
@@ -910,13 +928,12 @@
           <div class="ac-dropdown" id="acDropdown"></div>
         </div>
         <button class="btn-buscar" id="btnBuscar" onclick="buscar(1)">🔍 Buscar licitações</button>
-        <button class="btn-busca-avancada" id="btnBuscaAvancada" onclick="toggleMaisFiltros()" type="button">⚙ Busca avançada ▾</button>
       </div>
 
       <!-- Linha 2: Filtros rápidos com label -->
       <div class="filtros-linha-selects">
         <div class="filtro-campo">
-          <span class="filtro-campo-label">Onde?</span>
+          <span class="filtro-campo-label">Selecionar estados</span>
           <button class="select-trigger" id="ufTrigger" onclick="abrirModalUF()" type="button">
             <span class="select-trigger-txt" id="ufTriggerTxt">📍 Todos os estados</span>
             <span style="color:var(--text3);font-size:.72rem;flex-shrink:0">▼</span>
@@ -938,31 +955,38 @@
         </div>
         <div class="filtro-campo">
           <span class="filtro-campo-label">Período de publicação</span>
-          <button class="select-trigger" id="periodoTrigger" onclick="toggleMaisFiltros()" type="button">
-            <span class="select-trigger-txt" id="periodoTriggerTxt">📅 Qualquer período</span>
-            <span style="color:var(--text3);font-size:.72rem;flex-shrink:0">▼</span>
-          </button>
+          <div class="periodo-wrapper">
+            <button class="select-trigger" id="periodoTrigger" onclick="togglePeriodoPanel(event)" type="button">
+              <span class="select-trigger-txt" id="periodoTriggerTxt">📅 Qualquer período</span>
+              <span style="color:var(--text3);font-size:.72rem;flex-shrink:0">▼</span>
+            </button>
+            <div class="periodo-panel" id="periodoPanel">
+              <div class="periodo-panel-titulo">Encerramento de propostas</div>
+              <div class="periodo-inputs">
+                <input type="date" id="dataInicial" placeholder="De" onchange="atualizarPeriodoTrigger()"/>
+                <span class="periodo-sep">até</span>
+                <input type="date" id="dataFinal" placeholder="Até" onchange="atualizarPeriodoTrigger()"/>
+              </div>
+              <div class="periodo-atalhos">
+                <span class="periodo-atalho" onclick="setDateRange('year')">📆 Até o fim do ano</span>
+                <span class="periodo-atalho" onclick="setDateRange('30')">⏱ Próximos 30 dias</span>
+              </div>
+              <div class="periodo-footer">
+                <button class="periodo-limpar" onclick="limparDatas()">✕ Limpar datas</button>
+                <button class="periodo-confirmar" onclick="fecharPeriodoPanel()">Confirmar ✓</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Mais filtros (datas) -->
+      <!-- Mais filtros — chevron simples -->
       <div class="mais-filtros-toggle" id="maisFiltrosToggle" onclick="toggleMaisFiltros()">
         <span>⚙ Mais filtros</span>
         <span class="mais-filtros-toggle-chevron" id="maisFiltrosChevron">▾</span>
       </div>
       <div class="mais-filtros-corpo" id="maisFiltrosCorpo">
-        <div class="data-row">
-          <span class="data-row-label">⏰ Encerramento de propostas:</span>
-          <input type="date" id="dataInicial" onchange="atualizarPeriodoTrigger()"/>
-          <span class="data-row-sep">até</span>
-          <input type="date" id="dataFinal" onchange="atualizarPeriodoTrigger()"/>
-          <div class="data-atalhos">
-            <span class="data-atalho" onclick="setDateRange('year')" title="Propostas que encerram até 31/12 do ano atual">📆 Até o fim do ano</span>
-            <span class="data-atalho" onclick="setDateRange('30')" title="Propostas que encerram nos próximos 30 dias">⏱ Próximos 30 dias</span>
-            <span class="data-atalho" onclick="limparDatas()">✕ Limpar datas</span>
-          </div>
-        </div>
-        <div class="kw-hint" style="margin-top:8px">💡 Separe com <strong>;</strong> para múltiplos termos · Use <strong>"aspas"</strong> para busca exata</div>
+        <div class="kw-hint">💡 Separe com <strong>;</strong> para múltiplos termos · Use <strong>"aspas"</strong> para busca exata · Ex: papel kraft; "bobina kraft"</div>
       </div>
 
       <!-- Chips de filtros ativos -->
@@ -971,7 +995,7 @@
     </div>
 
     <div class="historico-box" id="historicoBox">
-      <div class="historico-label"><span>🕒 Buscas recentes</span><button onclick="limparHistorico()">Limpar tudo</button></div>
+      <div class="historico-label"><span>🕒 Mais buscadas</span><button onclick="limparHistorico()">Limpar</button></div>
       <div class="historico-chips" id="historicoChips"></div>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
@@ -1475,13 +1499,28 @@
     atualizarChipsFiltrosAtivos();
   }
 
+  // ===== PAINEL PERÍODO =====
+  let periodoAberto=false;
+  function togglePeriodoPanel(e){
+    if(e)e.stopPropagation();
+    periodoAberto=!periodoAberto;
+    document.getElementById('periodoPanel').classList.toggle('aberto',periodoAberto);
+  }
+  function fecharPeriodoPanel(){
+    periodoAberto=false;
+    document.getElementById('periodoPanel').classList.remove('aberto');
+    atualizarPeriodoTrigger();
+  }
+  document.addEventListener('click',e=>{
+    if(periodoAberto&&!e.target.closest('.periodo-wrapper'))fecharPeriodoPanel();
+  });
+
   // ===== MAIS FILTROS (toggle) =====
   let maisFiltrosAberto=false;
   function toggleMaisFiltros(){
     maisFiltrosAberto=!maisFiltrosAberto;
     document.getElementById('maisFiltrosCorpo').classList.toggle('aberto',maisFiltrosAberto);
     document.getElementById('maisFiltrosChevron').classList.toggle('aberto',maisFiltrosAberto);
-    document.getElementById('btnBuscaAvancada').classList.toggle('ativo',maisFiltrosAberto);
   }
 
   function atualizarPeriodoTrigger(){
@@ -1872,10 +1911,12 @@
         <div class="card-vert-data"><span>⏰ Fim</span><span>${fmt(item.data_fim_vigencia)}</span></div>
       </div>
       <div class="card-vert-footer">
-        <span class="footer-badge badge-status">${badge.texto}</span>
         <span class="card-vert-local">📍 ${item.municipio_nome||item.uf||'—'} / ${item.uf||''}</span>
-        ${mod ? `<span class="footer-badge">${mod}</span>` : ''}
-        ${item.esfera_nome ? `<span class="footer-badge">${item.esfera_nome}</span>` : ''}
+        <div class="card-exp-footer-badges">
+          <span class="footer-badge badge-status">${badge.texto}</span>
+          ${mod ? `<span class="footer-badge">${mod}</span>` : ''}
+          ${item.esfera_id ? `<span class="footer-badge">${item.esfera_id==='F'?'🌐 Comprasnet':item.esfera_id==='E'?'🌐 Estadual':'🌐 Municipal'}</span>` : ''}
+        </div>
       </div>
     </div>`;
   }
@@ -1915,12 +1956,14 @@
         </div>
       </div>
       <div class="card-exp-footer">
-        <span class="footer-badge badge-status">${badge.texto}</span>
         <span class="footer-info">📍 ${item.municipio_nome || '—'} / ${item.uf || '—'}</span>
         <span class="footer-info">📅 ${fmt(item.data_inicio_vigencia)}</span>
         <span class="footer-info">⏰ ${fmt(item.data_fim_vigencia)}</span>
-        ${mod ? `<span class="footer-badge">${mod}</span>` : ''}
-        ${esferaNome ? `<span class="footer-badge" title="Portal de origem">${item.esfera_id==='F'?'🌐 Compras.gov.br':item.esfera_id==='E'?'🌐 Portal Estadual':'🌐 Portal Municipal'}</span>` : ''}
+        <div class="card-exp-footer-badges">
+          <span class="footer-badge badge-status">${badge.texto}</span>
+          ${mod ? `<span class="footer-badge">${mod}</span>` : ''}
+          ${esferaNome ? `<span class="footer-badge" title="Portal de origem">${item.esfera_id==='F'?'🌐 Comprasnet':item.esfera_id==='E'?'🌐 Estadual':'🌐 Municipal'}</span>` : ''}
+        </div>
       </div>
     </div>`;
   }
@@ -2280,31 +2323,33 @@
   function mudarMes(dir){if(dir===0)mesAtual=new Date();else mesAtual=new Date(mesAtual.getFullYear(),mesAtual.getMonth()+dir,1);renderAgenda()}
 
   // ===== HISTÓRICO =====
-  function getHistorico(){try{return JSON.parse(localStorage.getItem(HIST_KEY)||'[]')}catch{return[]}}
-  function salvarHistorico(kw,ufs,mods){
+  // Buscas recentes — salvas no servidor, compartilhadas entre usuários
+  let _buscasRecentes=[];
+  async function salvarHistorico(kw){
     if(!kw)return;
-    const h=getHistorico().filter(x=>x.kw!==kw);
-    h.unshift({kw,ufs:[...ufs],mods:[...mods]});
-    localStorage.setItem(HIST_KEY,JSON.stringify(h.slice(0,15)));renderHistorico();
+    try{ await fetch('/api/buscas-recentes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kw})}); }catch{}
+    await carregarHistorico();
+  }
+  async function carregarHistorico(){
+    try{
+      const r=await fetch('/api/buscas-recentes');
+      const d=await r.json();
+      _buscasRecentes=d.buscas||[];
+    }catch{_buscasRecentes=[];}
+    renderHistorico();
   }
   function renderHistorico(){
-    const h=getHistorico(),box=document.getElementById('historicoBox');
-    if(!h.length){box.style.display='none';return}
+    const box=document.getElementById('historicoBox');
+    if(!_buscasRecentes.length){box.style.display='none';return;}
     box.style.display='block';
-    document.getElementById('historicoChips').innerHTML=h.map((x,i)=>`
-      <span class="chip" onclick="aplicarHistorico(${i})">${x.kw}${x.ufs&&x.ufs.length?' · '+x.ufs.slice(0,3).join(','):''}
-        <span class="chip-x" onclick="event.stopPropagation();removerHistorico(${i})">✕</span>
-      </span>`).join('');
+    document.getElementById('historicoChips').innerHTML=_buscasRecentes.map(x=>`
+      <span class="chip" onclick="aplicarHistorico('${x.kw.replace(/'/g,"\\'")}')" title="${x.count>1?x.count+' buscas':'1 busca'}">${x.kw}</span>`).join('');
   }
-  function aplicarHistorico(i){
-    const h=getHistorico()[i];if(!h)return;
-    document.getElementById('palavraChave').value=h.kw;
-    selectedUFs=h.ufs||[];atualizarBotaoUF();
-    selectedMods=h.mods||['6','8'];atualizarBotaoMod();
+  function aplicarHistorico(kw){
+    document.getElementById('palavraChave').value=kw;
     buscar(1);
   }
-  function removerHistorico(i){const h=getHistorico();h.splice(i,1);localStorage.setItem(HIST_KEY,JSON.stringify(h));renderHistorico()}
-  function limparHistorico(){localStorage.removeItem(HIST_KEY);renderHistorico()}
+  function limparHistorico(){_buscasRecentes=[];renderHistorico();}
 
   // ===== UTILS =====
   function fmt(iso){if(!iso)return'—';return new Date(iso).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}
@@ -2555,7 +2600,7 @@
       const resp=await fetchComRetry(`/api/buscar?${params}`);
       const data=await resp.json();
       if(data.erro){document.getElementById('resultado').innerHTML=`<div class="erro">Erro: ${data.erro}<br><small>Tente novamente em alguns segundos.</small></div>`;return}
-      salvarHistorico(kw,selectedUFs,selectedMods);
+      salvarHistorico(kw);
       const itens=data.data||[],total=data.totalRegistros||0;
       totalPaginas=data.totalPaginas||1;
       document.getElementById('resumo').innerHTML=`<strong>${total.toLocaleString('pt-BR')}</strong> licitações encontradas · Página ${paginaAtual} de ${totalPaginas}`;
@@ -3267,6 +3312,8 @@
 
   carregarTema();
   atualizarBotaoMod();
+  atualizarBotaoPortal();
+  carregarHistorico();
   renderNotificacoes();
   // Restaura view ao dar F5
   (function(){
