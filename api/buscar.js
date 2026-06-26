@@ -53,17 +53,17 @@ export default async function handler(req, res) {
   };
 
   // Filtro de data aplicado sobre itens já buscados do PNCP.
-  // Filtra pela DATA DE ENCERRAMENTO DE PROPOSTAS (data_fim_vigencia).
-  // Itens sem data de encerramento são excluídos quando filtro ativo.
+  // Filtra pela DATA DE ABERTURA DAS PROPOSTAS (data_inicio_vigencia),
+  // igual ao tipoPeriodo:"abertura" do SigaPregão — campo correto.
   const filtrarData = (items) => {
     if (!comFiltroData) return items;
     const dI = dataInicial ? new Date(dataInicial + 'T00:00:00') : null;
     const dF = dataFinal   ? new Date(dataFinal   + 'T23:59:59') : null;
     return items.filter(i => {
-      const fim = i.data_fim_vigencia ? new Date(i.data_fim_vigencia) : null;
-      if (!fim) return false;
-      if (dI && fim < dI) return false;
-      if (dF && fim > dF) return false;
+      const abertura = i.data_inicio_vigencia ? new Date(i.data_inicio_vigencia) : null;
+      if (!abertura) return false;
+      if (dI && abertura < dI) return false;
+      if (dF && abertura > dF) return false;
       return true;
     });
   };
