@@ -2817,11 +2817,13 @@
     }
 
     lista.innerHTML = mensagens.map(m => {
-      const tipo = m.tipoMensagem||m.tipo||m.descricaoTipoMensagem||'Mensagem';
-      const remetente = m.nomeRemetente||m.remetente||m.nome||'—';
+      // v2: categoria, tipoRemetente, texto, dataHora, identificadorRemetente
+      // v1 deprecated: tipoRemetente, texto, dataHora, loginRemetente
+      const tipo = m.categoria||m.tipoMensagem||m.tipo||m.tipoRemetente||m.descricaoTipoMensagem||'Mensagem';
+      const remetente = m.loginRemetente||m.identificadorRemetente||m.nomeRemetente||m.remetente||m.nome||'—';
       const cnpj = m.cpfCnpjRemetente||m.cnpj||m.cpf||'';
-      const texto = m.descricao||m.mensagem||m.texto||m.conteudo||'';
-      const dt = m.dataHoraEnvio||m.dataEnvio||m.data||m.createdAt||'';
+      const texto = m.texto||m.descricao||m.mensagem||m.conteudo||'';
+      const dt = m.dataHora||m.dataHoraEnvio||m.dataEnvio||m.data||m.createdAt||'';
       const hora = dt ? new Date(dt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '';
       const data = dt ? new Date(dt).toLocaleDateString('pt-BR') : '';
 
