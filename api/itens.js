@@ -31,14 +31,24 @@ export default async function handler(req, res) {
         const codUnidade = d.unidadeOrgao?.codigoUnidade;
         const nomeUnidade = d.unidadeOrgao?.nomeUnidade || d.orgaoEntidade?.razaoSocial;
         const linkOrigem = d.linkSistemaOrigem || null;
+        // Extrai número real do Comprasnet da URL do sistema de origem
+        // Formato: ...?compra=UASG(6)+MOD(2)+NUM(5)+ANO(4) = 17 dígitos
+        let numeroComprasnet = null, anoComprasnet = null;
+        if (linkOrigem) {
+          const m = linkOrigem.match(/compra=(\d{17})/);
+          if (m) {
+            numeroComprasnet = parseInt(m[1].substring(8, 13)).toString();
+            anoComprasnet    = m[1].substring(13);
+          }
+        }
+
         orgaoInfo = {
-          codigoUnidade: codUnidade || null,
-          nomeUnidade:   nomeUnidade || null,
-          cnpj:          d.orgaoEntidade?.cnpj || cnpj,
+          codigoUnidade:     codUnidade || null,
+          nomeUnidade:       nomeUnidade || null,
+          cnpj:              d.orgaoEntidade?.cnpj || cnpj,
           linkSistemaOrigem: linkOrigem,
-          numeroCompra:  d.numeroCompra || null,
-          anoCompra:     d.anoCompra || null,
-          // Label formatado: "153167 - COLEGIO PEDRO II/REITORIA"
+          numeroCompra:      numeroComprasnet || d.numeroCompra || null,
+          anoCompra:         anoComprasnet || d.anoCompra || null,
           uasgLabel: codUnidade && nomeUnidade ? `${codUnidade} - ${nomeUnidade}` : nomeUnidade || null,
         };
       } catch {}
