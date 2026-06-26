@@ -31,14 +31,16 @@ export default async function handler(req, res) {
         const codUnidade = d.unidadeOrgao?.codigoUnidade;
         const nomeUnidade = d.unidadeOrgao?.nomeUnidade || d.orgaoEntidade?.razaoSocial;
         const linkOrigem = d.linkSistemaOrigem || null;
-        // Extrai número real do Comprasnet da URL do sistema de origem
-        // Formato: ...?compra=UASG(6)+MOD(2)+NUM(5)+ANO(4) = 17 dígitos
+        // Tenta extrair número Comprasnet da URL do sistema de origem
+        // Formato conhecido: ...?compra=UASG(6)+MOD(2)+NUM(5)+ANO(4) = 17 dígitos
         let numeroComprasnet = null, anoComprasnet = null;
-        if (linkOrigem) {
-          const m = linkOrigem.match(/compra=(\d{17})/);
-          if (m) {
-            numeroComprasnet = parseInt(m[1].substring(8, 13)).toString();
-            anoComprasnet    = m[1].substring(13);
+        if (linkOrigem && codUnidade) {
+          const m = linkOrigem.match(/compra=(\d+)/);
+          if (m && m[1].length >= 13) {
+            const codigo = m[1];
+            // Remove UASG (6) + MOD (2) = 8 chars → NUM são os próximos 5
+            numeroComprasnet = parseInt(codigo.substring(8, 13)).toString();
+            anoComprasnet    = codigo.substring(13, 17) || null;
           }
         }
 
@@ -47,7 +49,9 @@ export default async function handler(req, res) {
           nomeUnidade:       nomeUnidade || null,
           cnpj:              d.orgaoEntidade?.cnpj || cnpj,
           linkSistemaOrigem: linkOrigem,
-          numeroCompra:      numeroComprasnet || d.numeroCompra || null,
+          linkSistemaOrigemRaw: linkOrigem, // debug
+          numeroCompraPNCP:  d.numeroCompra || null, // número PNCP bruto para debug
+          numeroCompra:      numeroComprasnet || null,
           anoCompra:         anoComprasnet || d.anoCompra || null,
           uasgLabel: codUnidade && nomeUnidade ? `${codUnidade} - ${nomeUnidade}` : nomeUnidade || null,
         };
