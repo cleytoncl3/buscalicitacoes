@@ -32,13 +32,20 @@ export default async function handler(req, res) {
   const agora = new Date();
 
   const fetchJSON = async (url) => {
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 2; i++) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 7000);
       try {
         const r = await fetch(url, {
+          signal: ctrl.signal,
           headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' }
         });
+        clearTimeout(timer);
         return JSON.parse(await r.text());
-      } catch { if (i < 2) await new Promise(r => setTimeout(r, 600)); }
+      } catch {
+        clearTimeout(timer);
+        if (i < 1) await new Promise(r => setTimeout(r, 300));
+      }
     }
     return null;
   };
