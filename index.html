@@ -263,30 +263,30 @@
     .drawer{position:fixed;top:0;right:-640px;width:600px;max-width:96vw;height:100vh;background:var(--drawer-bg);z-index:200;box-shadow:-4px 0 30px rgba(0,0,0,.35);transition:right .3s ease;display:flex;flex-direction:column;border-left:1px solid var(--border)}
     .drawer.ativo{right:0}
 
-    /* Cabeçalho */
-    .drawer-header{background:var(--primary);padding:16px 20px 14px;position:sticky;top:0;z-index:2;flex-shrink:0;text-align:center}
-    .drawer-fechar{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
-    .drawer-fechar:hover{background:rgba(255,255,255,.3)}
-    .d-fonte-badge{display:inline-block;background:rgba(255,255,255,.15);color:var(--accent);font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:6px;letter-spacing:.5px}
-    .d-num-header{font-size:.95rem;font-weight:700;color:#fff;line-height:1.3}
+    /* Cabeçalho — só o botão fechar */
+    .drawer-header{position:relative;height:0;flex-shrink:0}
+    .drawer-fechar{position:absolute;top:12px;right:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);width:30px;height:30px;border-radius:50%;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:3}
+    .drawer-fechar:hover{background:var(--border)}
+    .d-fonte-badge{display:none}
+    .d-num-header{display:none}
 
     /* Corpo */
-    .drawer-body{padding:18px 20px;overflow-y:auto;flex:1}
+    .drawer-body{padding:48px 20px 18px;overflow-y:auto;flex:1;text-align:center}
     .d-orgao-bloco{margin-bottom:14px}
-    .d-orgao-nome{font-size:.98rem;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.3}
+    .d-orgao-nome{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.3}
     .d-unidade-nome{font-size:.82rem;color:var(--text2);margin-bottom:2px}
     .d-local{font-size:.78rem;color:var(--text3)}
     .d-sep{height:1px;background:var(--border);margin:14px 0}
     .d-objeto{font-size:.9rem;color:var(--text);line-height:1.55;margin-bottom:12px;font-weight:500}
 
     /* Tags */
-    .drawer-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+    .drawer-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;justify-content:center}
     .drawer-tag{background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:20px;padding:3px 10px;font-size:.75rem;font-weight:600}
     [data-tema="escuro"] .drawer-tag{color:var(--accent)}
 
     /* Abertura em destaque */
     .d-abertura-box{background:var(--chip-bg);border:1px solid var(--chip-border);border-radius:10px;padding:14px 16px;margin:4px 0 14px;text-align:center}
-    .d-abertura-label{font-size:.75rem;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+    .d-abertura-label{font-size:.75rem;color:#fff;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
     .d-abertura-data{font-size:1.15rem;font-weight:700;color:var(--accent)}
 
     /* Info grid */
@@ -296,7 +296,7 @@
     .d-info-val{font-size:.88rem;font-weight:600;color:var(--text)}
 
     /* Situação + modalidade */
-    .d-situacao-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+    .d-situacao-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;justify-content:center}
     .d-sit-badge{font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:20px;background:var(--badge-verde-bg);color:var(--badge-verde-txt)}
     .d-mod-badge{font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:20px;background:var(--primary);color:var(--btn-text)}
     [data-tema="claro"] .d-mod-badge{background:var(--chip-bg);color:var(--primary)}
@@ -885,7 +885,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.4</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.5</span>
   </div>
 </header>
 
@@ -1333,6 +1333,8 @@
 
   <div class="drawer-body">
 
+    <div id="d-num-header" style="font-size:.8rem;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px"></div>
+
     <div class="d-orgao-bloco">
       <div class="d-orgao-nome" id="d-orgao"></div>
       <div class="d-unidade-nome" id="d-unidade"></div>
@@ -1341,7 +1343,7 @@
 
     <div class="d-sep"></div>
 
-    <div class="d-objeto" id="d-objeto"></div>
+    <div class="d-objeto" id="d-objeto" style="text-align:left"></div>
 
     <div class="drawer-tags" id="d-tags"></div>
 
