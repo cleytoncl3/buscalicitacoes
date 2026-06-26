@@ -29,8 +29,7 @@ export default async function handler(req, res) {
   // Limites de data para filtro client-side por data_fim_vigencia
   const dtIni = dataInicial ? new Date(dataInicial) : null;
   const dtFim = dataFinal   ? new Date(dataFinal + 'T23:59:59') : null;
-  const hoje  = new Date();
-  hoje.setHours(0, 0, 0, 0);
+  const agora = new Date();
 
   const fetchJSON = async (url) => {
     for (let i = 0; i < 3; i++) {
@@ -63,7 +62,7 @@ export default async function handler(req, res) {
     return items.filter(item => {
       const fim = item.data_fim_vigencia ? new Date(item.data_fim_vigencia) : null;
       if (!fim) return false;
-      if (fim < hoje) return false;                 // proposta já encerrada
+      if (fim < agora) return false;                // proposta já encerrada
       if (dtIni && fim < dtIni) return false;
       if (dtFim && fim > dtFim) return false;
       return true;
