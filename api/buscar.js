@@ -4,22 +4,21 @@ export default async function handler(req, res) {
   const {
     palavraChave = '', uf = '', pagina = 1,
     modalidade = '', dataInicial = '', dataFinal = '',
-    status = 'recebendo_proposta', esfera = '',
+    esfera = '',
   } = req.query;
 
   const pg  = parseInt(pagina) || 1;
   const TAM = 20;
 
-  // Cada keyword separada por ";" vira uma busca de frase exata automaticamente:
-  // "bobina papel kraft" ou bobina papel kraft → enviado como "bobina papel kraft" pro PNCP
-  // Palavra única → sem aspas (não precisa)
-  // Já entre aspas → mantém como está
+  // Busca com aspas só quando o usuário colocou aspas explicitamente.
+  // Palavra única ou frase SEM aspas → enviada sem aspas para o PNCP
+  // fazer uma busca de proximidade ampla (inclui variações morfológicas).
+  // Frase JÁ entre aspas → mantém aspas (busca exata pelo usuário).
   const wrapFrase = (kw) => {
     kw = kw.trim();
     if (!kw) return kw;
-    if (kw.startsWith('"') && kw.endsWith('"')) return kw; // já tem aspas
-    if (kw.includes(' ')) return `"${kw}"`; // multi-palavra → adiciona aspas
-    return kw; // palavra única → sem aspas
+    if (kw.startsWith('"') && kw.endsWith('"')) return kw; // usuário pediu exata
+    return kw; // sem aspas → PNCP faz busca ampla (encontra mais resultados)
   };
 
   const keywords = palavraChave
@@ -29,8 +28,9 @@ export default async function handler(req, res) {
   const mods    = modalidade ? modalidade.split(',').map(m => m.trim()).filter(Boolean) : [];
   const esferas = esfera    ? esfera.split(',').map(e => e.trim()).filter(Boolean) : [];
 
-  const statusValidos = ['recebendo_proposta','propostas_encerradas','encerradas','todos'];
-  const statusFinal   = statusValidos.includes(status) ? status : 'recebendo_proposta';
+  // Status: sem filtro de status por padrão → retorna todas (abertas + encerradas).
+  // Equivalente ao SigaPregão que exibe todas as licitações do período.
+  // O filtro de datas client-side já reduz ao período desejado.
 
   const fetchJSON = async (url) => {
     for (let i = 0; i < 3; i++) {
@@ -44,13 +44,10 @@ export default async function handler(req, res) {
     return null;
   };
 
-  // Parâmetros corretos do PNCP:
-  // ✅ modalidades (plural) com pipe  ✅ ufs com pipe  ✅ ordenacao=-data
   const buildUrl = (kw, paginaReq) => {
     const p = new URLSearchParams({
       tipos_documento: 'edital',
       ordenacao:       '-data',
-      status:          statusFinal,
       pagina:          paginaReq,
       tam_pagina:      TAM,
     });
