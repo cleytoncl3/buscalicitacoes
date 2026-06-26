@@ -263,15 +263,16 @@
     .drawer{position:fixed;top:0;right:-640px;width:600px;max-width:96vw;height:100vh;background:var(--drawer-bg);z-index:200;box-shadow:-4px 0 30px rgba(0,0,0,.35);transition:right .3s ease;display:flex;flex-direction:column;border-left:1px solid var(--border)}
     .drawer.ativo{right:0}
 
-    /* Cabeçalho — só o botão fechar */
-    .drawer-header{position:relative;height:0;flex-shrink:0}
-    .drawer-fechar{position:absolute;top:12px;right:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);width:30px;height:30px;border-radius:50%;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:3}
+    /* Cabeçalho fixo */
+    .drawer-header{background:var(--surface2);border-bottom:1px solid var(--border);padding:12px 48px 12px 16px;position:sticky;top:0;z-index:2;flex-shrink:0;text-align:center}
+    .drawer-fechar{position:absolute;top:10px;right:12px;background:transparent;border:1px solid var(--border);color:var(--text);width:30px;height:30px;border-radius:50%;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
     .drawer-fechar:hover{background:var(--border)}
     .d-fonte-badge{display:none}
-    .d-num-header{display:none}
+    .d-num-header{font-size:.95rem;font-weight:700;color:var(--text);line-height:1.4}
+    .d-uasg-header{font-size:.78rem;color:var(--accent);font-weight:700;margin-top:2px}
 
     /* Corpo */
-    .drawer-body{padding:48px 20px 18px;overflow-y:auto;flex:1;text-align:center}
+    .drawer-body{padding:18px 20px;overflow-y:auto;flex:1;text-align:center}
     .d-orgao-bloco{margin-bottom:14px}
     .d-orgao-nome{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.3}
     .d-unidade-nome{font-size:.82rem;color:var(--text2);margin-bottom:2px}
@@ -885,7 +886,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.5</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.6</span>
   </div>
 </header>
 
@@ -1327,13 +1328,12 @@
 
   <div class="drawer-header">
     <button class="drawer-fechar" onclick="fecharDrawer()">✕</button>
-    <div class="d-fonte-badge" id="d-fonte-badge">PNCP</div>
+    <div class="d-fonte-badge" id="d-fonte-badge"></div>
     <div class="d-num-header" id="d-num-header"></div>
+    <div class="d-uasg-header" id="d-uasg-header"></div>
   </div>
 
   <div class="drawer-body">
-
-    <div id="d-num-header" style="font-size:.8rem;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px"></div>
 
     <div class="d-orgao-bloco">
       <div class="d-orgao-nome" id="d-orgao"></div>
@@ -2468,9 +2468,11 @@
     const num=extrairNumEdital(item);
     const esfera=item.esfera_id==='F'?'Comprasnet':item.esfera_id==='E'?'Estadual':item.esfera_id==='M'?'Municipal':'PNCP';
 
-    // Header — mostra portal aproximado, depois busca o exato
+    // Header
     const portalAprox = fmtPortalEsfera(item.esfera_id, item.uf);
-    document.getElementById('d-fonte-badge').textContent='🌐 '+portalAprox;
+    document.getElementById('d-fonte-badge').textContent='';
+    document.getElementById('d-num-header').textContent=(mod?mod+' ':'')+(num?'Nº '+num:'')+(item.uf?' — '+item.uf:'');
+    document.getElementById('d-uasg-header').textContent='';
     document.getElementById('d-portal-compras').textContent=portalAprox;
     // Busca portal exato em background
     const pPortal = parseControle(item.numero_controle_pncp);
@@ -2490,7 +2492,6 @@
           }
         }).catch(()=>{});
     }
-    document.getElementById('d-num-header').textContent=(mod?mod+' ':'')+(num?'Nº '+num:'')+(item.uf?' — '+item.uf:'');
     // Reset UASG — preenchida quando itens carregarem
     if(itemAtualDrawer){itemAtualDrawer._uasg=null;itemAtualDrawer._uasgLabel=null;}
 
@@ -2550,6 +2551,9 @@
       // Popula UASG no drawer quando disponível
       if(data.orgaoInfo){
         const {uasgLabel,codigoUnidade,linkSistemaOrigem}=data.orgaoInfo;
+        // Atualiza UASG no cabeçalho do drawer
+        const elUasgH=document.getElementById('d-uasg-header');
+        if(elUasgH&&codigoUnidade) elUasgH.textContent='UASG '+codigoUnidade;
         // Atualiza campo unidade no drawer com UASG label
         const elU=document.getElementById('d-unidade');
         if(elU&&uasgLabel) elU.textContent=uasgLabel;
