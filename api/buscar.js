@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   const {
     palavraChave = '', uf = '', pagina = 1,
     modalidade = '', dataInicial = '', dataFinal = '',
-    status = 'recebendo_proposta',
+    status = 'recebendo_proposta', esfera = '',
   } = req.query;
 
   const pg  = parseInt(pagina) || 1;
@@ -25,8 +25,9 @@ export default async function handler(req, res) {
   const keywords = palavraChave
     ? palavraChave.split(';').map(k => wrapFrase(k)).filter(Boolean)
     : [''];
-  const ufs  = uf        ? uf.split(',').map(u => u.trim()).filter(Boolean) : [];
-  const mods = modalidade ? modalidade.split(',').map(m => m.trim()).filter(Boolean) : [];
+  const ufs     = uf        ? uf.split(',').map(u => u.trim()).filter(Boolean) : [];
+  const mods    = modalidade ? modalidade.split(',').map(m => m.trim()).filter(Boolean) : [];
+  const esferas = esfera    ? esfera.split(',').map(e => e.trim()).filter(Boolean) : [];
 
   const statusValidos = ['recebendo_proposta','propostas_encerradas','encerradas','todos'];
   const statusFinal   = statusValidos.includes(status) ? status : 'recebendo_proposta';
@@ -53,9 +54,10 @@ export default async function handler(req, res) {
       pagina:          paginaReq,
       tam_pagina:      TAM,
     });
-    if (kw)          p.append('q',           kw);
-    if (ufs.length)  p.append('ufs',         ufs.join('|'));
-    if (mods.length) p.append('modalidades', mods.join('|'));
+    if (kw)             p.append('q',           kw);
+    if (ufs.length)     p.append('ufs',         ufs.join('|'));
+    if (mods.length)    p.append('modalidades', mods.join('|'));
+    if (esferas.length) p.append('esferas',     esferas.join('|'));
     return `https://pncp.gov.br/api/search/?${p}`;
   };
 

@@ -74,7 +74,7 @@
     .filtros{background:var(--surface);border-radius:10px;padding:20px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:12px;margin-bottom:8px;border:1px solid var(--border)}
     .filtros-linha{display:grid;gap:10px}
     .filtros-linha-busca{grid-template-columns:1fr auto auto}
-    .filtros-linha-selects{grid-template-columns:1fr 1fr}
+    .filtros-linha-selects{grid-template-columns:1fr 1fr 1fr}
     .filtros input,.filtros select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.95rem;background:var(--surface2);color:var(--text)}
     .filtros input:focus{outline:none;border-color:var(--primary)}
     .btn-buscar{background:var(--primary);color:var(--accent);border:none;padding:10px 28px;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;white-space:nowrap}
@@ -603,7 +603,7 @@
       .btn-limpar{width:100%;padding:10px}
 
       /* UF e Modalidade — coluna única */
-      .filtros-linha-selects{grid-template-columns:1fr}
+      .filtros-linha-selects{grid-template-columns:1fr 1fr}
       .select-trigger{width:100%;font-size:.88rem;padding:10px 12px}
 
       /* Data — coluna única */
@@ -708,6 +708,26 @@
         <button class="uf-footer-btn" onclick="modLimpar()">Limpar</button>
       </div>
       <button class="btn-confirmar-modal" onclick="confirmarMods()">Confirmar ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PORTAL -->
+<div class="modal-uf-overlay" id="modalPortalOverlay" onclick="fecharModalPortal(event)">
+  <div class="modal-uf">
+    <div class="modal-uf-header">
+      <h3>🌐 Selecionar Portais</h3>
+      <button class="modal-uf-fechar" onclick="fecharModalPortalDireto()">✕</button>
+    </div>
+    <div class="modal-uf-body" style="padding:0">
+      <div class="mod-pills" id="portalPills"></div>
+    </div>
+    <div class="modal-uf-footer">
+      <div class="modal-uf-footer-left">
+        <button class="uf-footer-btn" onclick="portalSelecionarTodos()">Todos</button>
+        <button class="uf-footer-btn" onclick="portalLimpar()">Limpar</button>
+      </div>
+      <button class="btn-confirmar-modal" onclick="confirmarPortais()">Confirmar ✓</button>
     </div>
   </div>
 </div>
@@ -862,6 +882,10 @@
         </button>
         <button class="select-trigger" id="modTrigger" onclick="abrirModalMod()" type="button">
           <span class="select-trigger-txt" id="modTriggerTxt">📋 Pregão Eletrônico, Dispensa</span>
+          <span style="color:var(--text3);font-size:.75rem;flex-shrink:0">▼</span>
+        </button>
+        <button class="select-trigger" id="portalTrigger" onclick="abrirModalPortal()" type="button">
+          <span class="select-trigger-txt" id="portalTriggerTxt">🌐 Comprasnet (Federal)</span>
           <span style="color:var(--text3);font-size:.75rem;flex-shrink:0">▼</span>
         </button>
       </div>
@@ -1272,7 +1296,7 @@
 <script>
   // ===== ESTADO =====
   let paginaAtual=1,totalPaginas=1,itemAtualDrawer=null,mesAtual=new Date(),todosItens=[],kwAtual=[];
-  let selectedUFs=[],selectedMods=['6','8']; // Pregão Eletrônico + Dispensa padrão
+  let selectedUFs=[],selectedMods=['6','8'],selectedEsferas=['F']; // UFs, Modalidades, Portais (F=Comprasnet/Federal)
 
   const REGIOES=[
     {nome:'Norte',ufs:['AC','AM','AP','PA','RO','RR','TO']},
@@ -1292,6 +1316,12 @@
     {id:'3',nome:'Concurso'},
     {id:'1',nome:'Leilão Eletrônico'},
     {id:'13',nome:'Leilão Presencial'},
+  ];
+
+  const PORTAIS=[
+    {id:'F',nome:'Comprasnet (Federal)',desc:'Portal de Compras do Governo Federal'},
+    {id:'E',nome:'Portais Estaduais',desc:'COMPRAS RS, Comprasnet Goiás, BLL, e-LIC, Minas, etc.'},
+    {id:'M',nome:'Portais Municipais',desc:'Licitações de prefeituras e câmaras municipais'},
   ];
 
   const HIST_KEY='arantesBusca_historico';
@@ -1402,6 +1432,35 @@
     }
   }
 
+
+  // ===== MODAL PORTAL =====
+  function renderModalPortal(){
+    document.getElementById('portalPills').innerHTML=PORTAIS.map(p=>`
+      <button class="mod-pill${selectedEsferas.includes(p.id)?' selecionado':''}" onclick="togglePortal('${p.id}')" id="portalpill-${p.id}" title="${p.desc}">
+        ${p.nome}
+      </button>`).join('');
+  }
+  function togglePortal(id){
+    if(selectedEsferas.includes(id))selectedEsferas=selectedEsferas.filter(e=>e!==id);
+    else selectedEsferas.push(id);
+    const p=document.getElementById('portalpill-'+id);
+    if(p)p.classList.toggle('selecionado',selectedEsferas.includes(id));
+  }
+  function portalSelecionarTodos(){selectedEsferas=PORTAIS.map(p=>p.id);renderModalPortal()}
+  function portalLimpar(){selectedEsferas=[];renderModalPortal()}
+  function abrirModalPortal(){renderModalPortal();document.getElementById('modalPortalOverlay').classList.add('aberto')}
+  function fecharModalPortal(e){if(e.target===document.getElementById('modalPortalOverlay'))fecharModalPortalDireto()}
+  function fecharModalPortalDireto(){document.getElementById('modalPortalOverlay').classList.remove('aberto')}
+  function confirmarPortais(){atualizarBotaoPortal();fecharModalPortalDireto()}
+  function atualizarBotaoPortal(){
+    const txt=document.getElementById('portalTriggerTxt');
+    if(!selectedEsferas.length)txt.textContent='🌐 Todos os portais';
+    else{
+      const nomes=selectedEsferas.map(id=>PORTAIS.find(p=>p.id===id)?.nome||id);
+      if(nomes.length===1)txt.textContent='🌐 '+nomes[0];
+      else txt.textContent=`🌐 ${nomes.join(', ')}`;
+    }
+  }
 
   // ===== NAVEGAÇÃO =====
   function toggleDropdown(id){
@@ -2283,10 +2342,12 @@
     const dataFinal=document.getElementById('dataFinal').value;
     const ufParam=selectedUFs.join(',');
     const modParam=selectedMods.join(',');
+    const esferaParam=selectedEsferas.join(',');
     const params=new URLSearchParams({pagina});
     if(kw)params.append('palavraChave',kw);
     if(ufParam)params.append('uf',ufParam);
     if(modParam)params.append('modalidade',modParam);
+    if(esferaParam)params.append('esfera',esferaParam);
     if(dataInicial)params.append('dataInicial',dataInicial);
     if(dataFinal)params.append('dataFinal',dataFinal);
     const btn=document.getElementById('btnBuscar');
@@ -2318,6 +2379,7 @@
     document.getElementById('palavraChave').value='';
     selectedUFs=[];atualizarBotaoUF();
     selectedMods=['6','8'];atualizarBotaoMod();
+    selectedEsferas=['F'];atualizarBotaoPortal();
     limparDatas();
     document.getElementById('resultado').innerHTML='';
     document.getElementById('layoutToggle').style.display='none';
