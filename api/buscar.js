@@ -10,15 +10,11 @@ export default async function handler(req, res) {
   const pg  = parseInt(pagina) || 1;
   const TAM = 20;
 
-  // Busca com aspas só quando o usuário colocou aspas explicitamente.
-  // Palavra única ou frase SEM aspas → enviada sem aspas para o PNCP
-  // fazer uma busca de proximidade ampla (inclui variações morfológicas).
-  // Frase JÁ entre aspas → mantém aspas (busca exata pelo usuário).
   const wrapFrase = (kw) => {
     kw = kw.trim();
     if (!kw) return kw;
-    if (kw.startsWith('"') && kw.endsWith('"')) return kw; // usuário pediu exata
-    return kw; // sem aspas → PNCP faz busca ampla (encontra mais resultados)
+    if (kw.startsWith('"') && kw.endsWith('"')) return kw;
+    return kw;
   };
 
   const keywords = palavraChave
@@ -28,9 +24,7 @@ export default async function handler(req, res) {
   const mods    = modalidade ? modalidade.split(',').map(m => m.trim()).filter(Boolean) : [];
   const esferas = esfera    ? esfera.split(',').map(e => e.trim()).filter(Boolean) : [];
 
-  // Status: sem filtro de status por padrão → retorna todas (abertas + encerradas).
-  // Equivalente ao SigaPregão que exibe todas as licitações do período.
-  // O filtro de datas client-side já reduz ao período desejado.
+  const comFiltroData = !!(dataInicial || dataFinal);
 
   const fetchJSON = async (url) => {
     for (let i = 0; i < 3; i++) {
@@ -44,8 +38,6 @@ export default async function handler(req, res) {
     return null;
   };
 
-  const comFiltroData = !!(dataInicial || dataFinal);
-
   const buildUrl = (kw, paginaReq) => {
     const p = new URLSearchParams({
       tipos_documento: 'edital',
@@ -57,35 +49,60 @@ export default async function handler(req, res) {
     if (ufs.length)     p.append('ufs',         ufs.join('|'));
     if (mods.length)    p.append('modalidades', mods.join('|'));
     if (esferas.length) p.append('esferas',     esferas.join('|'));
-    // Quando o usuário filtra por período, limita ao PNCP só licitações abertas.
-    // Isso resolve dois problemas ao mesmo tempo:
-    // 1) Elimina encerradas que não deveriam aparecer no período selecionado
-    // 2) Reduz o total de ~943 para ~40, corrigindo a paginação quebrada
-    //    (paginação server-side + filtro client-side eram incompatíveis)
-    if (comFiltroData) p.append('status', 'recebendo_proposta');
     return `https://pncp.gov.br/api/search/?${p}`;
   };
 
-  // Filtro de data client-side (segunda passagem, sobre itens já abertos do PNCP)
-  // Filtra pela DATA DE ENCERRAMENTO DE PROPOSTAS (data_fim_vigencia)
-  // Ex: "Próximos 30 dias" = propostas que encerram nos próximos 30 dias
+  // Filtro de data aplicado sobre itens já buscados do PNCP.
+  // Filtra pela DATA DE ENCERRAMENTO DE PROPOSTAS (data_fim_vigencia).
+  // Itens sem data de encerramento são excluídos quando filtro ativo.
   const filtrarData = (items) => {
     if (!comFiltroData) return items;
     const dI = dataInicial ? new Date(dataInicial + 'T00:00:00') : null;
     const dF = dataFinal   ? new Date(dataFinal   + 'T23:59:59') : null;
     return items.filter(i => {
       const fim = i.data_fim_vigencia ? new Date(i.data_fim_vigencia) : null;
-      if (!fim) return false;                 // sem data de encerramento: exclui
-      if (dI && fim < dI) return false;       // encerra antes do período: fora
-      if (dF && fim > dF) return false;       // encerra depois do período: fora
+      if (!fim) return false;
+      if (dI && fim < dI) return false;
+      if (dF && fim > dF) return false;
       return true;
     });
   };
 
   try {
     // ════════════════════════════════════════════════════════════
-    // KEYWORD ÚNICO — paginação nativa do PNCP sempre
-    // Simples, estável e nunca quebra
+    // COM FILTRO DE DATA — over-fetch: busca 5 páginas em paralelo,
+    // filtra por data_fim_vigencia, retorna paginação real dos filtrados.
+    // Isso resolve dois bugs de uma vez:
+    //   1) encerradas não aparecem (data_fim_vigencia fora do intervalo)
+    //   2) paginação correta (total = itens filtrados, não total do PNCP)
+    // ════════════════════════════════════════════════════════════
+    if (comFiltroData && keywords.length === 1) {
+      const OVERFETCH = 5; // 5 páginas × 20 = 100 itens do PNCP
+      const pageNums  = Array.from({ length: OVERFETCH }, (_, i) => i + 1);
+      const results   = await Promise.all(pageNums.map(n => fetchJSON(buildUrl(keywords[0], n))));
+
+      const seen = new Set();
+      const all  = [];
+      for (const d of results) {
+        for (const item of (d?.items || [])) {
+          const k = item.id || item.numero_controle_pncp;
+          if (k && !seen.has(k)) { seen.add(k); all.push(item); }
+        }
+      }
+
+      const filtered   = filtrarData(all);
+      const start      = (pg - 1) * TAM;
+      const pageItems  = filtered.slice(start, start + TAM);
+
+      return res.status(200).json({
+        data:           pageItems,
+        totalRegistros: filtered.length,
+        totalPaginas:   Math.ceil(filtered.length / TAM) || 1,
+      });
+    }
+
+    // ════════════════════════════════════════════════════════════
+    // SEM FILTRO DE DATA, KEYWORD ÚNICO — paginação nativa do PNCP
     // ════════════════════════════════════════════════════════════
     if (keywords.length === 1) {
       const data  = await fetchJSON(buildUrl(keywords[0], pg));
@@ -93,8 +110,8 @@ export default async function handler(req, res) {
       const total = data?.total  || 0;
 
       return res.status(200).json({
-        data:           filtrarData(raw),   // filtro de data na página atual
-        totalRegistros: total,              // total real do PNCP
+        data:           raw,
+        totalRegistros: total,
         totalPaginas:   Math.ceil(total / TAM) || 1,
       });
     }
