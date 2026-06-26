@@ -889,7 +889,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.9</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.10</span>
   </div>
 </header>
 
@@ -1910,6 +1910,7 @@
         ${mod ? `<div class="card-vert-mod">${mod}</div>` : ''}
         ${num ? `<div class="card-vert-titulo">Nº ${num}</div>` : ''}
         <div class="card-vert-orgao">🏛 ${(item.orgao_nome||'—').substring(0,50)}</div>
+        ${item.unidade_codigo ? `<div style="font-size:.72rem;color:var(--accent);font-weight:700;margin-top:2px">UASG ${item.unidade_codigo}</div>` : ''}
       </div>
       <div class="card-vert-desc">${item.description||'—'}</div>
       <div class="card-vert-divider"></div>
@@ -1932,7 +1933,8 @@
     const badge = statusBadge(item);
     const mod = fmtModalidade(item.modalidade_licitacao_nome) || 'Licitação';
     const num = extrairNumEdital(item);
-    const titulo = `${mod.toUpperCase()}${num ? ' Nº ' + num : ''} — ${(item.orgao_nome || '').toUpperCase()}${item.uf ? ' / ' + item.uf : ''}`;
+    const uasg = item.unidade_codigo || '';
+    const titulo = `${mod.toUpperCase()}${num ? ' Nº ' + num : ''}${uasg ? ` — <span style="color:var(--accent);font-weight:700">UASG ${uasg}</span>` : ''} — ${(item.orgao_nome || '').toUpperCase()}${item.uf ? ' / ' + item.uf : ''}`;
     return `<div class="card" onclick='abrirDrawer(${JSON.stringify(item)})'>
       <div class="card-titulo-principal">${titulo}</div>
       <div class="card-desc">${item.description || '—'}</div>
@@ -1949,7 +1951,8 @@
     const badge = statusBadge(item);
     const mod = fmtModalidade(item.modalidade_licitacao_nome) || 'Licitação';
     const num = extrairNumEdital(item);
-    const titulo = `${mod.toUpperCase()}${num ? ' Nº ' + num : ''} — ${(item.orgao_nome || '').toUpperCase()}${item.uf ? ' / ' + item.uf : ''}`;
+    const uasg = item.unidade_codigo || '';
+    const titulo = `${mod.toUpperCase()}${num ? ' Nº ' + num : ''}${uasg ? ` — <span style="color:var(--accent);font-weight:700">UASG ${uasg}</span>` : ''} — ${(item.orgao_nome || '').toUpperCase()}${item.uf ? ' / ' + item.uf : ''}`;
     const cardId = (item.numero_controle_pncp || item.id || Math.random().toString(36).substr(2,9)).replace(/[^a-z0-9]/gi,'_');
     const esferaNome = item.esfera_id === 'F' ? 'Comprasnet' : item.esfera_id === 'E' ? 'Estadual' : item.esfera_id === 'M' ? 'Municipal' : '';
     return `<div class="card-exp" onclick='abrirDrawer(${JSON.stringify(item)})'>
