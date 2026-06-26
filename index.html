@@ -714,16 +714,18 @@
 
 <!-- MODAL PORTAL -->
 <div class="modal-uf-overlay" id="modalPortalOverlay" onclick="fecharModalPortal(event)">
-  <div class="modal-uf">
+  <div class="modal-uf" style="max-width:560px">
     <div class="modal-uf-header">
-      <h3>🌐 Selecionar Portais</h3>
+      <h3>🌐 Selecionar Portais de Compra</h3>
       <button class="modal-uf-fechar" onclick="fecharModalPortalDireto()">✕</button>
     </div>
-    <div class="modal-uf-body" style="padding:0">
-      <div class="mod-pills" id="portalPills"></div>
+    <div class="modal-uf-body">
+      <div class="uf-regioes" id="portalGrupos"></div>
     </div>
     <div class="modal-uf-footer">
       <div class="modal-uf-footer-left">
+        <button class="uf-footer-btn" onclick="portalSelecionarGrupo('Federal')">Federal</button>
+        <button class="uf-footer-btn" onclick="portalSelecionarGrupo('Estadual')">Estaduais</button>
         <button class="uf-footer-btn" onclick="portalSelecionarTodos()">Todos</button>
         <button class="uf-footer-btn" onclick="portalLimpar()">Limpar</button>
       </div>
@@ -830,7 +832,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v1.2</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v1.3</span>
   </div>
 </header>
 
@@ -1296,7 +1298,7 @@
 <script>
   // ===== ESTADO =====
   let paginaAtual=1,totalPaginas=1,itemAtualDrawer=null,mesAtual=new Date(),todosItens=[],kwAtual=[];
-  let selectedUFs=[],selectedMods=['6','8'],selectedEsferas=['F']; // UFs, Modalidades, Portais (F=Comprasnet/Federal)
+  let selectedUFs=[],selectedMods=['6','8'],selectedPortais=['CN']; // UFs, Modalidades, Portais (CN=Comprasnet padrão)
 
   const REGIOES=[
     {nome:'Norte',ufs:['AC','AM','AP','PA','RO','RR','TO']},
@@ -1318,11 +1320,49 @@
     {id:'13',nome:'Leilão Presencial'},
   ];
 
-  const PORTAIS=[
-    {id:'F',nome:'Comprasnet (Federal)',desc:'Portal de Compras do Governo Federal'},
-    {id:'E',nome:'Portais Estaduais',desc:'COMPRAS RS, Comprasnet Goiás, BLL, e-LIC, Minas, etc.'},
-    {id:'M',nome:'Portais Municipais',desc:'Licitações de prefeituras e câmaras municipais'},
+  // Portais organizados por grupo/esfera
+  // esfera: 'F'=Federal, 'E'=Estadual, 'M'=Municipal
+  // uf: filtra também pela UF quando o portal é de estado específico
+  const PORTAL_GRUPOS=[
+    {
+      nome:'Federal',
+      portais:[
+        {id:'CN',nome:'Comprasnet',esfera:'F',uf:null},
+      ]
+    },
+    {
+      nome:'Estadual',
+      portais:[
+        {id:'PCP',   nome:'Portal de Compras Públicas', esfera:'E', uf:null},
+        {id:'BRSUL', nome:'Banrisul',                   esfera:'E', uf:'RS'},
+        {id:'CRS',   nome:'Compras RS',                 esfera:'E', uf:'RS'},
+        {id:'CBA',   nome:'Compras Bahia',              esfera:'E', uf:'BA'},
+        {id:'CAM',   nome:'Compras Amazonas',           esfera:'E', uf:'AM'},
+        {id:'CNGO',  nome:'Comprasnet Goiás',           esfera:'E', uf:'GO'},
+        {id:'CRJ',   nome:'Compras RJ',                 esfera:'E', uf:'RJ'},
+        {id:'CREC',  nome:'Compras Recife',             esfera:'E', uf:'PE'},
+        {id:'BLL',   nome:'BLL Compras',                esfera:'E', uf:null},
+        {id:'ELIC',  nome:'Portal e-LIC (SC)',          esfera:'E', uf:'SC'},
+        {id:'PROC',  nome:'Procergs',                   esfera:'E', uf:'RS'},
+        {id:'CMG',   nome:'Compras Minas Gerais',       esfera:'E', uf:'MG'},
+        {id:'BNPA',  nome:'Banpará',                    esfera:'E', uf:'PA'},
+        {id:'PEI',   nome:'PE Integrado',               esfera:'E', uf:'PE'},
+        {id:'LN',    nome:'Licitanet',                  esfera:'E', uf:null},
+        {id:'BNC',   nome:'BNC',                        esfera:'E', uf:null},
+        {id:'LICE',  nome:'Licitações-e (BB)',          esfera:'E', uf:null},
+        {id:'LICCX', nome:'Licitações Caixa',           esfera:'E', uf:null},
+        {id:'PNCP',  nome:'Outros/PNCP',                esfera:'E', uf:null},
+      ]
+    },
+    {
+      nome:'Municipal',
+      portais:[
+        {id:'MUN',   nome:'Portais Municipais',         esfera:'M', uf:null},
+      ]
+    },
   ];
+  // Lista plana de todos os portais para lookups rápidos
+  const PORTAIS_TODOS=PORTAL_GRUPOS.flatMap(g=>g.portais);
 
   const HIST_KEY='arantesBusca_historico';
   const TEMA_KEY='arantesBusca_tema';
@@ -1435,31 +1475,59 @@
 
   // ===== MODAL PORTAL =====
   function renderModalPortal(){
-    document.getElementById('portalPills').innerHTML=PORTAIS.map(p=>`
-      <button class="mod-pill${selectedEsferas.includes(p.id)?' selecionado':''}" onclick="togglePortal('${p.id}')" id="portalpill-${p.id}" title="${p.desc}">
-        ${p.nome}
-      </button>`).join('');
+    document.getElementById('portalGrupos').innerHTML=PORTAL_GRUPOS.map(g=>`
+      <div class="uf-regiao">
+        <div class="uf-regiao-header">
+          ${g.nome}
+          <span class="uf-regiao-link" onclick="portalSelecionarGrupo('${g.nome}')">Selecionar todos</span>
+        </div>
+        <div class="uf-pills">
+          ${g.portais.map(p=>`<button class="uf-pill${selectedPortais.includes(p.id)?' selecionado':''}" onclick="togglePortal('${p.id}')" id="portalpill-${p.id}">${p.nome}</button>`).join('')}
+        </div>
+      </div>`).join('');
   }
   function togglePortal(id){
-    if(selectedEsferas.includes(id))selectedEsferas=selectedEsferas.filter(e=>e!==id);
-    else selectedEsferas.push(id);
+    if(selectedPortais.includes(id))selectedPortais=selectedPortais.filter(e=>e!==id);
+    else selectedPortais.push(id);
     const p=document.getElementById('portalpill-'+id);
-    if(p)p.classList.toggle('selecionado',selectedEsferas.includes(id));
+    if(p)p.classList.toggle('selecionado',selectedPortais.includes(id));
   }
-  function portalSelecionarTodos(){selectedEsferas=PORTAIS.map(p=>p.id);renderModalPortal()}
-  function portalLimpar(){selectedEsferas=[];renderModalPortal()}
+  function portalSelecionarGrupo(nomeGrupo){
+    const g=PORTAL_GRUPOS.find(x=>x.nome===nomeGrupo);
+    if(!g)return;
+    const ids=g.portais.map(p=>p.id);
+    const todos=ids.every(id=>selectedPortais.includes(id));
+    if(todos)selectedPortais=selectedPortais.filter(id=>!ids.includes(id));
+    else ids.forEach(id=>{if(!selectedPortais.includes(id))selectedPortais.push(id)});
+    renderModalPortal();
+  }
+  function portalSelecionarTodos(){selectedPortais=PORTAIS_TODOS.map(p=>p.id);renderModalPortal()}
+  function portalLimpar(){selectedPortais=[];renderModalPortal()}
   function abrirModalPortal(){renderModalPortal();document.getElementById('modalPortalOverlay').classList.add('aberto')}
   function fecharModalPortal(e){if(e.target===document.getElementById('modalPortalOverlay'))fecharModalPortalDireto()}
   function fecharModalPortalDireto(){document.getElementById('modalPortalOverlay').classList.remove('aberto')}
   function confirmarPortais(){atualizarBotaoPortal();fecharModalPortalDireto()}
   function atualizarBotaoPortal(){
     const txt=document.getElementById('portalTriggerTxt');
-    if(!selectedEsferas.length)txt.textContent='🌐 Todos os portais';
-    else{
-      const nomes=selectedEsferas.map(id=>PORTAIS.find(p=>p.id===id)?.nome||id);
-      if(nomes.length===1)txt.textContent='🌐 '+nomes[0];
-      else txt.textContent=`🌐 ${nomes.join(', ')}`;
-    }
+    if(!selectedPortais.length){txt.textContent='🌐 Todos os portais';return;}
+    const nomes=selectedPortais.map(id=>PORTAIS_TODOS.find(p=>p.id===id)?.nome||id);
+    if(nomes.length===1)txt.textContent='🌐 '+nomes[0];
+    else if(nomes.length<=2)txt.textContent='🌐 '+nomes.join(', ');
+    else txt.textContent=`🌐 ${nomes.slice(0,2).join(', ')} (+${nomes.length-2})`;
+  }
+  // Calcula esferas e UFs adicionais a partir dos portais selecionados
+  function calcularFiltrosPortal(){
+    if(!selectedPortais.length) return {esferas:[],ufsPortal:[]};
+    const portaisSel=selectedPortais.map(id=>PORTAIS_TODOS.find(p=>p.id===id)).filter(Boolean);
+    const esferas=[...new Set(portaisSel.map(p=>p.esfera))];
+    // UFs específicas: só inclui se TODOS os portais estaduais selecionados têm UF definida
+    // e nenhum portal estadual "genérico" (uf:null) foi selecionado
+    const estaduaisSel=portaisSel.filter(p=>p.esfera==='E');
+    const temEstadualGenerico=estaduaisSel.some(p=>!p.uf);
+    const ufsPortal=(!temEstadualGenerico&&estaduaisSel.length)
+      ? [...new Set(estaduaisSel.map(p=>p.uf).filter(Boolean))]
+      : [];
+    return {esferas,ufsPortal};
   }
 
   // ===== NAVEGAÇÃO =====
@@ -2340,9 +2408,12 @@
     const kw=document.getElementById('palavraChave').value.trim();
     const dataInicial=document.getElementById('dataInicial').value;
     const dataFinal=document.getElementById('dataFinal').value;
-    const ufParam=selectedUFs.join(',');
+    const {esferas,ufsPortal}=calcularFiltrosPortal();
+    // Mescla UFs do filtro de estados com UFs dos portais selecionados
+    const ufsUnidas=[...new Set([...selectedUFs,...ufsPortal])];
+    const ufParam=ufsUnidas.join(',');
     const modParam=selectedMods.join(',');
-    const esferaParam=selectedEsferas.join(',');
+    const esferaParam=esferas.join(',');
     const params=new URLSearchParams({pagina});
     if(kw)params.append('palavraChave',kw);
     if(ufParam)params.append('uf',ufParam);
@@ -2379,7 +2450,7 @@
     document.getElementById('palavraChave').value='';
     selectedUFs=[];atualizarBotaoUF();
     selectedMods=['6','8'];atualizarBotaoMod();
-    selectedEsferas=['F'];atualizarBotaoPortal();
+    selectedPortais=['CN'];atualizarBotaoPortal();
     limparDatas();
     document.getElementById('resultado').innerHTML='';
     document.getElementById('layoutToggle').style.display='none';
