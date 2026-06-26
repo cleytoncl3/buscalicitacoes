@@ -44,6 +44,8 @@ export default async function handler(req, res) {
     return null;
   };
 
+  const comFiltroData = !!(dataInicial || dataFinal);
+
   const buildUrl = (kw, paginaReq) => {
     const p = new URLSearchParams({
       tipos_documento: 'edital',
@@ -55,22 +57,25 @@ export default async function handler(req, res) {
     if (ufs.length)     p.append('ufs',         ufs.join('|'));
     if (mods.length)    p.append('modalidades', mods.join('|'));
     if (esferas.length) p.append('esferas',     esferas.join('|'));
+    // Quando o usuário filtra por período, limita ao PNCP só licitações abertas.
+    // Isso resolve dois problemas ao mesmo tempo:
+    // 1) Elimina encerradas que não deveriam aparecer no período selecionado
+    // 2) Reduz o total de ~943 para ~40, corrigindo a paginação quebrada
+    //    (paginação server-side + filtro client-side eram incompatíveis)
+    if (comFiltroData) p.append('status', 'recebendo_proposta');
     return `https://pncp.gov.br/api/search/?${p}`;
   };
 
-  // Filtro de data client-side (PNCP não suporta este filtro na /api/search/)
-  // Lógica: inclui licitação se ela for RELEVANTE no período selecionado
+  // Filtro de data client-side (segunda passagem, sobre itens já abertos do PNCP)
   // Filtra pela DATA DE ENCERRAMENTO DE PROPOSTAS (data_fim_vigencia)
-  // Lógica: o usuário quer ver licitações cujo prazo de proposta cai dentro do período
-  // Ex: "Próximos 30 dias" = propostas que encerram nos próximos 30 dias (urgência)
-  // Isso é estável porque licitações abertas têm data_fim_vigencia no futuro próximo
+  // Ex: "Próximos 30 dias" = propostas que encerram nos próximos 30 dias
   const filtrarData = (items) => {
-    if (!dataInicial && !dataFinal) return items;
+    if (!comFiltroData) return items;
     const dI = dataInicial ? new Date(dataInicial + 'T00:00:00') : null;
     const dF = dataFinal   ? new Date(dataFinal   + 'T23:59:59') : null;
     return items.filter(i => {
       const fim = i.data_fim_vigencia ? new Date(i.data_fim_vigencia) : null;
-      if (!fim) return true;                  // sem data de encerramento: inclui
+      if (!fim) return false;                 // sem data de encerramento: exclui
       if (dI && fim < dI) return false;       // encerra antes do período: fora
       if (dF && fim > dF) return false;       // encerra depois do período: fora
       return true;
