@@ -10,15 +10,15 @@ export default async function handler(req, res) {
   const hdrs = { Accept: 'application/json', 'User-Agent': 'Mozilla/5.0' };
 
   try {
-    // Busca itens
-    const itensRes = await fetch(`${base}/itens?pagina=1&tamanhoPagina=100`, { headers: hdrs });
+    // Busca itens e info do órgão em paralelo
+    // O endpoint de detalhe retorna 301 — usamos a search API como fallback
+    const numeroControle = `${cnpj}-1-${String(seq).padStart(6,'0')}/${ano}`;
+    const searchUrl = `https://pncp.gov.br/api/search/?tipos_documento=edital&q=${encodeURIComponent(numeroControle)}&tam_pagina=1`;
 
-    // Busca detalhe com tratamento manual de redirect
-    let detalheRes = await fetch(base, { headers: hdrs, redirect: 'manual' });
-    if (detalheRes.status === 301 || detalheRes.status === 302) {
-      const loc = detalheRes.headers.get('location');
-      if (loc) detalheRes = await fetch(loc.startsWith('http') ? loc : `https://pncp.gov.br${loc}`, { headers: hdrs });
-    }
+    const [itensRes, searchRes] = await Promise.all([
+      fetch(`${base}/itens?pagina=1&tamanhoPagina=100`, { headers: hdrs }),
+      fetch(searchUrl, { headers: hdrs }),
+    ]);
 
     // Processa itens
     let itensList = [];
@@ -35,72 +35,40 @@ export default async function handler(req, res) {
       }
     } catch {}
 
-    // Processa detalhe
+    // Extrai info do órgão via search API
     let orgaoInfo = null;
-    const detalheStatus = detalheRes.status;
+    try {
+      if (searchRes.ok) {
+        const sd = await searchRes.json();
+        const item = sd?.items?.[0];
+        if (item) {
+          const codUnidade = item.unidade_codigo || item.codigo_unidade || uasgDoItem;
+          const nomeUnidade = item.unidade_nome || null;
+          const linkOrigem  = item.link_sistema_origem || item.linkSistemaOrigem || null;
 
-    if (detalheRes.ok) {
-      try {
-        const d = await detalheRes.json();
-        const codUnidade = d.unidadeOrgao?.codigoUnidade || uasgDoItem;
-        const nomeUnidade = d.unidadeOrgao?.nomeUnidade || d.orgaoEntidade?.razaoSocial;
-        const linkOrigem  = d.linkSistemaOrigem || null;
-
-        // Extrai número Comprasnet da URL (formato: ?compra=UASG6+MOD2+NUM5+ANO4)
-        let numeroComprasnet = null, anoComprasnet = null;
-        if (linkOrigem) {
-          const m = linkOrigem.match(/compra=(\d+)/);
-          if (m && m[1].length >= 13) {
-            numeroComprasnet = parseInt(m[1].substring(8, 13)).toString();
-            anoComprasnet    = m[1].substring(13, 17) || null;
+          // Extrai número Comprasnet da URL (formato: ?compra=UASG6+MOD2+NUM5+ANO4)
+          let numeroComprasnet = null, anoComprasnet = null;
+          if (linkOrigem) {
+            const m = linkOrigem.match(/compra=(\d+)/);
+            if (m && m[1].length >= 13) {
+              numeroComprasnet = parseInt(m[1].substring(8, 13)).toString();
+              anoComprasnet    = m[1].substring(13, 17) || null;
+            }
           }
-        }
 
-        orgaoInfo = {
-          codigoUnidade:    codUnidade || null,
-          nomeUnidade:      nomeUnidade || null,
-          cnpj:             d.orgaoEntidade?.cnpj || cnpj,
-          linkSistemaOrigem: linkOrigem,
-          numeroCompraPNCP: d.numeroCompra || null,
-          numeroCompra:     numeroComprasnet || null,
-          anoCompra:        anoComprasnet || d.anoCompra || null,
-          uasgLabel: codUnidade && nomeUnidade ? `${codUnidade} - ${nomeUnidade}` : nomeUnidade || null,
-        };
-      } catch {}
-    } else {
-      // Detalhe falhou — tenta endpoint alternativo (unidades)
-      try {
-        const altRes = await fetch(
-          `https://pncp.gov.br/api/pncp/v1/orgaos/${cnpj}/compras/${ano}/${seq}/itens?pagina=1&tamanhoPagina=1`,
-          { headers: hdrs }
-        );
-        if (altRes.ok) {
-          const altData = await altRes.json();
-          const firstItem = Array.isArray(altData) ? altData[0] : (altData.data||[])[0];
-          const codAlt = firstItem?.unidadeRequisitante?.codigoUnidade
-            || firstItem?.codigoUnidadeRequisitante
-            || uasgDoItem;
-          const nomeAlt = firstItem?.unidadeRequisitante?.nomeUnidade || null;
-          if (codAlt) {
-            orgaoInfo = {
-              codigoUnidade: codAlt,
-              nomeUnidade: nomeAlt,
-              uasgLabel: nomeAlt ? `${codAlt} - ${nomeAlt}` : String(codAlt),
-              linkSistemaOrigem: null,
-              numeroCompra: null,
-              anoCompra: null,
-              _detalheStatus: detalheStatus,
-            };
-          }
+          // Debug: retorna todos os campos do item da search para inspeção
+          orgaoInfo = {
+            codigoUnidade:    codUnidade || null,
+            nomeUnidade:      nomeUnidade || null,
+            linkSistemaOrigem: linkOrigem,
+            numeroCompra:     numeroComprasnet || null,
+            anoCompra:        anoComprasnet || null,
+            uasgLabel: codUnidade && nomeUnidade ? `${codUnidade} - ${nomeUnidade}` : nomeUnidade || null,
+            _searchFields: Object.keys(item), // debug: lista campos disponíveis
+          };
         }
-      } catch {}
-
-      // Ainda null — retorna ao menos o status para debug
-      if (!orgaoInfo) {
-        const loc = detalheRes.headers?.get?.('location') || null;
-        orgaoInfo = { _detalheStatus: detalheStatus, _debug: `detalhe falhou: ${detalheStatus}`, _location: loc };
       }
-    }
+    } catch {}
 
     return res.status(200).json({ data: itensList, total: itensList.length, orgaoInfo });
 
