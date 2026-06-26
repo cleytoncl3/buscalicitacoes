@@ -10,12 +10,15 @@ export default async function handler(req, res) {
   const hdrs = { Accept: 'application/json', 'User-Agent': 'Mozilla/5.0' };
 
   try {
-    // Busca itens e detalhe em paralelo
-    const fetchOpts = { headers: hdrs, redirect: 'follow' };
-    const [itensRes, detalheRes] = await Promise.all([
-      fetch(`${base}/itens?pagina=1&tamanhoPagina=100`, fetchOpts),
-      fetch(base + '/', fetchOpts),   // trailing slash evita redirect 301
-    ]);
+    // Busca itens
+    const itensRes = await fetch(`${base}/itens?pagina=1&tamanhoPagina=100`, { headers: hdrs });
+
+    // Busca detalhe com tratamento manual de redirect
+    let detalheRes = await fetch(base, { headers: hdrs, redirect: 'manual' });
+    if (detalheRes.status === 301 || detalheRes.status === 302) {
+      const loc = detalheRes.headers.get('location');
+      if (loc) detalheRes = await fetch(loc.startsWith('http') ? loc : `https://pncp.gov.br${loc}`, { headers: hdrs });
+    }
 
     // Processa itens
     let itensList = [];
@@ -94,7 +97,8 @@ export default async function handler(req, res) {
 
       // Ainda null — retorna ao menos o status para debug
       if (!orgaoInfo) {
-        orgaoInfo = { _detalheStatus: detalheStatus, _debug: `detalhe falhou: ${detalheStatus}` };
+        const loc = detalheRes.headers?.get?.('location') || null;
+        orgaoInfo = { _detalheStatus: detalheStatus, _debug: `detalhe falhou: ${detalheStatus}`, _location: loc };
       }
     }
 
