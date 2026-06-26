@@ -11,9 +11,10 @@ export default async function handler(req, res) {
 
   try {
     // Busca itens e detalhe em paralelo
+    const fetchOpts = { headers: hdrs, redirect: 'follow' };
     const [itensRes, detalheRes] = await Promise.all([
-      fetch(`${base}/itens?pagina=1&tamanhoPagina=100`, { headers: hdrs }),
-      fetch(base, { headers: hdrs }),
+      fetch(`${base}/itens?pagina=1&tamanhoPagina=100`, fetchOpts),
+      fetch(base + '/', fetchOpts),   // trailing slash evita redirect 301
     ]);
 
     // Processa itens
