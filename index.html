@@ -701,9 +701,10 @@
       .busca-subtitulo{font-size:.75rem}
 
       /* Filtros rápidos — 2 colunas no mobile */
-      .filtros-linha-selects{grid-template-columns:1fr 1fr;gap:8px}
-      .filtro-campo-label{font-size:.68rem}
-      .select-trigger{font-size:.82rem;padding:8px 10px}
+      .filtros-linha-selects{grid-template-columns:1fr 1fr;gap:6px}
+      .filtro-campo-label{font-size:.65rem;letter-spacing:.2px}
+      .select-trigger{font-size:.78rem;padding:7px 8px}
+      .select-trigger-txt{font-size:.78rem}
 
       /* Data — coluna única */
       .data-row{flex-direction:column;align-items:stretch;gap:6px}
@@ -726,10 +727,16 @@
       .layout-btn{font-size:.78rem;padding:5px 10px}
 
       /* Cards verticais — 1 coluna, cada card ocupa a tela inteira */
-      .cards-vertical{grid-template-columns:1fr;gap:0;scroll-snap-type:y mandatory;overflow-y:auto;height:calc(100dvh - 54px - 56px);padding:0}
-      .card-vert{border-top-width:3px;aspect-ratio:unset;border-radius:0;border-left:none;border-right:none;border-top:none;border-bottom:1px solid var(--border);border-top:3px solid var(--primary);height:calc(100dvh - 54px - 56px);scroll-snap-align:start;flex-shrink:0}
+      .cards-vertical{grid-template-columns:1fr;gap:0;scroll-snap-type:y mandatory;overflow-y:auto;height:calc(100dvh - 54px - 56px);padding:0;scrollbar-width:none}
+      .cards-vertical::-webkit-scrollbar{display:none}
+      .card-vert{border-top-width:3px;aspect-ratio:unset;border-radius:0;border-left:none;border-right:none;border-top:none;border-bottom:1px solid var(--border);border-top:3px solid var(--primary);height:calc(100dvh - 54px - 56px);scroll-snap-align:start;flex-shrink:0;cursor:pointer}
+      .card-vert *{pointer-events:none}
+      .card-vert .card-exp-items{pointer-events:auto}
       .card-vert-body{flex:1;overflow:hidden}
       .card-vert-footer{padding:12px 14px}
+      /* Botões de navegação flutuantes */
+      .nav-vert-btns{position:fixed;right:14px;bottom:80px;display:flex;flex-direction:column;gap:8px;z-index:200}
+      .nav-vert-btn{width:44px;height:44px;border-radius:50%;background:var(--primary);color:#fff;border:none;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 
       /* Cards horizontais — empilha */
       .card-exp{border-radius:8px}
@@ -1015,7 +1022,7 @@
           <input type="text" id="palavraChave" placeholder="O que você deseja buscar?" autocomplete="off"/>
           <div class="ac-dropdown" id="acDropdown"></div>
         </div>
-        <button class="btn-buscar" id="btnBuscar" onclick="buscar(1)">🔍 Buscar licitações</button>
+        <button class="btn-buscar" id="btnBuscar" onclick="buscar(1)">🔍 Buscar</button>
       </div>
 
       <!-- Linha 2: Filtros rápidos com label -->
@@ -1826,6 +1833,7 @@
       document.querySelectorAll('.dropdown,.notif-panel').forEach(d=>d.classList.remove('aberto'));
   });
   function irParaView(view){
+    document.getElementById('navVertBtns')?.remove();
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('ativo'));
     document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('ativo'));
     document.querySelectorAll('.dropdown').forEach(d=>d.classList.remove('aberto'));
@@ -2013,12 +2021,13 @@
       });
     } else {
       document.getElementById('resultado').innerHTML =
-        `<div class="cards-vertical">${itens.map(renderCardVertical).join('')}</div>`;
+        `<div class="cards-vertical" id="cardsVerticalList">${itens.map(renderCardVertical).join('')}</div>`;
       itens.forEach((item) => {
         const p = parseControle(item.numero_controle_pncp);
         const cardId = (item.numero_controle_pncp || item.id || '').replace(/[^a-z0-9]/gi,'_');
         if (p && cardId) carregarItensCard(p.cnpj, p.ano, p.seq, cardId);
       });
+      _iniciarNavVertMobile();
     }
     // Em background: busca os números reais (Comprasnet) para todos os cards
     carregarNumerosEmBatch(itens);
@@ -2567,6 +2576,28 @@
 
   function aplicarHistorico(kw){
     document.getElementById('palavraChave').value=kw;
+  }
+
+  // ===== NAV VERTICAL MOBILE =====
+  function _iniciarNavVertMobile() {
+    // Só ativa em telas pequenas
+    document.getElementById('navVertBtns')?.remove();
+    if (window.innerWidth > 600) return;
+    const list = document.getElementById('cardsVerticalList');
+    if (!list) return;
+    const btns = document.createElement('div');
+    btns.className = 'nav-vert-btns';
+    btns.id = 'navVertBtns';
+    btns.innerHTML = `<button class="nav-vert-btn" onclick="_navVert(-1)" title="Anterior">↑</button><button class="nav-vert-btn" onclick="_navVert(1)" title="Próximo">↓</button>`;
+    document.body.appendChild(btns);
+    // Remove ao sair da view
+    list.addEventListener('remove', () => btns.remove(), {once:true});
+  }
+  function _navVert(dir) {
+    const list = document.getElementById('cardsVerticalList');
+    if (!list) return;
+    const h = list.clientHeight;
+    list.scrollBy({top: dir * h, behavior: 'smooth'});
   }
 
   // ===== UTILS =====
