@@ -2,56 +2,64 @@
 <html lang="pt-BR" data-tema="escuro">
 <head>
   <meta charset="UTF-8"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Arantes Licitações</title>
   <style>
     :root{
-      --bg:#f4f6f8;--surface:#fff;--surface2:#f8f9fa;--border:#e0e0e0;
-      --text:#222;--text2:#555;--text3:#888;--text4:#999;
-      --primary:#1a3d2b;--primary-hover:#245239;--accent:#d4a825;--btn-text:#fff;
-      --chip-bg:#eef5f1;--chip-border:#c5ddd0;
-      --card-shadow:0 2px 6px rgba(0,0,0,.06);--card-shadow-hover:0 4px 14px rgba(0,0,0,.12);
-      --drawer-bg:#fff;
-      --badge-verde-bg:#e6f4ec;--badge-verde-txt:#1a7a3c;
-      --badge-amarelo-bg:#fff8e1;--badge-amarelo-txt:#b8860b;
-      --badge-cinza-bg:#f0f0f0;--badge-cinza-txt:#666;
-      --erro-bg:#fff3f3;--erro-border:#f5c6c6;--erro-txt:#c0392b;
+      --bg:#f0f4f8;--surface:#ffffff;--surface2:#f5f7fa;--border:#dde3ec;
+      --text:#1a2236;--text2:#4a5f7a;--text3:#7a90aa;--text4:#99aabb;
+      --primary:#2563eb;--primary-hover:#1d4ed8;--accent:#1e40af;--btn-text:#fff;
+      --chip-bg:#eff6ff;--chip-border:#bfdbfe;
+      --card-shadow:0 1px 4px rgba(0,0,0,.07);--card-shadow-hover:0 4px 16px rgba(0,0,0,.13);
+      --drawer-bg:#ffffff;
+      --badge-verde-bg:#ecfdf5;--badge-verde-txt:#065f46;
+      --badge-amarelo-bg:#fffbeb;--badge-amarelo-txt:#92400e;
+      --badge-cinza-bg:#f1f5f9;--badge-cinza-txt:#475569;
+      --erro-bg:#fef2f2;--erro-border:#fecaca;--erro-txt:#991b1b;
     }
     [data-tema="escuro"]{
-      --bg:#0d1117;--surface:#161b27;--surface2:#1e2538;--border:#2a3050;--btn-text:#fff;
-      --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--text4:#475569;
-      --chip-bg:#1e2d24;--chip-border:#2d4a38;
-      --card-shadow:0 2px 6px rgba(0,0,0,.3);--card-shadow-hover:0 4px 14px rgba(0,0,0,.5);
-      --drawer-bg:#161b27;
-      --badge-verde-bg:#0d2b1a;--badge-verde-txt:#4ade80;
-      --badge-amarelo-bg:#2b2000;--badge-amarelo-txt:#fbbf24;
-      --badge-cinza-bg:#1e2538;--badge-cinza-txt:#94a3b8;
-      --erro-bg:#2b0d0d;--erro-border:#7f1d1d;--erro-txt:#fca5a5;
+      --bg:#07090f;--surface:#0d1322;--surface2:#131c30;--border:#1e2d47;--btn-text:#fff;
+      --text:#dde6f0;--text2:#7d9ab8;--text3:#4a6585;--text4:#334d66;
+      --chip-bg:#0f1c36;--chip-border:#1e3a6e;
+      --card-shadow:0 2px 8px rgba(0,0,0,.4);--card-shadow-hover:0 6px 20px rgba(0,0,0,.6);
+      --drawer-bg:#0d1322;
+      --badge-verde-bg:#052e16;--badge-verde-txt:#34d399;
+      --badge-amarelo-bg:#1c1200;--badge-amarelo-txt:#fbbf24;
+      --badge-cinza-bg:#131c30;--badge-cinza-txt:#7d9ab8;
+      --erro-bg:#1a0505;--erro-border:#7f1d1d;--erro-txt:#fca5a5;
     }
     *{box-sizing:border-box;margin:0;padding:0;transition:background-color .2s,color .2s,border-color .2s}
+    .app-layout,.app-sidebar,.app-main{transition:none !important}
     html,body{max-width:100%;overflow-x:hidden}
-    body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text)}
+    body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 
     /* HEADER */
-    header{background:var(--primary);padding:0 24px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;height:58px;position:sticky;top:0;z-index:50;gap:16px}
-    .header-logo{font-size:1.05rem;font-weight:800;letter-spacing:1.5px;white-space:nowrap;color:var(--accent);text-transform:uppercase}
-    .header-logo span{font-size:.65rem;color:rgba(255,255,255,.5);display:block;font-weight:400;letter-spacing:.5px;text-transform:none;margin-top:1px}
+    header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;height:54px;position:sticky;top:0;z-index:50;gap:12px;box-shadow:0 1px 0 var(--border)}
+    .header-logo{display:flex;align-items:center;gap:9px;text-decoration:none;white-space:nowrap}
+    .header-logo-icon{width:28px;height:28px;border-radius:7px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+    .header-logo-text{font-size:.95rem;font-weight:800;color:var(--text);letter-spacing:-.3px}
+    .header-logo-text span{color:var(--primary)}
+    [data-tema="escuro"] .header-logo-text span{color:#60a5fa}
     .nav{display:flex;gap:2px;justify-content:center}
-    .nav-btn{background:transparent;border:none;color:rgba(255,255,255,.65);padding:8px 16px;border-radius:8px;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:7px;position:relative;white-space:nowrap;font-weight:500;transition:all .15s}
-    .nav-btn:hover{background:rgba(255,255,255,.12);color:#fff}
-    .nav-btn.ativo{background:rgba(255,255,255,.15);color:var(--accent);font-weight:700}
-    .nav-btn-icon{font-size:.95rem}
-    .dropdown{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);min-width:210px;z-index:400;display:none;padding:6px}
+    .nav-btn{background:transparent;border:none;color:rgba(255,255,255,.6);padding:7px 13px;border-radius:7px;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:6px;position:relative;white-space:nowrap;font-weight:500;transition:all .15s;font-family:'DM Sans',sans-serif}
+    .nav-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+    .nav-btn.ativo{background:rgba(255,255,255,.12);color:#fff;font-weight:600}
+    [data-tema="escuro"] .nav-btn.ativo{color:#60a5fa;background:var(--chip-bg)}
+    .nav-btn-icon{font-size:.85rem;opacity:.7}
+    .dropdown{position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.22);min-width:210px;z-index:400;display:none;padding:5px}
     .dropdown.aberto{display:block}
-    .dropdown-item{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:.88rem;color:var(--text);cursor:pointer;border-radius:8px}
+    .dropdown-item{display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:.85rem;color:var(--text);cursor:pointer;border-radius:7px;font-family:'DM Sans',sans-serif}
     .dropdown-item:hover{background:var(--chip-bg);color:var(--primary)}
-    [data-tema="escuro"] .dropdown-item:hover{color:var(--accent)}
+    [data-tema="escuro"] .dropdown-item:hover{color:#60a5fa}
     .dropdown-sep{height:1px;background:var(--border);margin:4px 0}
     .header-right{display:flex;align-items:center;gap:8px;justify-content:flex-end}
-    .btn-tema{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:pointer}
-    .btn-tema:hover{background:rgba(255,255,255,.25)}
-    .btn-sino{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1rem;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center}
-    .btn-sino:hover{background:rgba(255,255,255,.25)}
+    .btn-tema{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);width:32px;height:32px;border-radius:8px;font-size:.95rem;cursor:pointer}
+    .btn-tema:hover{background:rgba(255,255,255,.18);color:#fff}
+    .btn-sino{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);width:32px;height:32px;border-radius:8px;font-size:.9rem;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center}
+    .btn-sino:hover{background:rgba(255,255,255,.18);color:#fff}
     .sino-badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:.6rem;font-weight:700;border-radius:20px;padding:1px 5px;min-width:16px;text-align:center;display:none}
     .sino-badge.visivel{display:block}
     .notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:360px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:400;display:none;max-height:500px;overflow-y:auto}
@@ -67,7 +75,18 @@
     .notif-vazia{padding:24px;text-align:center;color:var(--text3);font-size:.88rem}
     .notif-wrapper{position:relative}
 
-    .container{max-width:1100px;margin:0 auto;padding:24px 16px}
+    .container{max-width:1060px;margin:0 auto;padding:20px 20px}
+    /* SIDEBAR LAYOUT */
+    .app-layout{display:flex !important;flex-direction:row !important;min-height:calc(100vh - 54px);align-items:stretch}
+    .app-sidebar{width:220px !important;flex-shrink:0 !important;background:var(--surface);border-right:1px solid var(--border);display:flex !important;flex-direction:column !important;padding:10px 8px;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto;box-sizing:border-box}
+    .sb-section-label{display:block !important;font-size:.65rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;padding:10px 10px 4px}
+    .sb-item{display:flex !important;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;font-size:.84rem;font-weight:500;color:var(--text2);cursor:pointer;border:none;background:transparent;width:100%;text-align:left;transition:background .15s,color .15s;font-family:'DM Sans',sans-serif;box-sizing:border-box}
+    .sb-item:hover{background:var(--surface2) !important;color:var(--text)}
+    .sb-item.on{background:rgba(37,99,235,.12) !important;color:#60a5fa !important;font-weight:600}
+    [data-tema="claro"] .sb-item.on{background:var(--chip-bg) !important;color:var(--primary) !important}
+    .sb-badge{margin-left:auto;background:var(--primary);color:#fff;border-radius:20px;font-size:.6rem;font-weight:700;padding:1px 6px;min-width:18px;text-align:center}
+    .sb-divider{height:1px;background:var(--border);margin:4px 0;display:block !important}
+    .app-main{flex:1 !important;min-width:0 !important}
     .view{display:none}.view.ativo{display:block}
 
     /* ÁREA DE BUSCA */
@@ -84,7 +103,7 @@
     #palavraChave{width:100%;padding:11px 14px 11px 40px;border:1px solid var(--border);border-radius:9px;font-size:.95rem;background:var(--surface2);color:var(--text);box-sizing:border-box}
     #palavraChave:focus{outline:none;border-color:var(--primary)}
     #palavraChave::placeholder{color:var(--text3)}
-    .btn-buscar{background:var(--primary);color:var(--btn-text);border:none;padding:11px 24px;border-radius:9px;font-size:.92rem;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:7px}
+    .btn-buscar{background:var(--primary);color:#fff;border:none;padding:11px 22px;border-radius:9px;font-size:.9rem;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;transition:background .15s}
     .btn-buscar:hover{background:var(--primary-hover)}
     .btn-buscar:disabled{background:var(--text3);cursor:wait}
     /* Período dropdown */
@@ -132,7 +151,7 @@
     .data-row-sep{font-size:.82rem;color:var(--text3)}
     .data-atalhos{display:flex;gap:8px;margin-left:4px;flex-wrap:wrap}
     .data-atalho{font-size:.78rem;color:var(--primary);cursor:pointer;background:var(--chip-bg);border:1px solid var(--chip-border);padding:4px 10px;border-radius:20px;white-space:nowrap}
-    [data-tema="escuro"] .data-atalho{color:var(--accent);background:var(--chip-bg);border-color:var(--chip-border)}
+    [data-tema="escuro"] .data-atalho{color:#60a5fa;background:var(--chip-bg);border-color:var(--chip-border)}
     .data-atalho:hover{opacity:.8}
 
     /* Chips de filtros ativos */
@@ -196,12 +215,14 @@
     /* CARDS */
     .resumo{font-size:.9rem;color:var(--text2);margin-bottom:14px}
     .resumo strong{color:var(--primary)}
-    [data-tema="escuro"] .resumo strong{color:var(--accent)}
+    [data-tema="escuro"] .resumo strong{color:#60a5fa}
     .cards{display:flex;flex-direction:column;gap:12px}
     .card{background:var(--surface);border-radius:10px;padding:16px 20px;box-shadow:var(--card-shadow);border-left:4px solid var(--primary);cursor:pointer}
     .card:hover{box-shadow:var(--card-shadow-hover);border-left-color:var(--accent)}
-    .card-titulo-principal{font-weight:700;font-size:.9rem;color:var(--accent);margin-bottom:5px;line-height:1.4}
-    [data-tema="claro"] .card-titulo-principal{color:var(--primary)}
+    .card-titulo-principal{font-weight:800;font-size:.95rem;color:var(--primary);margin-bottom:2px;line-height:1.3}
+    [data-tema="escuro"] .card-titulo-principal{color:#60a5fa}
+    .card-num-uasg{font-size:.72rem;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:3px}
+    .card-orgao-nome{font-size:.82rem;font-weight:700;color:var(--text);margin-bottom:4px}
     .card-desc{font-size:.85rem;color:var(--text2);margin-bottom:8px;line-height:1.4}
     .badge{font-size:.72rem;padding:2px 9px;border-radius:20px;white-space:nowrap;font-weight:600}
     .badge-verde{background:var(--badge-verde-bg);color:var(--badge-verde-txt)}
@@ -227,7 +248,7 @@
     .jornal-nome{font-weight:700;font-size:1rem;color:var(--text)}
     .jornal-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
     .jornal-chip{background:var(--chip-bg);color:var(--primary);border:1px solid var(--chip-border);border-radius:20px;padding:3px 10px;font-size:.78rem;font-weight:600}
-    [data-tema="escuro"] .jornal-chip{color:var(--accent)}
+    [data-tema="escuro"] .jornal-chip{color:#60a5fa}
     .jornal-meta{font-size:.78rem;color:var(--text3);margin-bottom:10px}
     .jornal-actions{display:flex;gap:8px;flex-wrap:wrap}
     .jornal-btn{font-size:.8rem;padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer}
@@ -264,17 +285,18 @@
     .drawer.ativo{right:0}
 
     /* Cabeçalho fixo */
-    .drawer-header{background:var(--surface2);border-bottom:1px solid var(--border);padding:12px 48px 12px 16px;position:sticky;top:0;z-index:2;flex-shrink:0;text-align:center}
-    .drawer-fechar{position:absolute;top:10px;right:12px;background:transparent;border:1px solid var(--border);color:var(--text);width:30px;height:30px;border-radius:50%;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
-    .drawer-fechar:hover{background:var(--border)}
+    .drawer-header{background:var(--primary);border-bottom:1px solid rgba(255,255,255,.1);padding:14px 48px 14px 18px;position:sticky;top:0;z-index:2;flex-shrink:0;text-align:left}
+    .drawer-fechar{position:absolute;top:11px;right:13px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:#fff;width:28px;height:28px;border-radius:8px;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .drawer-fechar:hover{background:rgba(255,255,255,.25)}
     .d-fonte-badge{display:none}
-    .d-num-header{font-size:.95rem;font-weight:700;color:var(--text);line-height:1.4}
-    .d-uasg-header{font-size:.78rem;color:var(--accent);font-weight:700;margin-top:2px}
+    .d-num-header{font-size:.78rem;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;font-family:'DM Mono',monospace}
+    .d-num-principal{font-size:1.05rem;font-weight:800;color:#fff;line-height:1.3}
+    .d-uasg-header{font-size:.75rem;color:rgba(255,255,255,.65);font-weight:600;margin-top:2px;font-family:'DM Mono',monospace}
 
     /* Corpo */
     .drawer-body{padding:18px 20px;overflow-y:auto;flex:1;text-align:center}
     .d-orgao-bloco{margin-bottom:14px}
-    .d-orgao-nome{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.3}
+    .d-orgao-nome{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.3}
     .d-unidade-nome{font-size:.82rem;color:var(--text2);margin-bottom:2px}
     .d-local{font-size:.78rem;color:var(--text3)}
     .d-sep{height:1px;background:var(--border);margin:14px 0}
@@ -286,12 +308,13 @@
     [data-tema="escuro"] .drawer-tag{color:var(--accent)}
 
     /* Abertura em destaque */
-    .d-abertura-box{background:var(--chip-bg);border:1px solid var(--chip-border);border-radius:10px;padding:14px 16px;margin:4px 0 14px}
+    .d-abertura-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:4px 0 14px}
     .d-abertura-cols{display:grid;grid-template-columns:1fr 1fr;gap:0}
     .d-abertura-col{text-align:center;padding:0 8px}
     .d-abertura-col+.d-abertura-col{border-left:1px solid rgba(255,255,255,.12)}
-    .d-abertura-label{font-size:.72rem;color:#fff;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
-    .d-abertura-data{font-size:1rem;font-weight:700;color:var(--accent);line-height:1.3}
+    .d-abertura-label{font-size:.68rem;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+    .d-abertura-data{font-size:.95rem;font-weight:700;color:var(--primary);line-height:1.3}
+    [data-tema="escuro"] .d-abertura-data{color:#60a5fa}
     .d-abertura-portal{font-size:.82rem;color:var(--text2);margin-top:10px;text-align:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)}
 
     /* Info grid */
@@ -310,7 +333,7 @@
     .d-acoes{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
     .d-btn-acessar{background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:11px 16px;border-radius:8px;font-size:.92rem;cursor:pointer;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;transition:background .15s}
     .d-btn-acessar:hover{background:var(--border)}
-    .d-btn-negocio{background:var(--primary);color:var(--btn-text);border:none;padding:12px 16px;border-radius:8px;font-size:.95rem;font-weight:700;cursor:pointer;text-align:center;transition:background .15s}
+    .d-btn-negocio{background:var(--primary);color:#fff;border:none;padding:12px 16px;border-radius:9px;font-size:.92rem;font-weight:700;cursor:pointer;text-align:center;transition:background .15s;font-family:'DM Sans',sans-serif}
     .d-btn-negocio:hover{background:var(--primary-hover)}
     .d-btn-negocio.adicionado{background:#166534;color:#fff}
 
@@ -327,7 +350,7 @@
     .neg-tab{background:transparent;border:none;color:var(--text2);padding:10px 16px;font-size:.9rem;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}
     .neg-tab:hover{color:var(--text)}
     .neg-tab.ativo{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
-    [data-tema="escuro"] .neg-tab.ativo{color:var(--accent);border-bottom-color:var(--accent)}
+    [data-tema="escuro"] .neg-tab.ativo{color:#60a5fa;border-bottom-color:#60a5fa}
     .neg-view{display:none}.neg-view.ativo{display:block}
     .funil{display:flex;flex-direction:column;gap:24px}
     .fase-titulo{display:flex;align-items:center;gap:10px;margin-bottom:12px}
@@ -372,7 +395,7 @@
     .cal-dia-num{font-weight:600;color:var(--text2);margin-bottom:2px}
     .cal-evento{background:var(--primary);color:var(--btn-text);border-radius:3px;padding:1px 4px;font-size:.65rem;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .cal-evento.encerramento{background:#7f1d1d;color:#fca5a5}
-    [data-tema="escuro"] .cal-evento{background:#245239}
+    [data-tema="escuro"] .cal-evento{background:#1d4ed8}
 
 
 
@@ -395,9 +418,9 @@
     .ac-item{padding:9px 14px;font-size:.9rem;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border)}
     .ac-item:last-child{border-bottom:none}
     .ac-item:hover,.ac-item.selecionado{background:var(--chip-bg);color:var(--primary)}
-    [data-tema="escuro"] .ac-item:hover,[data-tema="escuro"] .ac-item.selecionado{color:var(--accent)}
+    [data-tema="escuro"] .ac-item:hover,[data-tema="escuro"] .ac-item.selecionado{color:#60a5fa}
     .ac-item strong{color:var(--primary)}
-    [data-tema="escuro"] .ac-item strong{color:var(--accent)}
+    [data-tema="escuro"] .ac-item strong{color:#60a5fa}
 
 
     /* ===== LAYOUT VERTICAL (smartphone style) ===== */
@@ -405,8 +428,11 @@
     .card-vert{background:var(--surface);border-radius:10px;padding:14px;box-shadow:var(--card-shadow);border-top:3px solid var(--primary);cursor:pointer;display:flex;flex-direction:column;gap:8px;transition:box-shadow .2s}
     .card-vert:hover{box-shadow:var(--card-shadow-hover);border-top-color:var(--accent)}
     .card-vert-mod{font-size:.65rem;font-weight:700;text-transform:uppercase;color:var(--text3);letter-spacing:.5px}
-    .card-vert-titulo{font-size:.82rem;font-weight:700;color:var(--accent);line-height:1.3}
-    [data-tema="claro"] .card-vert-titulo{color:var(--primary)}
+    .card-vert-modalidade{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:2px}
+    .card-vert-num{font-size:.92rem;font-weight:800;color:var(--primary);line-height:1.2}
+    [data-tema="escuro"] .card-vert-num{color:#60a5fa}
+    .card-vert-uasg{font-size:.7rem;color:var(--text3);font-family:'DM Mono',monospace;margin-top:1px}
+    .card-vert-titulo{font-size:.78rem;font-weight:600;color:var(--text2);line-height:1.3}
     .card-vert-orgao{font-size:.75rem;color:var(--text2);font-weight:500}
     .card-vert-desc{font-size:.75rem;color:var(--text2);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
     .card-vert-divider{height:1px;background:var(--border)}
@@ -426,8 +452,12 @@
     .card-exp:hover{box-shadow:var(--card-shadow-hover);border-left-color:var(--accent)}
     .card-exp-main{display:grid;grid-template-columns:1fr 280px;min-height:120px}
     .card-exp-left{padding:14px 16px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:6px}
-    .card-exp-titulo{font-weight:700;font-size:.88rem;color:var(--accent);line-height:1.3}
-    [data-tema="claro"] .card-exp-titulo{color:var(--primary)}
+    .card-exp-modalidade{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);margin-bottom:2px;font-family:'DM Mono',monospace}
+    .card-exp-num{font-size:1rem;font-weight:800;color:var(--primary);line-height:1.2;margin-bottom:1px}
+    [data-tema="escuro"] .card-exp-num{color:#60a5fa}
+    .card-exp-uasg{font-size:.72rem;font-weight:700;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:4px}
+    .card-exp-titulo{font-weight:600;font-size:.82rem;color:var(--text2);line-height:1.35;margin-bottom:3px}
+    .card-exp-orgao{font-size:.82rem;font-weight:700;color:var(--text);line-height:1.3}
     .card-exp-desc{font-size:.8rem;color:var(--text2);line-height:1.4;flex:1}
     .card-exp-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:2px}
     .card-exp-meta span{font-size:.75rem;color:var(--text2)}
@@ -452,11 +482,11 @@
     .card-items-loading{padding:12px;color:var(--text3);font-size:.75rem;text-align:center}
     .card-items-vazio{padding:12px;color:var(--text3);font-size:.75rem;text-align:center}
 
-    .card-exp-footer{background:var(--surface2);border-top:2px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .card-exp-footer{background:var(--surface2);border-top:1px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
     .card-exp-footer span{font-size:.74rem;color:var(--text2)}
     .card-exp-footer-badges{display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:wrap}
     .footer-info{font-size:.74rem;color:var(--text2)}
-    .footer-badge{font-size:.72rem;font-weight:700;color:var(--accent) !important;background:var(--primary);padding:3px 9px;border-radius:4px;white-space:nowrap}
+    .footer-badge{font-size:.72rem;font-weight:700;color:#fff !important;background:var(--primary);padding:3px 9px;border-radius:4px;white-space:nowrap}
     .badge-status{font-size:.72rem;font-weight:700;color:var(--btn-text) !important;background:var(--primary);padding:3px 9px;border-radius:4px}
     [data-tema="claro"] .footer-badge,[data-tema="claro"] .badge-status{color:var(--primary) !important;background:var(--chip-bg)}
 
@@ -496,16 +526,25 @@
 
 
     /* Hambúrguer mobile */
-    .nav-mobile-btn{display:none;background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:8px;font-size:1.2rem;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0}
-    .nav-mobile-btn:hover{background:rgba(255,255,255,.25)}
-    .mobile-menu{position:fixed;top:52px;left:0;right:0;background:var(--primary);z-index:499;padding:8px;display:none;flex-direction:column;gap:4px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+    .nav-mobile-btn{display:none;background:var(--surface2);border:1px solid var(--border);color:var(--text2);width:32px;height:32px;border-radius:8px;font-size:1.1rem;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0}
+    .nav-mobile-btn:hover{background:var(--surface2);color:var(--text)}
+    .mobile-menu{position:fixed;top:54px;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--border);z-index:499;padding:8px;display:none;flex-direction:column;gap:2px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
     .mobile-menu.aberto{display:flex}
-    .mobile-menu-item{padding:12px 16px;color:rgba(255,255,255,.85);font-size:.95rem;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:10px}
-    .mobile-menu-item:hover{background:rgba(255,255,255,.15);color:#fff}
-    .mobile-menu-sep{height:1px;background:rgba(255,255,255,.15);margin:4px 0}
+    .mobile-menu-item{padding:11px 14px;color:var(--text2);font-size:.9rem;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:10px;font-family:'DM Sans',sans-serif}
+    .mobile-menu-item:hover{background:var(--surface2);color:var(--text)}
+    .mobile-menu-sep{height:1px;background:var(--border);margin:3px 0}
+    /* Bottom nav mobile */
+    .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--surface);border-top:1px solid var(--border);z-index:498;padding:0 4px;padding-bottom:env(safe-area-inset-bottom)}
+    .bottom-nav-inner{display:flex;height:100%}
+    .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border-radius:8px;margin:4px 2px;position:relative}
+    .bn-item-icon{font-size:1.1rem;line-height:1}
+    .bn-item-label{font-size:.62rem;font-weight:600;color:var(--text3);font-family:'DM Sans',sans-serif}
+    .bn-item.on .bn-item-label{color:var(--primary)}
+    [data-tema="escuro"] .bn-item.on .bn-item-label{color:#60a5fa}
+    .bn-dot{position:absolute;top:2px;right:calc(50% - 14px);width:6px;height:6px;background:#ef4444;border-radius:50%}
 
     /* Botão scroll-to-top */
-    .btn-topo{position:fixed;bottom:24px;right:16px;width:44px;height:44px;border-radius:50%;background:var(--primary);color:var(--accent);border:2px solid var(--accent);font-size:1.1rem;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:150;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:opacity .2s}
+    .btn-topo{position:fixed;bottom:72px;right:16px;width:40px;height:40px;border-radius:50%;background:var(--primary);color:#fff;border:none;font-size:1.1rem;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:150;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:opacity .2s}
     .btn-topo.visivel{display:flex}
     .btn-topo:hover{background:var(--primary-hover)}
 
@@ -516,7 +555,7 @@
     .modal-itens-overlay.aberto{display:flex}
     .modal-itens{background:var(--surface);border-radius:14px;width:640px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
     .modal-itens-header{background:var(--primary);padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
-    .modal-itens-header h3{color:var(--accent);font-size:.95rem;font-weight:700}
+    .modal-itens-header h3{color:#fff;font-size:.95rem;font-weight:700}
     .modal-itens-sub{font-size:.75rem;color:rgba(255,255,255,.6);margin-top:2px}
     .modal-itens-fechar{background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center}
     .modal-itens-busca{padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
@@ -536,7 +575,7 @@
     .modal-itens-acoes{display:flex;gap:8px}
     .btn-sel-todos{padding:7px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:.8rem;cursor:pointer}
     .btn-sel-todos:hover{background:var(--chip-bg)}
-    .btn-salvar-neg{background:var(--primary);color:var(--accent);border:none;padding:9px 22px;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer}
+    .btn-salvar-neg{background:var(--primary);color:#fff;border:none;padding:9px 22px;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer}
     .btn-salvar-neg:hover{background:var(--primary-hover)}
     .modal-itens-loading{text-align:center;padding:30px;color:var(--text3)}
 
@@ -544,7 +583,8 @@
     /* ═══ CHAT MONITOR ═══ */
     .chat-abas{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px}
     .chat-aba{padding:10px 20px;font-size:.88rem;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s}
-    .chat-aba.ativo{color:var(--accent);border-bottom-color:var(--accent)}
+    .chat-aba.ativo{color:var(--primary);border-bottom-color:var(--primary)}
+    [data-tema="escuro"] .chat-aba.ativo{color:#60a5fa;border-bottom-color:#60a5fa}
     .chat-aba:hover{color:var(--text)}
     .chat-aba-content{display:none}
     .chat-aba-content.ativo{display:block}
@@ -557,7 +597,7 @@
     .chat-card-info{flex:1}
     .chat-card-titulo{font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:4px}
     .chat-card-sub{font-size:.75rem;color:var(--text2);display:flex;gap:12px;flex-wrap:wrap}
-    .chat-card-badge{background:var(--primary);color:var(--accent);border-radius:20px;padding:2px 10px;font-size:.7rem;font-weight:700}
+    .chat-card-badge{background:var(--primary);color:#fff;border-radius:20px;padding:2px 10px;font-size:.7rem;font-weight:700}
     .chat-card-acoes{display:flex;gap:6px;flex-shrink:0}
     .chat-icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
     .chat-icon-btn:hover{background:var(--primary);color:var(--accent);border-color:var(--primary)}
@@ -645,13 +685,16 @@
       .data-row,.cards,.cards-vertical,.card-exp,.card-vert{width:100%;max-width:100%}
 
       /* Header mobile */
-      header{padding:0 10px;height:52px;grid-template-columns:auto 1fr auto;gap:8px}
-      .header-logo{display:none}
+      header{padding:0 12px;height:52px;grid-template-columns:auto 1fr auto;gap:8px}
       .nav{justify-content:flex-start;gap:0}
       .nav-btn:not(#navMobileBtn){display:none}
       .nav-mobile-btn{display:flex}
       .header-right{gap:6px}
       .btn-tema,.btn-sino{width:30px;height:30px;font-size:.9rem}
+      /* Sidebar oculta, bottom nav aparece no mobile */
+      .app-sidebar{display:none !important}
+      .bottom-nav{display:flex}
+      .container{padding-bottom:72px}
 
       /* Container e filtros */
       .container{padding:10px 8px}
@@ -843,57 +886,46 @@
 </div>
 
 <header>
-  <div class="header-logo">📋 Arantes<span>Licitações · PNCP</span></div>
+  <div class="header-logo"><div class="header-logo-icon">🔍</div><div class="header-logo-text">Arantes <span>Licitações</span></div></div>
 
   <nav class="nav">
-    <button class="nav-btn ativo" id="navOportunidades" onclick="toggleDropdown('dropOportunidades')">
-      <span class="nav-btn-icon">🔍</span> Pesquisar ▾
-      <div class="dropdown" id="dropOportunidades">
-        <div class="dropdown-item" onclick="irParaView('busca')">🔍 Buscar Licitações</div>
-        <div class="dropdown-item" onclick="irParaView('jornais')">🔔 Meus Alertas</div>
-        <div class="dropdown-sep"></div>
-        <div class="dropdown-item" onclick="irParaView('orgaos')">🏛️ Órgãos Públicos</div>
-        <div class="dropdown-item" onclick="irParaView('buscarNum')">🔢 Buscar por Número</div>
-      </div>
+    <button class="nav-btn ativo" id="navBusca" onclick="irParaView('busca');setHeaderNav('navBusca')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 3 3"/></svg>
+      Busca
     </button>
-    <button class="nav-btn" id="navAnalise" onclick="toggleDropdown('dropAnalise')">
-      <span class="nav-btn-icon">📊</span> Análises ▾
-      <div class="dropdown" id="dropAnalise">
-        <div class="dropdown-item" onclick="irParaView('historico')">📈 Preços Praticados</div>
-        <div class="dropdown-item" onclick="irParaView('empresa')">🔎 Consultar Empresa</div>
-      </div>
+    <button class="nav-btn" id="navJornaisBtn" onclick="irParaView('jornais');setHeaderNav('navJornaisBtn')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      Jornais
+      <span id="headerJornalBadge" style="background:#2563eb;color:#fff;border-radius:20px;font-size:.6rem;font-weight:700;padding:1px 7px;display:none">0</span>
     </button>
-    <button class="nav-btn" id="navNegocios" onclick="toggleDropdown('dropNegocios')">
-      <span class="nav-btn-icon">📁</span> Meus Negócios ▾
-      <div class="dropdown" id="dropNegocios">
-        <div class="dropdown-item" onclick="irParaNegocios('funil')">📊 Por Etapa</div>
-        <div class="dropdown-item" onclick="irParaNegocios('quadros')">🗂️ Visão Geral</div>
-        <div class="dropdown-item" onclick="irParaNegocios('agenda')">📅 Calendário de Prazos</div>
-      </div>
+    <button class="nav-btn" id="navNegociosBtn" onclick="irParaView('negocios');setHeaderNav('navNegociosBtn')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Negócios
     </button>
-    <button class="nav-btn" id="navChat" onclick="irParaView('chatMonitor')">
-      <span class="nav-btn-icon">💬</span> Sessões ao Vivo
+    <button class="nav-btn" id="navChatBtn" onclick="irParaView('chatMonitor');setHeaderNav('navChatBtn')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Chat Monitor
+    </button>
+    <button class="nav-btn" id="navDescobrir" onclick="irParaView('descobrir');setHeaderNav('navDescobrir')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+      Descobrir
     </button>
     <button class="nav-mobile-btn" id="navMobileBtn" onclick="toggleMobileMenu()">☰</button>
   </nav>
 
   <div class="header-right">
-    <button class="nav-btn" id="navMinhaEmpresa" onclick="toggleDropdown('dropMinhaEmpresa')" style="font-size:.82rem">
-      🏢 Minha Empresa ▾
-      <div class="dropdown" id="dropMinhaEmpresa" style="right:0;left:auto">
-        <div class="dropdown-item" onclick="irParaView('minhaEmpresa')">🏢 CNPJ</div>
-        <div class="dropdown-item" onclick="irParaView('documentos')">📂 Documentos</div>
-      </div>
-    </button>
     <div class="notif-wrapper">
-      <button class="btn-sino" onclick="toggleNotificacoes()">🔔<span class="sino-badge" id="sinoBadge">0</span></button>
+      <button class="btn-sino" onclick="toggleNotificacoes()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="sino-badge" id="sinoBadge">0</span>
+      </button>
       <div class="notif-panel" id="notifPanel">
         <div class="notif-header"><span>🔔 Notificações</span><button onclick="limparNotificacoes()">Limpar todas</button></div>
         <div id="notifLista"><div class="notif-vazia">Nenhuma notificação</div></div>
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.22</span>
+    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0" onclick="irParaView('minhaEmpresa')">AC</div>
   </div>
 </header>
 
@@ -918,9 +950,56 @@
   <div class="mobile-menu-item" onclick="alternarTema();fecharMobileMenu()">🌓 Alternar tema</div>
 </div>
 
+<!-- BOTTOM NAV MOBILE -->
+<div class="bottom-nav" id="bottomNav">
+  <div class="bottom-nav-inner">
+    <div class="bn-item on" id="bnBusca" onclick="irParaView('busca');setBottomNav('bnBusca')">
+      <div class="bn-item-icon">🔍</div>
+      <div class="bn-item-label">Busca</div>
+    </div>
+    <div class="bn-item" id="bnJornais" onclick="irParaView('jornais');setBottomNav('bnJornais')">
+      <div class="bn-item-icon">🔔</div>
+      <div class="bn-dot" id="bnJornalDot" style="display:none"></div>
+      <div class="bn-item-label">Jornais</div>
+    </div>
+    <div class="bn-item" id="bnNegocios" onclick="irParaView('negocios');setBottomNav('bnNegocios')">
+      <div class="bn-item-icon">📁</div>
+      <div class="bn-item-label">Negócios</div>
+    </div>
+    <div class="bn-item" id="bnChat" onclick="irParaView('chatMonitor');setBottomNav('bnChat')">
+      <div class="bn-item-icon">💬</div>
+      <div class="bn-item-label">Sessões</div>
+    </div>
+    <div class="bn-item" id="bnMais" onclick="toggleMobileMenu()">
+      <div class="bn-item-icon">☰</div>
+      <div class="bn-item-label">Mais</div>
+    </div>
+  </div>
+</div>
 <button class="btn-topo" id="btnTopo" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Voltar ao topo">▲</button>
 
 
+<div class="app-layout">
+<aside class="app-sidebar" id="appSidebar">
+  <div class="sb-section-label">Principal</div>
+  <button class="sb-item on" id="sbBusca" onclick="irParaView('busca');setSidebarActive('sbBusca')">🔍 Buscar Licitações</button>
+  <button class="sb-item" id="sbJornais" onclick="irParaView('jornais');setSidebarActive('sbJornais')">🔔 Jornais de Alerta <span class="sb-badge" id="sbJornalBadge" style="display:none">0</span></button>
+  <div class="sb-divider"></div>
+  <div class="sb-section-label">Gestão</div>
+  <button class="sb-item" id="sbNegocios" onclick="irParaView('negocios');setSidebarActive('sbNegocios')">📁 Meus Negócios</button>
+  <button class="sb-item" id="sbAgenda" onclick="irParaNegocios('agenda');setSidebarActive('sbAgenda')">📅 Agenda</button>
+  <div class="sb-divider"></div>
+  <div class="sb-section-label">Ferramentas</div>
+  <button class="sb-item" id="sbChat" onclick="irParaView('chatMonitor');setSidebarActive('sbChat')">💬 Chat Monitor</button>
+  <button class="sb-item" id="sbDescobrir" onclick="irParaView('descobrir');setSidebarActive('sbDescobrir')">✨ Descobrir</button>
+  <div class="sb-divider"></div>
+  <div class="sb-section-label">Análises</div>
+  <button class="sb-item" id="sbHistorico" onclick="irParaView('historico');setSidebarActive('sbHistorico')">📈 Preços Praticados</button>
+  <button class="sb-item" id="sbConsulta" onclick="irParaView('empresa');setSidebarActive('sbConsulta')">🔎 Consultar Empresa</button>
+  <button class="sb-item" id="sbOrgaos" onclick="irParaView('orgaos');setSidebarActive('sbOrgaos')">🏛️ Órgãos Públicos</button>
+  <button class="sb-item" id="sbNum" onclick="irParaView('buscarNum');setSidebarActive('sbNum')">🔢 Buscar por Número</button>
+</aside>
+<div class="app-main">
 <!-- VIEW BUSCA -->
 <div class="view ativo" id="viewBusca">
   <div class="container">
@@ -946,7 +1025,7 @@
       <!-- Linha 2: Filtros rápidos com label -->
       <div class="filtros-linha-selects">
         <div class="filtro-campo">
-          <span class="filtro-campo-label">Selecionar estados</span>
+          <span class="filtro-campo-label">Estado (UF)</span>
           <button class="select-trigger" id="ufTrigger" onclick="abrirModalUF()" type="button">
             <span class="select-trigger-txt" id="ufTriggerTxt">📍 Todos os estados</span>
             <span style="color:var(--text3);font-size:.72rem;flex-shrink:0">▼</span>
@@ -1330,6 +1409,8 @@
   </div>
 </div>
 
+</div><!-- /app-main -->
+</div><!-- /app-layout -->
 <!-- DRAWER -->
 <div class="overlay" id="overlay" onclick="fecharDrawer()"></div>
 <div class="drawer" id="drawer">
@@ -1338,6 +1419,7 @@
     <button class="drawer-fechar" onclick="fecharDrawer()">✕</button>
     <div class="d-fonte-badge" id="d-fonte-badge"></div>
     <div class="d-num-header" id="d-num-header"></div>
+    <div class="d-num-principal" id="d-num-principal"></div>
     <div class="d-uasg-header" id="d-uasg-header"></div>
   </div>
 
@@ -1753,11 +1835,11 @@
     document.querySelectorAll('.dropdown').forEach(d=>d.classList.remove('aberto'));
     const el=document.getElementById('view'+view.charAt(0).toUpperCase()+view.slice(1));
     if(el)el.classList.add('ativo');
-    if(['busca','jornais','orgaos','buscarNum'].includes(view))document.getElementById('navOportunidades').classList.add('ativo');
-    if(view==='chatMonitor'){document.getElementById('navChat')?.classList.add('ativo');setTimeout(()=>iniciarChatMonitor(),0);}
-    if(['historico','empresa'].includes(view))document.getElementById('navAnalise').classList.add('ativo');
-    if(['negocios'].includes(view))document.getElementById('navNegocios').classList.add('ativo');
-    if(['minhaEmpresa','documentos'].includes(view)){const el=document.getElementById('navMinhaEmpresa');if(el)el.classList.add('ativo');}
+    if(['busca','jornais','orgaos','buscarNum'].includes(view))setHeaderNav('navBusca');
+    if(view==='chatMonitor'){setHeaderNav('navChatBtn');setTimeout(()=>iniciarChatMonitor(),0);}
+    if(['historico','empresa'].includes(view))setHeaderNav('navBusca');
+    if(['negocios'].includes(view)){setHeaderNav('navNegociosBtn');}
+    if(['minhaEmpresa','documentos'].includes(view)){setHeaderNav('navBusca');}
     if(view==='jornais')renderJornais();
     if(view==='minhaEmpresa')renderMinhaEmpresa();
     if(view==='documentos')renderDocumentos();
@@ -1968,18 +2050,19 @@
     const badge = statusBadge(item);
     const mod = fmtModalidade(item.modalidade_licitacao_nome) || '';
     const num = extrairNumEdital(item);
+    const uasg = item.unidade_codigo || '';
+    const topLine = [mod ? mod.toUpperCase() : '', num || '', uasg ? '· UASG ' + uasg : ''].filter(Boolean).join(' ');
+    const localStr = [item.municipio_nome, item.uf].filter(Boolean).join(' / ');
     return `<div class="card-vert" data-controle="${item.numero_controle_pncp||''}" onclick='abrirDrawer(${JSON.stringify(item)})'>
       <div>
-        ${mod ? `<div class="card-vert-mod">${mod}</div>` : ''}
-        ${num ? `<div class="card-vert-titulo"><span data-num>Nº ${num}</span></div>` : `<div class="card-vert-titulo"><span data-num></span></div>`}
-        <div class="card-vert-orgao">🏛 ${(item.orgao_nome||'—').substring(0,50)}</div>
-        ${item.unidade_codigo ? `<div style="font-size:.72rem;color:var(--accent);font-weight:700;margin-top:2px">UASG ${item.unidade_codigo}</div>` : ''}
+        <div style="font-size:.65rem;font-weight:700;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:.3px;margin-bottom:4px"><span data-num>${topLine}</span></div>
+        <div style="font-size:.82rem;font-weight:700;color:#60a5fa;line-height:1.3;margin-bottom:4px">${item.description||'—'}</div>
+        <div style="font-size:.75rem;color:var(--text2);margin-bottom:2px">🏛 ${(item.orgao_nome||'—').substring(0,50)}</div>
       </div>
-      <div class="card-vert-desc">${item.description||'—'}</div>
       <div class="card-vert-divider"></div>
       <div class="card-vert-datas">
-        <div class="card-vert-data"><span>📅 Início</span><span>${fmt(item.data_inicio_vigencia)}</span></div>
-        <div class="card-vert-data"><span>⏰ Fim</span><span>${fmt(item.data_fim_vigencia)}</span></div>
+        <div class="card-vert-data"><span>📅 Abertura</span><span>${fmt(item.data_inicio_vigencia)}</span></div>
+        <div class="card-vert-data"><span>⏰ Encerra</span><span>${fmt(item.data_fim_vigencia)}</span></div>
       </div>
       <div class="card-vert-footer">
         <span class="card-vert-local">📍 ${item.municipio_nome||item.uf||'—'} / ${item.uf||''}</span>
@@ -2012,30 +2095,35 @@
 
   function renderCardExpandido(item) {
     const badge = statusBadge(item);
-    const mod = fmtModalidade(item.modalidade_licitacao_nome) || 'Licitação';
+    const mod = fmtModalidade(item.modalidade_licitacao_nome) || '';
     const num = extrairNumEdital(item);
     const uasg = item.unidade_codigo || '';
-    const titulo = `${mod.toUpperCase()} <span data-num>${num ? 'Nº ' + num : ''}</span>${uasg ? ` — <span style="color:var(--accent);font-weight:700">UASG ${uasg}</span>` : ''} — ${(item.orgao_nome || '').toUpperCase()}${item.uf ? ' / ' + item.uf : ''}`;
     const cardId = (item.numero_controle_pncp || item.id || Math.random().toString(36).substr(2,9)).replace(/[^a-z0-9]/gi,'_');
     const esferaNome = item.esfera_id === 'F' ? 'Comprasnet' : item.esfera_id === 'E' ? 'Estadual' : item.esfera_id === 'M' ? 'Municipal' : '';
+    // Linha topo: "PE 042/2025 · UASG 153038"
+    const topLine = [mod ? mod.toUpperCase() : '', num || '', uasg ? '· UASG ' + uasg : ''].filter(Boolean).join(' ');
+    const localStr = [item.municipio_nome, item.uf].filter(Boolean).join(' / ');
     return `<div class="card-exp" data-controle="${item.numero_controle_pncp||''}" onclick='abrirDrawer(${JSON.stringify(item)})'>
       <div class="card-exp-main">
         <div class="card-exp-left">
-          <div class="card-exp-titulo">${titulo}</div>
-          <div class="card-exp-desc">${item.description || '—'}</div>
+          <div style="font-size:.7rem;font-weight:700;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:.3px;margin-bottom:5px"><span data-num>${topLine}</span></div>
+          <div style="font-size:.9rem;font-weight:700;color:#60a5fa;line-height:1.35;margin-bottom:6px">${item.description || '—'}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:auto;padding-top:4px">
+            ${item.orgao_nome ? `<span style="font-size:.78rem;color:var(--text2)">🏛 ${item.orgao_nome}</span>` : ''}
+            ${localStr ? `<span style="font-size:.78rem;color:var(--text2)">📍 ${localStr}</span>` : ''}
+          </div>
         </div>
         <div class="card-exp-items" id="card-items-${cardId}" onclick="event.stopPropagation()">
           <div class="card-items-loading">⏳ Carregando...</div>
         </div>
       </div>
       <div class="card-exp-footer">
-        <span class="footer-info">📍 ${item.municipio_nome || '—'} / ${item.uf || '—'}</span>
-        <span class="footer-info">📅 ${fmt(item.data_inicio_vigencia)}</span>
-        <span class="footer-info">⏰ ${fmt(item.data_fim_vigencia)}</span>
+        <span class="footer-badge badge-status">${badge.texto}</span>
+        ${item.data_inicio_vigencia ? `<span class="footer-info">Abertura: <strong>${fmt(item.data_inicio_vigencia)}</strong></span>` : ''}
+        ${item.data_fim_vigencia ? `<span class="footer-info">Encerra: <strong>${fmt(item.data_fim_vigencia)}</strong></span>` : ''}
         <div class="card-exp-footer-badges">
-          <span class="footer-badge badge-status">${badge.texto}</span>
           ${mod ? `<span class="footer-badge">${mod}</span>` : ''}
-          ${esferaNome ? `<span class="footer-badge" title="Portal de origem">${item.esfera_id==='F'?'🌐 Comprasnet':item.esfera_id==='E'?'🌐 Estadual':'🌐 Municipal'}</span>` : ''}
+          ${esferaNome ? `<span class="footer-badge">🌐 ${esferaNome}</span>` : ''}
         </div>
       </div>
     </div>`;
@@ -3601,6 +3689,32 @@
     }
   })();
   fetchNegocios().then(()=>{});
+  function setSidebarActive(id){
+    document.querySelectorAll('.sb-item').forEach(function(el){el.classList.remove('on');});
+    var el=document.getElementById(id);if(el)el.classList.add('on');
+  }
+  function setHeaderNav(id){
+    ['navBusca','navJornaisBtn','navNegociosBtn','navChatBtn','navDescobrir'].forEach(function(x){
+      var el=document.getElementById(x);if(el)el.classList.remove('ativo');
+    });
+    var el=document.getElementById(id);if(el)el.classList.add('ativo');
+  }
+  function setBottomNav(id){
+    ['bnBusca','bnJornais','bnNegocios','bnChat','bnMais'].forEach(x=>{
+      const el=document.getElementById(x);
+      if(el) el.classList.toggle('on',x===id);
+    });
+  }
+  // Patch irParaView após carregamento para sincronizar bottom nav
+  document.addEventListener('DOMContentLoaded',function(){
+    const _orig=irParaView;
+    window.irParaView=function(v){
+      _orig(v);
+      const map={busca:'bnBusca',jornais:'bnJornais',negocios:'bnNegocios',chatMonitor:'bnChat'};
+      if(map[v]) setBottomNav(map[v]);
+    };
+  });
+
 </script>
 </body>
 </html>
