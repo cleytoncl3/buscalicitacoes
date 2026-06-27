@@ -1313,6 +1313,7 @@
       </div>
       <button class="modal-itens-fechar" onclick="fecharModalItens()">✕</button>
     </div>
+    <div class="modal-itens-kw-chips" id="modalItensKwChips" style="display:none;padding:8px 16px 0;gap:6px;flex-wrap:wrap"></div>
     <div class="modal-itens-busca">
       <input type="text" id="modalItensBusca" placeholder="🔍 Filtrar itens..." oninput="filtrarModalItens()"/>
     </div>
@@ -2208,6 +2209,19 @@
     document.getElementById('modalItensOverlay').classList.add('aberto');
     document.body.style.overflow = 'hidden';
 
+    // Chips de palavra-chave para filtro rápido
+    const kwRaw = (document.getElementById('palavraChave').value || '').trim();
+    const kwChipsEl = document.getElementById('modalItensKwChips');
+    if (kwRaw) {
+      const kws = kwRaw.split(/[;,]/).map(s => s.trim()).filter(Boolean);
+      if (kws.length) {
+        kwChipsEl.style.display = 'flex';
+        kwChipsEl.innerHTML = kws.map(k =>
+          `<span class="chip" style="cursor:pointer" onclick="document.getElementById('modalItensBusca').value='${k.replace(/'/g,"\\'")}';filtrarModalItens()">${k}</span>`
+        ).join('');
+      } else { kwChipsEl.style.display = 'none'; kwChipsEl.innerHTML = ''; }
+    } else { kwChipsEl.style.display = 'none'; kwChipsEl.innerHTML = ''; }
+
     // Carrega itens
     const p = parseControle(itemAtualDrawer.numero_controle_pncp);
     if (!p) { document.getElementById('modalItensLista').innerHTML = '<div class="modal-itens-loading">Sem itens disponíveis.</div>'; return; }
@@ -2463,7 +2477,6 @@
 
   function aplicarHistorico(kw){
     document.getElementById('palavraChave').value=kw;
-    buscar(1);
   }
 
   // ===== UTILS =====
