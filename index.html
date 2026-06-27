@@ -694,9 +694,11 @@
       .filtros{padding:12px 10px;border-radius:8px}
       .busca-titulo{font-size:1.1rem}
 
-      /* Linha de busca — tudo em coluna */
-      .filtros-linha-busca{flex-direction:column;gap:8px;margin-bottom:10px}
-      .btn-buscar{width:100%;padding:12px;font-size:1rem;justify-content:center}
+      /* Linha de busca — campo + botão na mesma linha */
+      .filtros-linha-busca{flex-direction:row;gap:8px;margin-bottom:10px}
+      .btn-buscar{padding:10px 14px;font-size:.82rem;white-space:nowrap;flex-shrink:0}
+      .busca-titulo{font-size:.95rem}
+      .busca-subtitulo{font-size:.75rem}
 
       /* Filtros rápidos — 2 colunas no mobile */
       .filtros-linha-selects{grid-template-columns:1fr 1fr;gap:8px}
@@ -723,10 +725,11 @@
       .layout-toggle{flex-wrap:wrap;gap:4px}
       .layout-btn{font-size:.78rem;padding:5px 10px}
 
-      /* Cards verticais — 1 coluna */
-      .cards-vertical{grid-template-columns:1fr}
-      .card-vert{border-top-width:3px;aspect-ratio:unset}
-      .card-vert-titulo{font-size:.85rem}
+      /* Cards verticais — 1 coluna, cada card ocupa a tela inteira */
+      .cards-vertical{grid-template-columns:1fr;gap:0;scroll-snap-type:y mandatory;overflow-y:auto;height:calc(100dvh - 54px - 56px);padding:0}
+      .card-vert{border-top-width:3px;aspect-ratio:unset;border-radius:0;border-left:none;border-right:none;border-top:none;border-bottom:1px solid var(--border);border-top:3px solid var(--primary);height:calc(100dvh - 54px - 56px);scroll-snap-align:start;flex-shrink:0}
+      .card-vert-body{flex:1;overflow:hidden}
+      .card-vert-footer{padding:12px 14px}
 
       /* Cards horizontais — empilha */
       .card-exp{border-radius:8px}
@@ -2011,6 +2014,11 @@
     } else {
       document.getElementById('resultado').innerHTML =
         `<div class="cards-vertical">${itens.map(renderCardVertical).join('')}</div>`;
+      itens.forEach((item) => {
+        const p = parseControle(item.numero_controle_pncp);
+        const cardId = (item.numero_controle_pncp || item.id || '').replace(/[^a-z0-9]/gi,'_');
+        if (p && cardId) carregarItensCard(p.cnpj, p.ano, p.seq, cardId);
+      });
     }
     // Em background: busca os números reais (Comprasnet) para todos os cards
     carregarNumerosEmBatch(itens);
@@ -2047,12 +2055,16 @@
     const localStr = [item.municipio_nome, item.uf].filter(Boolean).join(' / ');
     const orgaoUFv = [item.orgao_nome, item.uf].filter(Boolean).join(' / ');
     const esferaNome = item.esfera_id === 'F' ? 'Comprasnet' : item.esfera_id === 'E' ? 'Estadual' : item.esfera_id === 'M' ? 'Municipal' : '';
+    const cardId = (item.numero_controle_pncp || item.id || Math.random().toString(36).substr(2,9)).replace(/[^a-z0-9]/gi,'_');
     return `<div class="card-vert" data-controle="${item.numero_controle_pncp||''}" onclick='abrirDrawer(${JSON.stringify(item)})'>
       <div class="card-vert-body">
         <div style="font-size:.72rem;font-weight:700;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:.3px">${mod ? mod.toUpperCase()+' ' : ''}<span data-num>${num || ''}</span>${uasg ? ' · UASG '+uasg : ''}</div>
         <div style="font-size:.82rem;font-weight:700;color:var(--text);line-height:1.3">${orgaoUFv || '—'}</div>
         <div style="font-size:.76rem;color:var(--text2);line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${item.description||'—'}</div>
         ${localStr ? `<div style="font-size:.71rem;color:var(--text3)">📍 ${localStr}</div>` : ''}
+        <div class="card-exp-items" id="card-items-${cardId}" onclick="event.stopPropagation()" style="border:none;padding:8px 0;background:transparent;flex:1;max-height:none">
+          <div class="card-items-loading">⏳ Carregando...</div>
+        </div>
       </div>
       <div class="card-vert-divider"></div>
       <div class="card-vert-footer">
