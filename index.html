@@ -889,7 +889,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.13</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.14</span>
   </div>
 </header>
 
@@ -963,7 +963,7 @@
           </button>
         </div>
         <div class="filtro-campo">
-          <span class="filtro-campo-label">Período de publicação</span>
+          <span class="filtro-campo-label">Período de publicação no PNCP</span>
           <div class="periodo-wrapper">
             <button class="select-trigger" id="periodoTrigger" onclick="togglePeriodoPanel(event)" type="button">
               <span class="select-trigger-txt" id="periodoTriggerTxt">📅 Qualquer período</span>
@@ -999,7 +999,7 @@
     </div>
 
     <div class="historico-box" id="historicoBox">
-      <div class="historico-label"><span>🕒 Mais buscadas</span><button onclick="limparHistorico()">Limpar</button></div>
+      <div class="historico-label"><span>🔥 Mais buscadas pela equipe</span></div>
       <div class="historico-chips" id="historicoChips"></div>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
@@ -2391,7 +2391,7 @@
     if(!_buscasRecentes.length){box.style.display='none';return;}
     box.style.display='block';
     document.getElementById('historicoChips').innerHTML=_buscasRecentes.map(x=>`
-      <span class="chip" onclick="aplicarHistorico('${x.kw.replace(/'/g,"\\'")}')" title="${x.count>1?x.count+' buscas':'1 busca'}">${x.kw}</span>`).join('');
+      <span class="chip" onclick="aplicarHistorico('${x.kw.replace(/'/g,"\\'")}')" title="Clique para buscar · ${x.count>1?x.count+' buscas pela equipe':'1 busca'}" style="display:inline-flex;align-items:center;gap:5px">${x.kw}${x.count>1?`<span style="font-size:.65rem;background:rgba(255,255,255,.15);border-radius:4px;padding:1px 5px;font-weight:700">${x.count}</span>`:''}</span>`).join('');
   }
   function aplicarHistorico(kw){
     document.getElementById('palavraChave').value=kw;
