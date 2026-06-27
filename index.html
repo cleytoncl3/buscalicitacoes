@@ -889,7 +889,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.18</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.19</span>
   </div>
 </header>
 
@@ -999,7 +999,7 @@
     </div>
 
     <div class="historico-box" id="historicoBox">
-      <div class="historico-label"><span>🔥 Mais buscadas pela equipe</span></div>
+      <div class="historico-label"><span>🔥 Mais buscadas</span></div>
       <div class="historico-chips" id="historicoChips"></div>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
@@ -2397,34 +2397,63 @@
   }
   function mudarMes(dir){if(dir===0)mesAtual=new Date();else mesAtual=new Date(mesAtual.getFullYear(),mesAtual.getMonth()+dir,1);renderAgenda()}
 
-  // ===== HISTÓRICO =====
-  // Buscas recentes — salvas no servidor, compartilhadas entre usuários
-  let _buscasRecentes=[];
+  // ===== HISTÓRICO (MAIS BUSCADAS) =====
+  const HIST_LS_KEY = 'arantes_mais_buscadas_v1';
+  let _buscasRecentes = [];
+
+  // Carrega do localStorage imediatamente (sem esperar API) para aparecer no F5
+  function _carregarHistoricoLS(){
+    try{
+      const raw = localStorage.getItem(HIST_LS_KEY);
+      if(raw){ _buscasRecentes = JSON.parse(raw); renderHistorico(); }
+    }catch{}
+  }
+
   async function salvarHistorico(kw){
     if(!kw)return;
-    try{ await fetch('/api/buscas-recentes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kw})}); }catch{}
-    await carregarHistorico();
+    // Incrementa localmente
+    const idx = _buscasRecentes.findIndex(x=>x.kw===kw.toLowerCase().trim());
+    if(idx>=0) _buscasRecentes[idx].count++;
+    else _buscasRecentes.unshift({kw:kw.toLowerCase().trim(),count:1});
+    _buscasRecentes.sort((a,b)=>b.count-a.count);
+    _buscasRecentes = _buscasRecentes.slice(0,20);
+    try{ localStorage.setItem(HIST_LS_KEY, JSON.stringify(_buscasRecentes)); }catch{}
+    renderHistorico();
+    // Sincroniza com servidor em background (para compartilhar entre funcionários)
+    try{ fetch('/api/buscas-recentes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kw})}); }catch{}
+    // Atualiza com dados do servidor (pode ter buscas de outros funcionários)
+    carregarHistorico();
   }
+
   async function carregarHistorico(){
     try{
-      const r=await fetch('/api/buscas-recentes');
-      const d=await r.json();
-      _buscasRecentes=d.buscas||[];
-    }catch{_buscasRecentes=[];}
-    renderHistorico();
+      const r = await fetch('/api/buscas-recentes');
+      const d = await r.json();
+      if(d.buscas?.length){
+        // Merge: servidor tem dados de outros funcionários, mescla com local
+        const map = {};
+        [..._buscasRecentes, ...d.buscas].forEach(x=>{ map[x.kw] = {kw:x.kw, count:Math.max(map[x.kw]?.count||0, x.count)}; });
+        _buscasRecentes = Object.values(map).sort((a,b)=>b.count-a.count).slice(0,20);
+        try{ localStorage.setItem(HIST_LS_KEY, JSON.stringify(_buscasRecentes)); }catch{}
+        renderHistorico();
+      }
+    }catch{}
   }
+
   function renderHistorico(){
-    const box=document.getElementById('historicoBox');
+    const box = document.getElementById('historicoBox');
     if(!_buscasRecentes.length){box.style.display='none';return;}
     box.style.display='block';
-    document.getElementById('historicoChips').innerHTML=_buscasRecentes.map(x=>`
-      <span class="chip" onclick="aplicarHistorico('${x.kw.replace(/'/g,"\\'")}')" title="Clique para buscar · ${x.count>1?x.count+' buscas pela equipe':'1 busca'}" style="display:inline-flex;align-items:center;gap:5px">${x.kw}${x.count>1?`<span style="font-size:.65rem;background:rgba(255,255,255,.15);border-radius:4px;padding:1px 5px;font-weight:700">${x.count}</span>`:''}</span>`).join('');
+    document.getElementById('historicoChips').innerHTML = _buscasRecentes.map(x=>`
+      <span class="chip" onclick="aplicarHistorico('${x.kw.replace(/'/g,"\\'")}')"
+        title="Clique para buscar · ${x.count>1?x.count+' buscas':'1 busca'}"
+        style="display:inline-flex;align-items:center;gap:5px">${x.kw}${x.count>1?`<span style="font-size:.65rem;background:rgba(255,255,255,.15);border-radius:4px;padding:1px 5px;font-weight:700">${x.count}</span>`:''}</span>`).join('');
   }
+
   function aplicarHistorico(kw){
     document.getElementById('palavraChave').value=kw;
     buscar(1);
   }
-  function limparHistorico(){_buscasRecentes=[];renderHistorico();}
 
   // ===== UTILS =====
   function fmt(iso){if(!iso)return'—';return new Date(iso).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}
@@ -2488,18 +2517,19 @@
   function atualizarNumeroNosCards(controle, numeroCompra, anoCompra){
     if(!controle||!numeroCompra)return;
     _cacheSet(controle,{numeroCompra,anoCompra});
-    document.querySelectorAll(`[data-controle="${CSS.escape(controle)}"]`).forEach(el=>{
+    const p = parseControle(controle);
+    if(!p)return;
+    const numAntigo = `${parseInt(p.seq)}/${p.ano}`;
+    const numNovo   = `${parseInt(numeroCompra)}/${anoCompra}`;
+    // Usa dataset.controle em vez de CSS selector (evita problemas com / no valor)
+    document.querySelectorAll('[data-controle]').forEach(el=>{
+      if(el.dataset.controle !== controle)return;
       const tituloEl = el.querySelector('.card-titulo-principal,.card-exp-titulo,.card-vert-titulo');
-      if(tituloEl){
-        const p = parseControle(controle);
-        if(p){
-          const numAntigo = `${parseInt(p.seq)}/${p.ano}`;
-          const numNovo   = `${parseInt(numeroCompra)}/${anoCompra}`;
-          tituloEl.innerHTML = tituloEl.innerHTML.replace(
-            new RegExp('Nº\\s*' + numAntigo.replace('/','\\/'), 'g'),
-            'Nº ' + numNovo
-          );
-        }
+      if(tituloEl && tituloEl.innerHTML.includes(numAntigo)){
+        tituloEl.innerHTML = tituloEl.innerHTML.replace(
+          new RegExp('Nº\\s*' + numAntigo.replace(/\//g,'\\/'), 'g'),
+          'Nº ' + numNovo
+        );
       }
     });
   }
@@ -3527,7 +3557,8 @@
   carregarTema();
   atualizarBotaoMod();
   atualizarBotaoPortal();
-  carregarHistorico();
+  _carregarHistoricoLS(); // exibe imediatamente do localStorage (sem aguardar API)
+  carregarHistorico();    // atualiza em background com dados do servidor
   renderNotificacoes();
   // Restaura view ao dar F5
   (function(){
