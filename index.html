@@ -2050,13 +2050,12 @@
     const mod = fmtModalidade(item.modalidade_licitacao_nome) || '';
     const num = extrairNumEdital(item);
     const uasg = item.unidade_codigo || '';
-    const topLine = [mod ? mod.toUpperCase() : '', num || '', uasg ? '· UASG ' + uasg : ''].filter(Boolean).join(' ');
     const localStr = [item.municipio_nome, item.uf].filter(Boolean).join(' / ');
+    const orgaoUFv = [item.orgao_nome, item.uf].filter(Boolean).join(' / ');
     return `<div class="card-vert" data-controle="${item.numero_controle_pncp||''}" onclick='abrirDrawer(${JSON.stringify(item)})'>
       <div>
-        <div style="font-size:.78rem;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;letter-spacing:.3px;margin-bottom:4px"><span data-num>${topLine}</span></div>
+        <div style="font-size:.78rem;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;letter-spacing:.3px;margin-bottom:4px">${mod ? mod.toUpperCase()+' ' : ''}<span data-num>${num || ''}</span>${uasg ? ' · UASG '+uasg : ''}${orgaoUFv ? ' — '+orgaoUFv : ''}</div>
         <div style="font-size:.75rem;font-weight:400;color:var(--text2);line-height:1.35;margin-bottom:4px">${item.description||'—'}</div>
-        <div style="font-size:.75rem;color:var(--text2);margin-bottom:2px">🏛 ${(item.orgao_nome||'—').substring(0,50)}</div>
       </div>
       <div class="card-vert-divider"></div>
       <div class="card-vert-datas">
@@ -2099,18 +2098,14 @@
     const uasg = item.unidade_codigo || '';
     const cardId = (item.numero_controle_pncp || item.id || Math.random().toString(36).substr(2,9)).replace(/[^a-z0-9]/gi,'_');
     const esferaNome = item.esfera_id === 'F' ? 'Comprasnet' : item.esfera_id === 'E' ? 'Estadual' : item.esfera_id === 'M' ? 'Municipal' : '';
-    // Linha topo: "PE 042/2025 · UASG 153038"
-    const topLine = [mod ? mod.toUpperCase() : '', num || '', uasg ? '· UASG ' + uasg : ''].filter(Boolean).join(' ');
     const localStr = [item.municipio_nome, item.uf].filter(Boolean).join(' / ');
+    const orgaoUF = [item.orgao_nome, item.uf].filter(Boolean).join(' / ');
     return `<div class="card-exp" data-controle="${item.numero_controle_pncp||''}" onclick='abrirDrawer(${JSON.stringify(item)})'>
       <div class="card-exp-main">
         <div class="card-exp-left">
-          <div style="font-size:.88rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:4px"><span data-num>${topLine}</span></div>
+          <div style="font-size:.88rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:4px">${mod ? mod.toUpperCase()+' ' : ''}<span data-num>${num || ''}</span>${uasg ? ' · UASG '+uasg : ''}${orgaoUF ? ' — '+orgaoUF : ''}</div>
           <div style="font-size:.78rem;font-weight:400;color:var(--text2);line-height:1.4;margin-bottom:6px">${item.description || '—'}</div>
           <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:auto;padding-top:4px">
-            ${item.orgao_nome ? `<span style="font-size:.78rem;color:var(--text2)">🏛 ${item.orgao_nome}</span>` : ''}
-            ${localStr ? `<span style="font-size:.78rem;color:var(--text2)">📍 ${localStr}</span>` : ''}
-          </div>
         </div>
         <div class="card-exp-items" id="card-items-${cardId}" onclick="event.stopPropagation()">
           <div class="card-items-loading">⏳ Carregando...</div>
