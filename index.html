@@ -889,7 +889,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.15</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.16</span>
   </div>
 </header>
 
@@ -1929,7 +1929,7 @@
     const badge = statusBadge(item);
     const mod = fmtModalidade(item.modalidade_licitacao_nome) || '';
     const num = extrairNumEdital(item);
-    return `<div class="card-vert" onclick='abrirDrawer(${JSON.stringify(item)})'>
+    return `<div class="card-vert" data-controle="${item.numero_controle_pncp||''}" onclick='abrirDrawer(${JSON.stringify(item)})'>
       <div>
         ${mod ? `<div class="card-vert-mod">${mod}</div>` : ''}
         ${num ? `<div class="card-vert-titulo">Nº ${num}</div>` : ''}
@@ -1959,7 +1959,7 @@
     const num = extrairNumEdital(item);
     const uasg = item.unidade_codigo || '';
     const titulo = `${mod.toUpperCase()}${num ? ' Nº ' + num : ''}${uasg ? ` — <span style="color:var(--accent);font-weight:700">UASG ${uasg}</span>` : ''} — ${(item.orgao_nome || '').toUpperCase()}${item.uf ? ' / ' + item.uf : ''}`;
-    return `<div class="card" onclick='abrirDrawer(${JSON.stringify(item)})'>
+    return `<div class="card" data-controle="${item.numero_controle_pncp||''}" onclick='abrirDrawer(${JSON.stringify(item)})'>
       <div class="card-titulo-principal">${titulo}</div>
       <div class="card-desc">${item.description || '—'}</div>
       <div class="card-info">
@@ -1979,7 +1979,7 @@
     const titulo = `${mod.toUpperCase()}${num ? ' Nº ' + num : ''}${uasg ? ` — <span style="color:var(--accent);font-weight:700">UASG ${uasg}</span>` : ''} — ${(item.orgao_nome || '').toUpperCase()}${item.uf ? ' / ' + item.uf : ''}`;
     const cardId = (item.numero_controle_pncp || item.id || Math.random().toString(36).substr(2,9)).replace(/[^a-z0-9]/gi,'_');
     const esferaNome = item.esfera_id === 'F' ? 'Comprasnet' : item.esfera_id === 'E' ? 'Estadual' : item.esfera_id === 'M' ? 'Municipal' : '';
-    return `<div class="card-exp" onclick='abrirDrawer(${JSON.stringify(item)})'>
+    return `<div class="card-exp" data-controle="${item.numero_controle_pncp||''}" onclick='abrirDrawer(${JSON.stringify(item)})'>
       <div class="card-exp-main">
         <div class="card-exp-left">
           <div class="card-exp-titulo">${titulo}</div>
@@ -2435,10 +2435,42 @@
     return 'PNCP';
   }
   function fmtModalidade(nome){if(!nome)return'';return nome.replace(' - ',' ')}
+  // Cache: numero_controle_pncp → { numeroCompra, anoCompra }
+  // Populado quando o drawer carrega o número real via /api/consulta/v1/
+  const _numCompraCache = {};
+
   function extrairNumEdital(item){
+    const controle = item.numero_controle_pncp;
+    // Se já temos o número real do Comprasnet em cache, usa ele
+    if(controle && _numCompraCache[controle]){
+      const c = _numCompraCache[controle];
+      return `${parseInt(c.numeroCompra)}/${c.anoCompra}`;
+    }
     if(item.numero_sequencial&&item.ano)return`${parseInt(item.numero_sequencial)}/${item.ano}`;
-    const c=item.numero_controle_pncp;if(!c)return'';
-    const m=c.match(/-(\d+)\/(\d+)$/);return m?`${parseInt(m[1])}/${m[2]}`:'';
+    if(!controle)return'';
+    const m=controle.match(/-(\d+)\/(\d+)$/);return m?`${parseInt(m[1])}/${m[2]}`:'';
+  }
+
+  // Atualiza o número exibido nos cards de resultado que já estão no DOM
+  function atualizarNumeroNosCards(controle, numeroCompra, anoCompra){
+    if(!controle||!numeroCompra)return;
+    _numCompraCache[controle]={numeroCompra,anoCompra};
+    // Atualiza todos os elementos de título que contenham o número antigo desse controle
+    document.querySelectorAll(`[data-controle="${CSS.escape(controle)}"]`).forEach(el=>{
+      const tituloEl = el.querySelector('.card-titulo-principal,.card-exp-titulo,.card-vert-titulo');
+      if(tituloEl){
+        // Substitui o número sequencial pelo número real no texto do título
+        const p = parseControle(controle);
+        if(p){
+          const numAntigo = `${parseInt(p.seq)}/${p.ano}`;
+          const numNovo   = `${parseInt(numeroCompra)}/${anoCompra}`;
+          tituloEl.innerHTML = tituloEl.innerHTML.replace(
+            new RegExp('Nº\\s*' + numAntigo.replace('/','\\/'), 'g'),
+            'Nº ' + numNovo
+          );
+        }
+      }
+    });
   }
 
   // ===== DRAWER =====
@@ -2633,6 +2665,8 @@
           const numReal=`${parseInt(numeroCompra)}/${anoCompra||itemAtualDrawer.ano||''}`;
           const elNum=document.getElementById('d-num-header');
           if(elNum) elNum.textContent=(mod?mod+' ':'')+'Nº '+numReal+(itemAtualDrawer.uf?' — '+itemAtualDrawer.uf:'');
+          // Atualiza o card na lista de resultados com o número correto
+          atualizarNumeroNosCards(itemAtualDrawer.numero_controle_pncp, numeroCompra, anoCompra||itemAtualDrawer.ano);
         }
         const elUasgH=document.getElementById('d-uasg-header');
         if(elUasgH&&codigoUnidade) elUasgH.textContent='UASG '+codigoUnidade+(uasgLabel?' — '+uasgLabel.split(' - ').slice(1).join(' - '):'');
