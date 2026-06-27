@@ -889,7 +889,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.17b</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.18</span>
   </div>
 </header>
 
@@ -1903,6 +1903,16 @@
 
   function renderCards(itens) {
     ultimosItens = itens;
+    // Salva UASG de cada item no cache imediatamente (já vem nos resultados da busca)
+    itens.forEach(item => {
+      if(item.numero_controle_pncp && item.unidade_codigo){
+        _cacheSet(item.numero_controle_pncp, {
+          uasg:      item.unidade_codigo,
+          uasgNome:  item.unidade_nome || '',
+          uasgLabel: item.unidade_codigo + (item.unidade_nome ? ' - ' + item.unidade_nome : ''),
+        });
+      }
+    });
     if (layoutAtual === 'expandido') {
       document.getElementById('resultado').innerHTML =
         `<div class="cards" style="gap:14px">${itens.map(renderCardExpandido).join('')}</div>`;
@@ -2452,15 +2462,21 @@
     return 'PNCP';
   }
   function fmtModalidade(nome){if(!nome)return'';return nome.replace(' - ',' ')}
-  // Cache: numero_controle_pncp → { numeroCompra, anoCompra }
-  // Populado quando o drawer carrega o número real via /api/consulta/v1/
-  const _numCompraCache = {};
+  // Cache por numero_controle_pncp: guarda UASG e número real (Comprasnet)
+  // Preenchido em dois momentos:
+  //  1. Quando renderCards roda: salva uasg/uasgNome de cada item da busca
+  //  2. Quando carregarNumerosEmBatch retorna: adiciona numeroCompra/anoCompra
+  const _licitCache = {}; // controle → { uasg, uasgNome, uasgLabel, numeroCompra, anoCompra }
+
+  function _cacheSet(controle, dados){
+    if(!controle)return;
+    _licitCache[controle] = Object.assign(_licitCache[controle]||{}, dados);
+  }
 
   function extrairNumEdital(item){
     const controle = item.numero_controle_pncp;
-    // Se já temos o número real do Comprasnet em cache, usa ele
-    if(controle && _numCompraCache[controle]){
-      const c = _numCompraCache[controle];
+    if(controle && _licitCache[controle]?.numeroCompra){
+      const c = _licitCache[controle];
       return `${parseInt(c.numeroCompra)}/${c.anoCompra}`;
     }
     if(item.numero_sequencial&&item.ano)return`${parseInt(item.numero_sequencial)}/${item.ano}`;
@@ -2468,15 +2484,13 @@
     const m=controle.match(/-(\d+)\/(\d+)$/);return m?`${parseInt(m[1])}/${m[2]}`:'';
   }
 
-  // Atualiza o número exibido nos cards de resultado que já estão no DOM
+  // Chamado quando o batch retorna: atualiza cache + números nos cards do DOM
   function atualizarNumeroNosCards(controle, numeroCompra, anoCompra){
     if(!controle||!numeroCompra)return;
-    _numCompraCache[controle]={numeroCompra,anoCompra};
-    // Atualiza todos os elementos de título que contenham o número antigo desse controle
+    _cacheSet(controle,{numeroCompra,anoCompra});
     document.querySelectorAll(`[data-controle="${CSS.escape(controle)}"]`).forEach(el=>{
       const tituloEl = el.querySelector('.card-titulo-principal,.card-exp-titulo,.card-vert-titulo');
       if(tituloEl){
-        // Substitui o número sequencial pelo número real no texto do título
         const p = parseControle(controle);
         if(p){
           const numAntigo = `${parseInt(p.seq)}/${p.ano}`;
@@ -2561,13 +2575,22 @@
     const num=extrairNumEdital(item);
     const esfera=item.esfera_id==='F'?'Comprasnet':item.esfera_id==='E'?'Estadual':item.esfera_id==='M'?'Municipal':'PNCP';
 
-    // Header
+    // Header: aplica imediatamente o que já está em cache (UASG + número correto)
+    const cached = _licitCache[item.numero_controle_pncp] || {};
+    const numCorreto = cached.numeroCompra
+      ? `${parseInt(cached.numeroCompra)}/${cached.anoCompra||item.ano||''}`
+      : num;
     const portalAprox = fmtPortalEsfera(item.esfera_id, item.uf);
     document.getElementById('d-fonte-badge').textContent='';
-    document.getElementById('d-num-header').textContent=(mod?mod+' ':'')+(num?'Nº '+num:'')+(item.uf?' — '+item.uf:'');
-    document.getElementById('d-uasg-header').textContent='';
+    document.getElementById('d-num-header').textContent=(mod?mod+' ':'')+(numCorreto?'Nº '+numCorreto:'')+(item.uf?' — '+item.uf:'');
+    // UASG: usa cache (preenchido pelo batch) ou campo direto do item de busca
+    const uasgCod  = cached.uasg      || item.unidade_codigo || '';
+    const uasgNome = cached.uasgNome  || item.unidade_nome   || '';
+    document.getElementById('d-uasg-header').textContent=uasgCod?(('UASG '+uasgCod+(uasgNome?' — '+uasgNome:''))):'';
     document.getElementById('d-portal-compras').textContent=portalAprox;
-    // Busca portal exato em background
+    // Propaga UASG para o item (para salvar em negócios)
+    if(uasgCod){ itemAtualDrawer._uasg=uasgCod; itemAtualDrawer._uasgLabel=uasgCod+(uasgNome?' - '+uasgNome:''); }
+    // Busca portal exato em background (só para o link do botão)
     const pPortal = parseControle(item.numero_controle_pncp);
     if(pPortal){
       fetch(`/api/portal?cnpj=${pPortal.cnpj}&ano=${pPortal.ano}&seq=${pPortal.seq}`)
@@ -2585,8 +2608,6 @@
           }
         }).catch(()=>{});
     }
-    // Reset UASG — preenchida quando itens carregarem
-    if(itemAtualDrawer){itemAtualDrawer._uasg=null;itemAtualDrawer._uasgLabel=null;}
 
     // Organização
     document.getElementById('d-orgao').textContent=item.orgao_nome||'—';
@@ -2731,31 +2752,31 @@
   }
 
   function aplicarOrgaoInfo(orgaoInfo){
-    if(!orgaoInfo)return;
+    if(!orgaoInfo||!itemAtualDrawer)return;
     const {uasgLabel,codigoUnidade,linkSistemaOrigem,numeroCompra,anoCompra}=orgaoInfo;
-    if(numeroCompra&&itemAtualDrawer){
+    const controle = itemAtualDrawer.numero_controle_pncp;
+    // Salva no cache para próximas aberturas
+    if(codigoUnidade) _cacheSet(controle,{uasg:codigoUnidade,uasgNome:uasgLabel?.split(' - ').slice(1).join(' - ')||'',uasgLabel});
+    if(numeroCompra)  _cacheSet(controle,{numeroCompra,anoCompra});
+    // Atualiza número no header do drawer (só se veio da API e é diferente do que está)
+    if(numeroCompra){
       const mod=fmtModalidade(itemAtualDrawer.modalidade_licitacao_nome)||'';
       const numReal=`${parseInt(numeroCompra)}/${anoCompra||itemAtualDrawer.ano||''}`;
       const elNum=document.getElementById('d-num-header');
       if(elNum) elNum.textContent=(mod?mod+' ':'')+'Nº '+numReal+(itemAtualDrawer.uf?' — '+itemAtualDrawer.uf:'');
-      atualizarNumeroNosCards(itemAtualDrawer.numero_controle_pncp, numeroCompra, anoCompra||itemAtualDrawer.ano);
+      atualizarNumeroNosCards(controle, numeroCompra, anoCompra||itemAtualDrawer.ano);
     }
+    // Atualiza UASG no header só se ainda estiver vazio
     const elUasgH=document.getElementById('d-uasg-header');
-    if(elUasgH&&codigoUnidade) elUasgH.textContent='UASG '+codigoUnidade+(uasgLabel?' — '+uasgLabel.split(' - ').slice(1).join(' - '):'');
-    const elU=document.getElementById('d-unidade');
-    if(elU&&uasgLabel) elU.textContent=uasgLabel;
-    if(itemAtualDrawer&&codigoUnidade){
-      itemAtualDrawer._uasg=codigoUnidade;
-      itemAtualDrawer._uasgLabel=uasgLabel;
+    if(elUasgH&&!elUasgH.textContent&&codigoUnidade){
+      elUasgH.textContent='UASG '+codigoUnidade+(uasgLabel?' — '+uasgLabel.split(' - ').slice(1).join(' - '):'');
     }
+    const elU=document.getElementById('d-unidade');
+    if(elU&&uasgLabel&&!elU.textContent) elU.textContent=uasgLabel;
+    if(codigoUnidade){ itemAtualDrawer._uasg=codigoUnidade; itemAtualDrawer._uasgLabel=uasgLabel; }
     if(linkSistemaOrigem){
       const btnA=document.getElementById('d-btn-acessar');
       if(btnA) btnA.onclick=()=>window.open(linkSistemaOrigem,'_blank');
-      const elFonte=document.getElementById('d-fonte-badge');
-      if(elFonte&&!elFonte.textContent.includes('BLL')&&!elFonte.textContent.includes('gov')){
-        const portalNome=detectarPortalUrl(linkSistemaOrigem);
-        if(portalNome) elFonte.textContent='🌐 '+portalNome;
-      }
     }
   }
 
