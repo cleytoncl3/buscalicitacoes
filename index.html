@@ -286,9 +286,16 @@
     [data-tema="escuro"] .drawer-tag{color:var(--accent)}
 
     /* Abertura em destaque */
-    .d-abertura-box{background:var(--chip-bg);border:1px solid var(--chip-border);border-radius:10px;padding:14px 16px;margin:4px 0 14px;text-align:center}
-    .d-abertura-label{font-size:.75rem;color:#fff;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
-    .d-abertura-data{font-size:1.15rem;font-weight:700;color:var(--accent)}
+    .d-abertura-box{background:var(--chip-bg);border:1px solid var(--chip-border);border-radius:10px;padding:14px 16px;margin:4px 0 14px}
+    .d-abertura-cols{display:grid;grid-template-columns:1fr 1fr;gap:0}
+    .d-abertura-col{text-align:center;padding:0 8px}
+    .d-abertura-col+.d-abertura-col{border-left:1px solid rgba(255,255,255,.12)}
+    .d-abertura-label{font-size:.72rem;color:#fff;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+    .d-abertura-data{font-size:1rem;font-weight:700;color:var(--accent);line-height:1.3}
+    .d-abertura-portal{font-size:.82rem;color:var(--text2);margin-top:10px;text-align:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)}
+    .d-leilao-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:14px;text-align:center}
+    .d-leilao-label{font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:4px}
+    .d-leilao-data{font-size:1rem;font-weight:700;color:var(--text)}
 
     /* Info grid */
     .d-info-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
@@ -889,7 +896,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.20</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.21</span>
   </div>
 </header>
 
@@ -1351,17 +1358,25 @@
     <div class="drawer-tags" id="d-tags"></div>
 
     <div class="d-abertura-box">
-      <div class="d-abertura-label">📅 Início de recebimento de propostas</div>
-      <div class="d-abertura-data" id="d-abertura">—</div>
-      <div class="d-abertura-label" style="margin-top:10px">🌐 Portal de compras</div>
-      <div class="d-abertura-data" id="d-portal-compras" style="font-size:.95rem">—</div>
+      <div class="d-abertura-cols">
+        <div class="d-abertura-col">
+          <div class="d-abertura-label">📅 Início de recebimento de proposta</div>
+          <div class="d-abertura-data" id="d-abertura">—</div>
+        </div>
+        <div class="d-abertura-col">
+          <div class="d-abertura-label">⏰ Encerramento do recebimento</div>
+          <div class="d-abertura-data" id="d-encerramento">—</div>
+        </div>
+      </div>
+      <div class="d-abertura-portal">🌐 Portal de compras: <strong id="d-portal-compras">—</strong></div>
+    </div>
+
+    <div class="d-leilao-box">
+      <div class="d-leilao-label">🔨 Início da fase de leilões</div>
+      <div class="d-leilao-data" id="d-leilao">—</div>
     </div>
 
     <div class="d-info-row">
-      <div class="d-info-item">
-        <span class="d-info-label">⏰ Encerramento</span>
-        <span class="d-info-val" id="d-encerramento">—</span>
-      </div>
       <div class="d-info-item">
         <span class="d-info-label">💰 Valor estimado</span>
         <span class="d-info-val" id="d-valor">—</span>
@@ -2645,6 +2660,8 @@
     // Datas e valores
     document.getElementById('d-abertura').textContent=fmt(item.data_inicio_vigencia);
     document.getElementById('d-encerramento').textContent=fmt(item.data_fim_vigencia);
+    // Início da fase de leilões = mesmo horário do encerramento de propostas
+    document.getElementById('d-leilao').textContent=fmt(item.data_fim_vigencia);
     document.getElementById('d-valor').textContent=fmtVal(item.valor_global);
 
     // Situação e modalidade
