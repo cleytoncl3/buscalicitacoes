@@ -426,24 +426,15 @@
 
 
     /* ===== LAYOUT VERTICAL (smartphone style) ===== */
-    .cards-vertical{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
-    .card-vert{background:var(--surface);border-radius:10px;padding:14px;box-shadow:var(--card-shadow);border-top:3px solid var(--primary);cursor:pointer;display:flex;flex-direction:column;gap:8px;transition:box-shadow .2s}
-    .card-vert:hover{box-shadow:var(--card-shadow-hover);border-top-color:var(--accent)}
-    .card-vert-mod{font-size:.65rem;font-weight:700;text-transform:uppercase;color:var(--text3);letter-spacing:.5px}
-    .card-vert-modalidade{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:2px}
-    .card-vert-num{font-size:.92rem;font-weight:800;color:var(--primary);line-height:1.2}
-    [data-tema="escuro"] .card-vert-num{color:#60a5fa}
-    .card-vert-uasg{font-size:.7rem;color:var(--text3);font-family:'DM Mono',monospace;margin-top:1px}
-    .card-vert-titulo{font-size:.78rem;font-weight:600;color:var(--text2);line-height:1.3}
-    .card-vert-orgao{font-size:.75rem;color:var(--text2);font-weight:500}
-    .card-vert-desc{font-size:.75rem;color:var(--text2);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-    .card-vert-divider{height:1px;background:var(--border)}
-    .card-vert-datas{display:flex;flex-direction:column;gap:3px}
-    .card-vert-data{display:flex;justify-content:space-between;font-size:.72rem}
-    .card-vert-data span:first-child{color:var(--text3)}
-    .card-vert-data span:last-child{color:var(--text);font-weight:600}
-    .card-vert-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px}
-    .card-vert-local{font-size:.7rem;color:var(--text3)}
+    .cards-vertical{display:flex;flex-direction:column;gap:8px}
+    .card-vert{background:var(--surface);border-radius:10px;box-shadow:var(--card-shadow);border:1px solid var(--border);border-left:4px solid var(--primary);cursor:pointer;display:grid;grid-template-columns:1fr 200px;transition:box-shadow .2s;overflow:hidden}
+    .card-vert:hover{box-shadow:var(--card-shadow-hover);border-left-color:var(--accent)}
+    .card-vert-left{padding:12px 16px;display:flex;flex-direction:column;gap:4px;min-width:0}
+    .card-vert-right{padding:12px 14px;border-left:1px solid var(--border);background:var(--surface2);display:flex;flex-direction:column;gap:6px;justify-content:space-between}
+    .card-vert-data{display:flex;align-items:center;gap:6px;font-size:.73rem}
+    .card-vert-data-label{color:var(--text3);white-space:nowrap}
+    .card-vert-data-val{color:var(--text);font-weight:600;white-space:nowrap}
+    .card-vert-badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto}
 
     /* ===== CARD EXPANDIDO COM ITENS ===== */
     .layout-toggle{display:flex;gap:6px;margin-bottom:14px;align-items:center}
@@ -676,7 +667,7 @@
     @media(max-width:1024px){
       .card-exp-main{grid-template-columns:1fr}
       .card-exp-items{border-top:1px solid var(--border);border-right:none}
-      .cards-vertical{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+      .cards-vertical{flex-direction:column}
     }
 
     /* ═══ MOBILE (≤640px) — qualquer celular em modo retrato ═══ */
@@ -732,8 +723,8 @@
       .layout-btn{font-size:.78rem;padding:5px 10px}
 
       /* Cards verticais — 1 coluna */
-      .cards-vertical{grid-template-columns:1fr;gap:8px}
-      .card-vert{padding:12px;border-radius:8px}
+      .card-vert{grid-template-columns:1fr;border-left-width:3px}
+      .card-vert-right{border-left:none;border-top:1px solid var(--border)}
       .card-vert-titulo{font-size:.85rem}
 
       /* Cards horizontais — empilha */
@@ -2054,22 +2045,22 @@
     const uasg = item.unidade_codigo || '';
     const localStr = [item.municipio_nome, item.uf].filter(Boolean).join(' / ');
     const orgaoUFv = [item.orgao_nome, item.uf].filter(Boolean).join(' / ');
+    const esferaNome = item.esfera_id === 'F' ? 'Comprasnet' : item.esfera_id === 'E' ? 'Estadual' : item.esfera_id === 'M' ? 'Municipal' : '';
     return `<div class="card-vert" data-controle="${item.numero_controle_pncp||''}" onclick='abrirDrawer(${JSON.stringify(item)})'>
-      <div>
-        <div style="font-size:.78rem;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;letter-spacing:.3px;margin-bottom:4px">${mod ? mod.toUpperCase()+' ' : ''}<span data-num>${num || ''}</span>${uasg ? ' · UASG '+uasg : ''}${orgaoUFv ? ' — '+orgaoUFv : ''}</div>
-        <div style="font-size:.75rem;font-weight:400;color:var(--text2);line-height:1.35;margin-bottom:4px">${item.description||'—'}</div>
+      <div class="card-vert-left">
+        <div style="font-size:.82rem;font-weight:700;color:var(--text);line-height:1.3">${mod ? mod.toUpperCase()+' ' : ''}<span data-num>${num || ''}</span>${uasg ? ' · UASG '+uasg : ''}${orgaoUFv ? ' — '+orgaoUFv : ''}</div>
+        <div style="font-size:.76rem;color:var(--text2);line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${item.description||'—'}</div>
+        ${localStr ? `<div style="font-size:.71rem;color:var(--text3);margin-top:2px">📍 ${localStr}</div>` : ''}
       </div>
-      <div class="card-vert-divider"></div>
-      <div class="card-vert-datas">
-        <div class="card-vert-data"><span>📅 Abertura</span><span>${fmt(item.data_inicio_vigencia)}</span></div>
-        <div class="card-vert-data"><span>⏰ Encerra</span><span>${fmt(item.data_fim_vigencia)}</span></div>
-      </div>
-      <div class="card-vert-footer">
-        <span class="card-vert-local">📍 ${item.municipio_nome||item.uf||'—'} / ${item.uf||''}</span>
-        <div class="card-exp-footer-badges">
+      <div class="card-vert-right">
+        <div>
+          ${item.data_inicio_vigencia ? `<div class="card-vert-data"><span class="card-vert-data-label">📅 Abertura</span><span class="card-vert-data-val">${fmt(item.data_inicio_vigencia)}</span></div>` : ''}
+          ${item.data_fim_vigencia ? `<div class="card-vert-data"><span class="card-vert-data-label">⏰ Encerra</span><span class="card-vert-data-val">${fmt(item.data_fim_vigencia)}</span></div>` : ''}
+        </div>
+        <div class="card-vert-badges">
           <span class="footer-badge badge-status">${badge.texto}</span>
           ${mod ? `<span class="footer-badge">${mod}</span>` : ''}
-          ${item.esfera_id ? `<span class="footer-badge">${item.esfera_id==='F'?'🌐 Comprasnet':item.esfera_id==='E'?'🌐 Estadual':'🌐 Municipal'}</span>` : ''}
+          ${esferaNome ? `<span class="footer-badge">🌐 ${esferaNome}</span>` : ''}
         </div>
       </div>
     </div>`;
