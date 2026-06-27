@@ -889,7 +889,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.11</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.12</span>
   </div>
 </header>
 
@@ -2076,19 +2076,18 @@
         const apiData=await r.json();
         const local=getNegocios();
         if(Array.isArray(apiData)){
-          // Merge: combina API + local por numero_controle (sem duplicatas)
+          // API é fonte de verdade; local só contribui com itens que a API ainda não tem
           const map={};
-          [...apiData,...local].forEach(n=>{
+          // Coloca local primeiro (mais antigo), depois API sobrescreve (mais confiável)
+          [...local,...apiData].forEach(n=>{
             const k=n.numero_controle||n.id;
-            if(k&&!map[k])map[k]=n;
+            if(k)map[k]=n; // API vence no merge
           });
           const merged=Object.values(map);
           localStorage.setItem(NEG_KEY,JSON.stringify(merged));
-          // Se local tinha itens que a API não tinha, sincroniza de volta
-          if(merged.length>apiData.length){
-            merged.filter(m=>!apiData.find(a=>a.numero_controle===m.numero_controle))
-              .forEach(n=>fetch('/api/negocios',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(n)}).catch(()=>{}));
-          }
+          // Sincroniza locais que a API não tem
+          local.filter(l=>!apiData.find(a=>a.numero_controle===l.numero_controle))
+            .forEach(n=>fetch('/api/negocios',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(n)}).catch(()=>{}));
           return merged;
         }
       }
@@ -2164,7 +2163,8 @@
 
     if (!itens) {
       try {
-        const r = await fetch(`/api/itens?cnpj=${p.cnpj}&ano=${p.ano}&sequencial=${p.seq}`);
+        const sq = p.seqOrgao || 1;
+        const r = await fetch(`/api/itens?cnpj=${p.cnpj}&ano=${p.ano}&sequencial=${p.seq}&seqOrgao=${sq}`);
         itens = (await r.json()).data || [];
         try { localStorage.setItem(cacheKey, JSON.stringify({ d: itens, ts: Date.now() })); } catch {}
       } catch { itens = []; }
@@ -2262,9 +2262,23 @@
 
   function abrirDrawerNeg(id){
     const n=getNegocios().find(x=>x.id===id);
-    if(!n||!n.itemData)return;
-    try{abrirDrawer(JSON.parse(n.itemData));}catch(e){alert('Não foi possível abrir os detalhes.');}
+    if(!n)return;
+    // Reconstrói objeto mínimo do item para o drawer funcionar (sem itemData completo)
+    let itemObj=null;
+    if(n.itemData){try{itemObj=JSON.parse(n.itemData);}catch{}}
+    if(!itemObj){
+      // Fallback: monta objeto básico a partir dos campos salvos no negócio
+      itemObj={titulo:n.titulo,title:n.titulo,description:n.objeto,orgao_nome:n.orgao,uf:n.uf,
+        modalidade_licitacao_nome:n.modalidade,data_inicio_vigencia:n.abertura,
+        data_fim_vigencia:n.encerramento,numero_controle_pncp:n.numero_controle,
+        unidade_nome:n.uasgLabel||'',_uasg:n.uasg,_uasgLabel:n.uasgLabel};
+    }
+    // Marca que o drawer foi aberto via negócio — itens vêm do banco, não do PNCP
+    _itensNegocio = Array.isArray(n.itensInteresse) ? n.itensInteresse : null;
+    abrirDrawer(itemObj);
   }
+  // Itens salvos do negócio (quando drawer aberto via meus negócios)
+  let _itensNegocio = null;
 
   function moverFase(id,fase){const negs=getNegocios(),n=negs.find(x=>x.id===id);if(n){n.fase=fase;salvarNegocios(negs);apiMoverFase(id,fase);renderFunil();renderQuadros()}}
   function removerNegocio(id){if(!confirm('Remover?'))return;salvarNegocios(getNegocios().filter(n=>n.id!==id));apiRemoverNegocio(id);renderFunil();renderQuadros();renderAgenda()}
@@ -2541,14 +2555,37 @@
     // Itens
     document.getElementById('buscaItem').value='';todosItens=[];
     renderDrawerKwChips();
-    document.getElementById('d-itens').innerHTML='<div class="item-loading">⏳ Carregando itens...</div>';
 
     // Abre
     document.getElementById('drawer').classList.add('ativo');
     document.getElementById('overlay').classList.add('ativo');
     document.body.style.overflow='hidden';
-    const p=parseControle(item.numero_controle_pncp);
-    if(p)carregarItens(p.cnpj,p.ano,p.seq,p.seqOrgao);
+
+    // Se aberto via Meus Negócios, usa itens salvos no banco; senão busca do PNCP
+    if(_itensNegocio !== null){
+      const saved = _itensNegocio;
+      _itensNegocio = null; // reset para próxima abertura normal
+      if(saved.length){
+        todosItens = saved;
+        document.getElementById('d-itens').innerHTML='';
+        renderItens(saved);
+        // Atualiza UASG no cabeçalho se disponível no negócio
+        const neg=getNegocios().find(n=>n.numero_controle===item.numero_controle_pncp);
+        if(neg){
+          const elUasg=document.getElementById('d-uasg-header');
+          if(elUasg&&neg.uasg) elUasg.textContent='UASG '+neg.uasg+(neg.uasgLabel?' — '+neg.uasgLabel.split(' - ').slice(1).join(' - '):'');
+          const elU=document.getElementById('d-unidade');
+          if(elU&&neg.uasgLabel) elU.textContent=neg.uasgLabel;
+        }
+      } else {
+        document.getElementById('d-itens').innerHTML='<div class="item-loading">Nenhum item de interesse salvo nesta licitação.</div>';
+      }
+    } else {
+      _itensNegocio = null;
+      document.getElementById('d-itens').innerHTML='<div class="item-loading">⏳ Carregando itens...</div>';
+      const p=parseControle(item.numero_controle_pncp);
+      if(p)carregarItens(p.cnpj,p.ano,p.seq,p.seqOrgao);
+    }
   }
   function fecharDrawer(){document.getElementById('drawer').classList.remove('ativo');document.getElementById('overlay').classList.remove('ativo');document.body.style.overflow='';itemAtualDrawer=null}
   function recarregarItens(){
