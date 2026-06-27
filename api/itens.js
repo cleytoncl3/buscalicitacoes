@@ -11,14 +11,14 @@ export default async function handler(req, res) {
   const baseAlt  = `https://pncp.gov.br/api/pncp/v1/orgaos/${cnpj}/unidades/${seqOrgao}/compras/${ano}/${seq}`;
   const hdrs     = { Accept: 'application/json', 'User-Agent': 'Mozilla/5.0' };
 
-  const fetchSafe = async (url) => {
+  const fetchSafe = async (url, opts = {}) => {
     const ctrl  = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 7000);
     try {
-      const r = await fetch(url, { headers: hdrs, signal: ctrl.signal });
+      const r = await fetch(url, { headers: hdrs, signal: ctrl.signal, ...opts });
       clearTimeout(timer);
       return r;
-    } catch {
+    } catch (e) {
       clearTimeout(timer);
       return null;
     }
@@ -28,11 +28,36 @@ export default async function handler(req, res) {
     const numeroControle = `${cnpj}-${seqOrgao}-${String(seq).padStart(6, '0')}/${ano}`;
     const searchUrl = `https://pncp.gov.br/api/search/?tipos_documento=edital&q=${encodeURIComponent(numeroControle)}&tam_pagina=1`;
 
-    const [itensRes, searchRes, detalheAltRes] = await Promise.all([
+    // Testa também o endpoint principal com redirect:follow para ver para onde vai
+    const [itensRes, searchRes, detalheAltRes, detalheBaseRes] = await Promise.all([
       fetchSafe(`${base}/itens?pagina=1&tamanhoPagina=100`),
       fetchSafe(searchUrl),
       fetchSafe(baseAlt),
+      fetchSafe(base, { redirect: 'follow' }),
     ]);
+
+    // Debug: captura corpo bruto de cada endpoint
+    const _debug = {};
+
+    // Endpoint base (com redirect follow)
+    try {
+      if (detalheBaseRes) {
+        _debug.baseStatus = detalheBaseRes.status;
+        _debug.baseUrl    = detalheBaseRes.url; // URL final após redirect
+        const txt = await detalheBaseRes.text();
+        try { _debug.baseBody = JSON.parse(txt); } catch { _debug.baseBodyRaw = txt.slice(0, 500); }
+      }
+    } catch(e) { _debug.baseErr = e.message; }
+
+    // Endpoint alternativo (unidades/{seqOrgao})
+    try {
+      if (detalheAltRes) {
+        _debug.altStatus = detalheAltRes.status;
+        _debug.altUrl    = detalheAltRes.url;
+        const txt = await detalheAltRes.text();
+        try { _debug.altBody = JSON.parse(txt); } catch { _debug.altBodyRaw = txt.slice(0, 500); }
+      }
+    } catch(e) { _debug.altErr = e.message; }
 
     // Processa itens
     let itensList = [];
@@ -50,14 +75,26 @@ export default async function handler(req, res) {
       }
     } catch {}
 
-    // Tenta extrair número Comprasnet do endpoint alternativo (unidades/{seqOrgao})
+    // Tenta extrair número Comprasnet do endpoint alternativo
     let numCompraDetalhe = null, anoCompraDetalhe = null;
+    const altBody = _debug.altBody;
     try {
-      if (detalheAltRes && detalheAltRes.ok) {
-        const dd = await detalheAltRes.json();
-        const di = Array.isArray(dd) ? dd[0] : dd;
-        numCompraDetalhe  = di?.numeroCompra  || di?.numero_compra  || null;
-        anoCompraDetalhe  = di?.anoCompra     || di?.ano_compra     || null;
+      if (altBody && _debug.altStatus === 200) {
+        const di = Array.isArray(altBody) ? altBody[0] : altBody;
+        numCompraDetalhe = di?.numeroCompra || di?.numero_compra || null;
+        anoCompraDetalhe = di?.anoCompra    || di?.ano_compra    || null;
+        _debug.numCompraDetalhe = numCompraDetalhe;
+      }
+    } catch {}
+
+    // Tenta número do endpoint base após redirect
+    let numCompraBase = null;
+    const baseBody = _debug.baseBody;
+    try {
+      if (baseBody && _debug.baseStatus === 200) {
+        const di = Array.isArray(baseBody) ? baseBody[0] : baseBody;
+        numCompraBase = di?.numeroCompra || di?.numero_compra || null;
+        _debug.numCompraBase = numCompraBase;
       }
     } catch {}
 
@@ -67,12 +104,19 @@ export default async function handler(req, res) {
       if (searchRes && searchRes.ok) {
         const sd   = await searchRes.json();
         const item = sd?.items?.[0];
+        _debug.searchItem = item ? Object.keys(item).reduce((o, k) => {
+          // Inclui apenas campos potencialmente relevantes para debug
+          if (['numero_compra','numero_sequencial_compra','link_sistema_origem','linkSistemaOrigem',
+               'unidade_codigo','unidade_nome','ano','numeroCompra','codigoCompra','numero_edital'].includes(k))
+            o[k] = item[k];
+          return o;
+        }, {}) : null;
+
         if (item) {
           const codUnidade  = item.unidade_codigo || item.codigo_unidade || uasgDoItem;
           const nomeUnidade = item.unidade_nome || null;
           const linkOrigem  = item.link_sistema_origem || item.linkSistemaOrigem || null;
 
-          // Tenta número Comprasnet via URL (formato: ?compra=UASG6+MOD2+NUM5+ANO4)
           let numeroComprasnet = null, anoComprasnet = null;
           if (linkOrigem) {
             const m = linkOrigem.match(/compra=(\d+)/);
@@ -82,20 +126,22 @@ export default async function handler(req, res) {
             }
           }
 
-          // Fallback: campo direto do item da search
           const numCompraSearch = item.numero_compra || item.numero_sequencial_compra || null;
 
           orgaoInfo = {
             codigoUnidade:     codUnidade || null,
             nomeUnidade:       nomeUnidade || null,
             linkSistemaOrigem: linkOrigem,
-            numeroCompra:      numCompraDetalhe || numeroComprasnet || numCompraSearch || null,
+            numeroCompra:      numCompraDetalhe || numCompraBase || numeroComprasnet || numCompraSearch || null,
             anoCompra:         anoCompraDetalhe || anoComprasnet || item.ano || null,
             uasgLabel: codUnidade && nomeUnidade ? `${codUnidade} - ${nomeUnidade}` : nomeUnidade || null,
+            _debug,
           };
         }
       }
     } catch {}
+
+    if (!orgaoInfo) orgaoInfo = { _debug };
 
     return res.status(200).json({ data: itensList, total: itensList.length, orgaoInfo });
 
