@@ -313,8 +313,7 @@
     .d-abertura-col{text-align:center;padding:0 8px}
     .d-abertura-col+.d-abertura-col{border-left:1px solid rgba(255,255,255,.12)}
     .d-abertura-label{font-size:.68rem;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
-    .d-abertura-data{font-size:.95rem;font-weight:700;color:var(--primary);line-height:1.3}
-    [data-tema="escuro"] .d-abertura-data{color:#60a5fa}
+    .d-abertura-data{font-size:.95rem;font-weight:700;color:var(--text);line-height:1.3}
     .d-abertura-portal{font-size:.82rem;color:var(--text2);margin-top:10px;text-align:center;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)}
 
     /* Info grid */
@@ -446,7 +445,7 @@
     /* ===== CARD EXPANDIDO COM ITENS ===== */
     .layout-toggle{display:flex;gap:6px;margin-bottom:14px;align-items:center}
     .layout-btn{padding:6px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:.82rem;cursor:pointer}
-    .layout-btn.ativo{background:var(--primary);color:var(--accent);border-color:var(--primary)}
+    .layout-btn.ativo{background:var(--primary);color:#fff;border-color:var(--primary)}
 
     .card-exp{background:var(--surface);border-radius:10px;box-shadow:var(--card-shadow);border:1px solid var(--border);border-left:4px solid var(--primary);cursor:pointer;overflow:hidden;transition:box-shadow .2s}
     .card-exp:hover{box-shadow:var(--card-shadow-hover);border-left-color:var(--accent)}
@@ -511,7 +510,7 @@
     .item-accordion{border:1px solid var(--border);border-radius:8px;overflow:hidden}
     .item-header{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:var(--surface2)}
     .item-header:hover{filter:brightness(1.05)}
-    .item-num-badge{background:var(--primary);color:var(--accent);border-radius:6px;padding:2px 8px;font-size:.75rem;font-weight:700;white-space:nowrap;min-width:56px;text-align:center;flex-shrink:0}
+    .item-num-badge{background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-size:.75rem;font-weight:700;white-space:nowrap;min-width:56px;text-align:center;flex-shrink:0}
     .item-resumo{flex:1;min-width:0}
     .item-nome{font-size:.88rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .item-qtd{font-size:.78rem;color:var(--text2);margin-top:2px}
@@ -636,7 +635,7 @@
     .busca-form{background:var(--surface);border-radius:10px;padding:16px;border:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
     .busca-form input,.busca-form select{flex:1;min-width:160px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.9rem;background:var(--surface2);color:var(--text);outline:none}
     .busca-form input:focus,.busca-form select:focus{border-color:var(--primary)}
-    .btn-primario{background:var(--primary);color:var(--accent);border:none;padding:10px 24px;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer;white-space:nowrap}
+    .btn-primario{background:var(--primary);color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer;white-space:nowrap}
     .btn-primario:hover{background:var(--primary-hover)}
     .resultado-grid{display:grid;gap:10px}
     .result-card{background:var(--surface);border-radius:10px;padding:16px;border:1px solid var(--border);border-left:4px solid var(--primary);cursor:pointer;transition:box-shadow .15s}
@@ -1153,7 +1152,7 @@
 
     <div class="chat-abas">
       <div class="chat-aba ativo" id="chatAba-buscar" onclick="mudarChatAba('buscar')">➕ Adicionar Certame</div>
-      <div class="chat-aba" id="chatAba-monitorados" onclick="mudarChatAba('monitorados')">📡 Monitorados <span id="chatBadgeCount" style="background:var(--primary);color:var(--accent);border-radius:10px;padding:1px 8px;font-size:.7rem;margin-left:4px">0</span></div>
+      <div class="chat-aba" id="chatAba-monitorados" onclick="mudarChatAba('monitorados')">📡 Monitorados <span id="chatBadgeCount" style="background:var(--primary);color:#fff;border-radius:10px;padding:1px 8px;font-size:.7rem;margin-left:4px">0</span></div>
       <div class="chat-aba" id="chatAba-notif" onclick="mudarChatAba('notif')">🔔 Notificações</div>
     </div>
 
@@ -1191,8 +1190,8 @@
         </div>
         <!-- Preview do código gerado -->
         <div id="chatCodigoPreview" style="margin-top:12px;padding:10px 14px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);font-size:.82rem;color:var(--text2);display:none">
-          <span>🔗 Código da compra: </span><strong id="chatCodigoValor" style="color:var(--accent);font-family:monospace"></strong>
-          <a id="chatLinkComprasnet" href="#" target="_blank" style="margin-left:12px;color:var(--accent);font-size:.78rem">↗ Abrir no Compras.gov.br</a>
+          <span>🔗 Código da compra: </span><strong id="chatCodigoValor" style="color:var(--text);font-family:monospace"></strong>
+          <a id="chatLinkComprasnet" href="#" target="_blank" style="margin-left:12px;color:var(--primary);font-size:.78rem;font-weight:600">↗ Abrir no Compras.gov.br</a>
         </div>
         <div style="margin-bottom:8px">
           <label style="display:block;font-size:.75rem;color:var(--text3);margin-bottom:5px;text-transform:uppercase">Ano</label>
@@ -1454,7 +1453,7 @@
     <div class="d-info-row">
       <div class="d-info-item" style="text-align:center">
         <span class="d-info-label">🔨 Início da fase de leilões</span>
-        <span class="d-info-val" id="d-leilao" style="display:block;font-size:.95rem;color:var(--accent)">—</span>
+        <span class="d-info-val" id="d-leilao" style="display:block;font-size:.95rem">—</span>
       </div>
       <div class="d-info-item" style="text-align:center">
         <span class="d-info-label">💰 Valor estimado</span>
@@ -2055,8 +2054,8 @@
     const localStr = [item.municipio_nome, item.uf].filter(Boolean).join(' / ');
     return `<div class="card-vert" data-controle="${item.numero_controle_pncp||''}" onclick='abrirDrawer(${JSON.stringify(item)})'>
       <div>
-        <div style="font-size:.65rem;font-weight:700;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:.3px;margin-bottom:4px"><span data-num>${topLine}</span></div>
-        <div style="font-size:.82rem;font-weight:700;color:#60a5fa;line-height:1.3;margin-bottom:4px">${item.description||'—'}</div>
+        <div style="font-size:.78rem;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;letter-spacing:.3px;margin-bottom:4px"><span data-num>${topLine}</span></div>
+        <div style="font-size:.75rem;font-weight:400;color:var(--text2);line-height:1.35;margin-bottom:4px">${item.description||'—'}</div>
         <div style="font-size:.75rem;color:var(--text2);margin-bottom:2px">🏛 ${(item.orgao_nome||'—').substring(0,50)}</div>
       </div>
       <div class="card-vert-divider"></div>
@@ -2080,7 +2079,7 @@
     const mod = fmtModalidade(item.modalidade_licitacao_nome) || 'Licitação';
     const num = extrairNumEdital(item);
     const uasg = item.unidade_codigo || '';
-    const titulo = `${mod.toUpperCase()} <span data-num>${num ? 'Nº ' + num : ''}</span>${uasg ? ` — <span style="color:var(--accent);font-weight:700">UASG ${uasg}</span>` : ''} — ${(item.orgao_nome || '').toUpperCase()}${item.uf ? ' / ' + item.uf : ''}`;
+    const titulo = `${mod.toUpperCase()} <span data-num>${num ? 'Nº ' + num : ''}</span>${uasg ? ` — <span style="font-weight:700">UASG ${uasg}</span>` : ''} — ${(item.orgao_nome || '').toUpperCase()}${item.uf ? ' / ' + item.uf : ''}`;
     return `<div class="card" data-controle="${item.numero_controle_pncp||''}" onclick='abrirDrawer(${JSON.stringify(item)})'>
       <div class="card-titulo-principal">${titulo}</div>
       <div class="card-desc">${item.description || '—'}</div>
@@ -2106,8 +2105,8 @@
     return `<div class="card-exp" data-controle="${item.numero_controle_pncp||''}" onclick='abrirDrawer(${JSON.stringify(item)})'>
       <div class="card-exp-main">
         <div class="card-exp-left">
-          <div style="font-size:.7rem;font-weight:700;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:.3px;margin-bottom:5px"><span data-num>${topLine}</span></div>
-          <div style="font-size:.9rem;font-weight:700;color:#60a5fa;line-height:1.35;margin-bottom:6px">${item.description || '—'}</div>
+          <div style="font-size:.88rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:4px"><span data-num>${topLine}</span></div>
+          <div style="font-size:.78rem;font-weight:400;color:var(--text2);line-height:1.4;margin-bottom:6px">${item.description || '—'}</div>
           <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:auto;padding-top:4px">
             ${item.orgao_nome ? `<span style="font-size:.78rem;color:var(--text2)">🏛 ${item.orgao_nome}</span>` : ''}
             ${localStr ? `<span style="font-size:.78rem;color:var(--text2)">📍 ${localStr}</span>` : ''}
@@ -2571,11 +2570,11 @@
   function fmt(iso){if(!iso)return'—';return new Date(iso).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}
   function fmtVal(v){if(!v)return'Não informado';return Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
   function statusBadge(item){
-    if(item.cancelado)return{texto:'Cancelado',cls:'badge-cinza'};
+    if(item.cancelado)return{texto:'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#6b7280;margin-right:5px;vertical-align:middle"></span>Cancelado',cls:'badge-cinza'};
     const agora=new Date(),fim=item.data_fim_vigencia?new Date(item.data_fim_vigencia):null,ini=item.data_inicio_vigencia?new Date(item.data_inicio_vigencia):null;
-    if(fim&&agora>fim)return{texto:'Encerrado',cls:'badge-cinza'};
-    if(ini&&agora>=ini)return{texto:'Recebendo proposta',cls:'badge-verde'};
-    return{texto:'Aguardando abertura',cls:'badge-amarelo'};
+    if(fim&&agora>fim)return{texto:'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#ef4444;margin-right:5px;vertical-align:middle"></span>Encerrado',cls:'badge-cinza'};
+    if(ini&&agora>=ini)return{texto:'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#22c55e;margin-right:5px;vertical-align:middle"></span>Recebendo proposta',cls:'badge-verde'};
+    return{texto:'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#f59e0b;margin-right:5px;vertical-align:middle"></span>Aguardando abertura',cls:'badge-amarelo'};
   }
   function parseControle(c){if(!c)return null;const m=c.match(/^(\d+)-(\d+)-(\d+)\/(\d+)$/);if(!m)return null;return{cnpj:m[1],seqOrgao:m[2],seq:parseInt(m[3]),ano:m[4]}}
   function buildLinks(item){const p=parseControle(item.numero_controle_pncp);if(!p)return{direto:''};return{direto:`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`}}
@@ -2763,7 +2762,7 @@
 
     // Situação e modalidade
     const elSit=document.getElementById('d-situacao');
-    elSit.textContent=badge.texto;
+    elSit.innerHTML=badge.texto;
     elSit.className='d-sit-badge';
     document.getElementById('d-modalidade').textContent=mod||'—';
 
