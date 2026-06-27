@@ -89,7 +89,7 @@
     .btn-buscar:disabled{background:var(--text3);cursor:wait}
     /* Período dropdown */
     .periodo-wrapper{position:relative}
-    .periodo-panel{position:absolute;top:calc(100% + 6px);left:0;right:0;min-width:320px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.35);z-index:400;padding:16px;display:none;flex-direction:column;gap:12px}
+    .periodo-panel{position:fixed;min-width:320px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.35);z-index:9999;padding:16px;display:none;flex-direction:column;gap:12px}
     .periodo-panel.aberto{display:flex}
     .periodo-panel-titulo{font-size:.75rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px}
     .periodo-inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -889,7 +889,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.12</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.13</span>
   </div>
 </header>
 
@@ -972,11 +972,11 @@
             <div class="periodo-panel" id="periodoPanel">
               <div class="periodo-inputs">
                 <div class="periodo-campo">
-                  <div class="periodo-campo-label">Início</div>
+                  <div class="periodo-campo-label">Início de envio de proposta</div>
                   <input type="date" id="dataInicial" onchange="atualizarPeriodoTrigger()"/>
                 </div>
                 <div class="periodo-campo">
-                  <div class="periodo-campo-label">Encerramento de proposta</div>
+                  <div class="periodo-campo-label">Encerramento de envio de proposta</div>
                   <input type="date" id="dataFinal" onchange="atualizarPeriodoTrigger()"/>
                 </div>
               </div>
@@ -1514,7 +1514,28 @@
   function togglePeriodoPanel(e){
     if(e)e.stopPropagation();
     periodoAberto=!periodoAberto;
-    document.getElementById('periodoPanel').classList.toggle('aberto',periodoAberto);
+    const panel=document.getElementById('periodoPanel');
+    panel.classList.toggle('aberto',periodoAberto);
+    if(periodoAberto){
+      // Posiciona o painel fixed abaixo do botão trigger, sem sair da viewport
+      const btn=document.getElementById('periodoTrigger');
+      const r=btn.getBoundingClientRect();
+      const panelW=Math.max(320,r.width);
+      let left=r.left;
+      let top=r.bottom+6;
+      // Evita sair pela direita
+      if(left+panelW>window.innerWidth-8) left=window.innerWidth-panelW-8;
+      if(left<8) left=8;
+      // Evita sair pela parte de baixo — abre para cima se necessário
+      panel.style.left=left+'px';
+      panel.style.top=top+'px';
+      panel.style.width=panelW+'px';
+      // Verifica altura após render
+      requestAnimationFrame(()=>{
+        const ph=panel.offsetHeight;
+        if(top+ph>window.innerHeight-8) panel.style.top=Math.max(8,r.top-ph-6)+'px';
+      });
+    }
   }
   function fecharPeriodoPanel(){
     periodoAberto=false;
