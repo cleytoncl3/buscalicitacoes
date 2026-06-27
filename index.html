@@ -889,7 +889,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.10</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.11</span>
   </div>
 </header>
 
@@ -1380,7 +1380,10 @@
 
     <div class="d-sep"></div>
 
-    <div class="d-itens-titulo">Itens da licitação</div>
+    <div class="d-itens-titulo" style="display:flex;align-items:center;justify-content:space-between">
+      <span>Itens da licitação</span>
+      <button id="btnRecarregarItens" onclick="recarregarItens()" title="Recarregar itens" style="background:none;border:none;cursor:pointer;font-size:1rem;color:var(--accent);padding:0 2px;line-height:1" aria-label="Recarregar itens">↻</button>
+    </div>
     <div class="drawer-kw-chips" id="drawerKwChips"></div>
     <input type="text" class="item-busca" id="buscaItem"
       placeholder="🔍 Buscar item dentro desta licitação..."
@@ -2545,12 +2548,21 @@
     document.getElementById('overlay').classList.add('ativo');
     document.body.style.overflow='hidden';
     const p=parseControle(item.numero_controle_pncp);
-    if(p)carregarItens(p.cnpj,p.ano,p.seq);
+    if(p)carregarItens(p.cnpj,p.ano,p.seq,p.seqOrgao);
   }
   function fecharDrawer(){document.getElementById('drawer').classList.remove('ativo');document.getElementById('overlay').classList.remove('ativo');document.body.style.overflow='';itemAtualDrawer=null}
-  async function carregarItens(cnpj,ano,seq){
+  function recarregarItens(){
+    if(!itemAtualDrawer)return;
+    const p=parseControle(itemAtualDrawer.numero_controle_pncp);
+    if(p){
+      document.getElementById('d-itens').innerHTML='<div class="item-loading">⏳ Carregando itens...</div>';
+      carregarItens(p.cnpj,p.ano,p.seq,p.seqOrgao);
+    }
+  }
+  async function carregarItens(cnpj,ano,seq,seqOrgao){
     try{
-      const r=await fetch(`/api/itens?cnpj=${cnpj}&ano=${ano}&sequencial=${seq}`);
+      const sq=seqOrgao||1;
+      const r=await fetch(`/api/itens?cnpj=${cnpj}&ano=${ano}&sequencial=${seq}&seqOrgao=${sq}`);
       const data=await r.json();
       todosItens=data.data||[];
       renderItens(todosItens);
