@@ -427,9 +427,9 @@
 
     /* ===== LAYOUT VERTICAL (smartphone style) ===== */
     .cards-vertical{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
-    .card-vert{background:var(--surface);border-radius:10px;box-shadow:var(--card-shadow);border:1px solid var(--border);border-top:3px solid var(--primary);cursor:pointer;display:flex;flex-direction:column;gap:0;transition:box-shadow .2s;overflow:hidden}
+    .card-vert{background:var(--surface);border-radius:10px;box-shadow:var(--card-shadow);border:1px solid var(--border);border-top:3px solid var(--primary);cursor:pointer;display:flex;flex-direction:column;gap:0;transition:box-shadow .2s;overflow:hidden;aspect-ratio:9/16}
     .card-vert:hover{box-shadow:var(--card-shadow-hover);border-top-color:var(--accent)}
-    .card-vert-body{padding:12px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+    .card-vert-body{padding:14px;display:flex;flex-direction:column;gap:8px;flex:1;overflow:hidden}
     .card-vert-divider{height:1px;background:var(--border)}
     .card-vert-footer{padding:10px 14px;background:var(--surface2);display:flex;flex-direction:column;gap:6px}
     .card-vert-data{display:flex;justify-content:space-between;align-items:center;font-size:.73rem}
@@ -725,7 +725,7 @@
 
       /* Cards verticais — 1 coluna */
       .cards-vertical{grid-template-columns:1fr}
-      .card-vert{border-top-width:3px}
+      .card-vert{border-top-width:3px;aspect-ratio:unset}
       .card-vert-titulo{font-size:.85rem}
 
       /* Cards horizontais — empilha */
