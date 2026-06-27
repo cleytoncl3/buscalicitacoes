@@ -48,6 +48,9 @@
     .nav-btn:hover{background:rgba(255,255,255,.1);color:#fff}
     .nav-btn.ativo{background:rgba(255,255,255,.12);color:#fff;font-weight:600}
     [data-tema="escuro"] .nav-btn.ativo{color:#60a5fa;background:var(--chip-bg)}
+    [data-tema="claro"] .nav-btn{color:var(--text2)}
+    [data-tema="claro"] .nav-btn:hover{background:var(--surface2);color:var(--text)}
+    [data-tema="claro"] .nav-btn.ativo{background:var(--chip-bg);color:var(--primary)}
     .nav-btn-icon{font-size:.85rem;opacity:.7}
     .dropdown{position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.22);min-width:210px;z-index:400;display:none;padding:5px}
     .dropdown.aberto{display:block}
@@ -117,8 +120,8 @@
     .periodo-inputs input[type=date]{padding:8px 10px;font-size:.85rem;border:1px solid var(--border);border-radius:7px;background:var(--surface2);color:var(--text);width:100%;box-sizing:border-box}
     .periodo-inputs input[type=date]:focus{outline:none;border-color:var(--primary)}
     .periodo-sep{display:none}
-    .periodo-atalhos{display:flex;gap:8px;flex-wrap:wrap}
-    .periodo-atalho{font-size:.78rem;color:var(--text);cursor:pointer;background:var(--surface2);border:1px solid var(--border);padding:6px 12px;border-radius:7px;white-space:nowrap;font-weight:500}
+    .periodo-atalhos{display:flex;gap:8px;flex-wrap:nowrap}
+    .periodo-atalho{font-size:.76rem;color:var(--text);cursor:pointer;background:var(--surface2);border:1px solid var(--border);padding:5px 10px;border-radius:7px;white-space:nowrap;font-weight:500;flex:1;text-align:center}
     .periodo-atalho:hover{border-color:var(--primary);color:var(--primary)}
     [data-tema="escuro"] .periodo-atalho:hover{color:var(--accent);border-color:var(--accent)}
     .periodo-footer{display:flex;justify-content:space-between;align-items:center;padding-top:4px;border-top:1px solid var(--border)}
