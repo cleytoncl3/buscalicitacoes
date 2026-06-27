@@ -734,8 +734,8 @@
       .card-vert .card-exp-items{pointer-events:auto}
       .card-vert-body{flex:1;overflow:hidden}
       .card-vert-footer{padding:12px 14px}
-      /* Botões de navegação flutuantes */
-      .nav-vert-btns{position:fixed;right:14px;bottom:80px;display:flex;flex-direction:column;gap:8px;z-index:200}
+      /* Botões de navegação flutuantes — lado esquerdo, abaixo do meio */
+      .nav-vert-btns{position:fixed;left:14px;bottom:80px;display:flex;flex-direction:column;gap:8px;z-index:200}
       .nav-vert-btn{width:44px;height:44px;border-radius:50%;background:var(--primary);color:#fff;border:none;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 
       /* Cards horizontais — empilha */
@@ -2220,7 +2220,11 @@
 
   // ===== AUTO-SCROLL PARA RESULTADOS (mobile) =====
   function scrollParaResultados(){
-    if(window.innerWidth <= 900){
+    if(window.innerWidth <= 600){
+      // No mobile vertical, rola até o container de cards (não até o resumo)
+      const el = document.getElementById('cardsVerticalList') || document.getElementById('resultado');
+      if(el) setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}), 300);
+    } else if(window.innerWidth <= 900){
       const el = document.getElementById('resumo');
       if(el) setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}), 200);
     }
@@ -3687,10 +3691,10 @@
   document.getElementById('palavraChave').addEventListener('blur', acFechar);
 
   // ===== INIT =====
-  // No celular: layout vertical por padrão (cards mais compactos)
-  // No desktop: layout horizontal por padrão (cards com preview de itens)
-  // Layout padrão sempre horizontal (tanto PC quanto celular)
-  // O usuário pode alternar manualmente usando os botões
+  // Mobile → vertical por padrão; desktop → horizontal por padrão
+  if (window.innerWidth <= 600) {
+    setLayout('compacto');
+  }
 
   carregarTema();
   atualizarBotaoMod();
