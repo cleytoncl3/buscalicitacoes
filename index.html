@@ -473,8 +473,7 @@
     .card-exp-items-titulo{font-size:.68rem;text-transform:uppercase;color:var(--text3);letter-spacing:.5px;font-weight:600;margin-bottom:2px}
     .card-item-prev{display:flex;align-items:baseline;gap:6px;padding:3px 0;border-bottom:1px solid var(--border)}
     .card-item-prev:last-child{border-bottom:none}
-    .card-item-prev-num{font-size:.68rem;color:var(--primary);font-weight:700;white-space:nowrap;flex-shrink:0}
-    [data-tema="escuro"] .card-item-prev-num{color:var(--accent)}
+    .card-item-prev-num{font-size:.68rem;color:var(--text3);font-weight:700;white-space:nowrap;flex-shrink:0}
     .card-item-prev-nome{font-size:.75rem;color:var(--text);flex:1;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .card-item-prev-qtd{font-size:.68rem;color:var(--text3);white-space:nowrap;flex-shrink:0}
     .card-item-prev-qtd strong{color:var(--text2);font-weight:600}
@@ -2104,8 +2103,7 @@
       <div class="card-exp-main">
         <div class="card-exp-left">
           <div style="font-size:.88rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:4px">${mod ? mod.toUpperCase()+' ' : ''}<span data-num>${num || ''}</span>${uasg ? ' · UASG '+uasg : ''}${orgaoUF ? ' — '+orgaoUF : ''}</div>
-          <div style="font-size:.78rem;font-weight:400;color:var(--text2);line-height:1.4;margin-bottom:6px">${item.description || '—'}</div>
-          <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:auto;padding-top:4px">
+          <div style="font-size:.78rem;font-weight:400;color:var(--text2);line-height:1.4">${item.description || '—'}</div>
         </div>
         <div class="card-exp-items" id="card-items-${cardId}" onclick="event.stopPropagation()">
           <div class="card-items-loading">⏳ Carregando...</div>
@@ -2113,10 +2111,10 @@
       </div>
       <div class="card-exp-footer">
         <span class="footer-badge badge-status">${badge.texto}</span>
+        ${localStr ? `<span class="footer-info">📍 ${localStr}</span>` : ''}
         ${item.data_inicio_vigencia ? `<span class="footer-info">Abertura: <strong>${fmt(item.data_inicio_vigencia)}</strong></span>` : ''}
         ${item.data_fim_vigencia ? `<span class="footer-info">Encerra: <strong>${fmt(item.data_fim_vigencia)}</strong></span>` : ''}
         <div class="card-exp-footer-badges">
-          ${mod ? `<span class="footer-badge">${mod}</span>` : ''}
           ${esferaNome ? `<span class="footer-badge">🌐 ${esferaNome}</span>` : ''}
         </div>
       </div>
