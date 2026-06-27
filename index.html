@@ -889,7 +889,7 @@
       </div>
     </div>
     <button class="btn-tema" id="btnTema" onclick="alternarTema()">☀️</button>
-    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.16</span>
+    <span title="Versão do sistema" style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:monospace;letter-spacing:.03em;padding:2px 5px;border:1px solid rgba(255,255,255,.15);border-radius:4px;user-select:none">v2.17</span>
   </div>
 </header>
 
@@ -1904,7 +1904,6 @@
   function renderCards(itens) {
     ultimosItens = itens;
     if (layoutAtual === 'expandido') {
-      // HORIZONTAL — card com itens à direita
       document.getElementById('resultado').innerHTML =
         `<div class="cards" style="gap:14px">${itens.map(renderCardExpandido).join('')}</div>`;
       itens.forEach((item) => {
@@ -1913,10 +1912,28 @@
         if (p && cardId) carregarItensCard(p.cnpj, p.ano, p.seq, cardId);
       });
     } else {
-      // VERTICAL — grid estilo smartphone
       document.getElementById('resultado').innerHTML =
         `<div class="cards-vertical">${itens.map(renderCardVertical).join('')}</div>`;
     }
+    // Em background: busca os números reais (Comprasnet) para todos os cards
+    carregarNumerosEmBatch(itens);
+  }
+
+  async function carregarNumerosEmBatch(itens) {
+    // Filtra apenas itens que ainda não têm número em cache
+    const semCache = itens.filter(i => i.numero_controle_pncp && !_numCompraCache[i.numero_controle_pncp]);
+    if (!semCache.length) return;
+    const controles = semCache.map(i => i.numero_controle_pncp).join(',');
+    try {
+      const r = await fetch(`/api/numeros-compra?controles=${encodeURIComponent(controles)}`);
+      if (!r.ok) return;
+      const mapa = await r.json();
+      Object.entries(mapa).forEach(([controle, val]) => {
+        if (val?.numeroCompra) {
+          atualizarNumeroNosCards(controle, val.numeroCompra, val.anoCompra);
+        }
+      });
+    } catch {}
   }
 
   function fmtModalidadeNome(nome) {
@@ -2650,46 +2667,97 @@
     }
   }
   async function carregarItens(cnpj,ano,seq,seqOrgao){
+    const sq=seqOrgao||1;
+    const cacheKey=`pncp_itens2_${cnpj}_${ano}_${seq}`;
+    // Mostra cache imediatamente se disponível (< 2h)
     try{
-      const sq=seqOrgao||1;
+      const cached=localStorage.getItem(cacheKey);
+      if(cached){
+        const {d,ts,org}=JSON.parse(cached);
+        if(Date.now()-ts<7200000&&d?.length){
+          todosItens=d;renderItens(d);
+          aplicarOrgaoInfo(org);
+          // Atualiza em background silenciosamente
+          _atualizarItensBackground(cnpj,ano,seq,sq,cacheKey);
+          return;
+        }
+      }
+    }catch{}
+    // Sem cache: carrega com retry
+    await _fetchItensComRetry(cnpj,ano,seq,sq,cacheKey,true);
+  }
+
+  async function _atualizarItensBackground(cnpj,ano,seq,sq,cacheKey){
+    try{
       const r=await fetch(`/api/itens?cnpj=${cnpj}&ano=${ano}&sequencial=${seq}&seqOrgao=${sq}`);
+      if(!r.ok)return;
       const data=await r.json();
-      todosItens=data.data||[];
-      renderItens(todosItens);
-      // Popula UASG no drawer quando disponível
-      if(data.orgaoInfo){
-        const {uasgLabel,codigoUnidade,linkSistemaOrigem,numeroCompra,anoCompra}=data.orgaoInfo;
-        // Atualiza número real (Comprasnet) + UASG no cabeçalho
-        if(numeroCompra&&itemAtualDrawer){
-          const mod=fmtModalidade(itemAtualDrawer.modalidade_licitacao_nome)||'';
-          const numReal=`${parseInt(numeroCompra)}/${anoCompra||itemAtualDrawer.ano||''}`;
-          const elNum=document.getElementById('d-num-header');
-          if(elNum) elNum.textContent=(mod?mod+' ':'')+'Nº '+numReal+(itemAtualDrawer.uf?' — '+itemAtualDrawer.uf:'');
-          // Atualiza o card na lista de resultados com o número correto
-          atualizarNumeroNosCards(itemAtualDrawer.numero_controle_pncp, numeroCompra, anoCompra||itemAtualDrawer.ano);
-        }
-        const elUasgH=document.getElementById('d-uasg-header');
-        if(elUasgH&&codigoUnidade) elUasgH.textContent='UASG '+codigoUnidade+(uasgLabel?' — '+uasgLabel.split(' - ').slice(1).join(' - '):'');
-        // Atualiza campo unidade no drawer com UASG label
-        const elU=document.getElementById('d-unidade');
-        if(elU&&uasgLabel) elU.textContent=uasgLabel;
-        // Guarda UASG no item atual para salvar nos negócios
-        if(itemAtualDrawer&&codigoUnidade){
-          itemAtualDrawer._uasg=codigoUnidade;
-          itemAtualDrawer._uasgLabel=uasgLabel;
-        }
-        // Atualiza link do botão se tiver linkSistemaOrigem
-        if(linkSistemaOrigem){
-          const btnA=document.getElementById('d-btn-acessar');
-          if(btnA) btnA.onclick=()=>window.open(linkSistemaOrigem,'_blank');
-          const elFonte=document.getElementById('d-fonte-badge');
-          if(elFonte&&!elFonte.textContent.includes('BLL')&&!elFonte.textContent.includes('gov')){
-            const portalNome=detectarPortalUrl(linkSistemaOrigem);
-            if(portalNome) elFonte.textContent='🌐 '+portalNome;
-          }
+      if(!data.data?.length)return;
+      try{localStorage.setItem(cacheKey,JSON.stringify({d:data.data,ts:Date.now(),org:data.orgaoInfo}));}catch{}
+      // Só atualiza UI se o drawer ainda estiver aberto para a mesma licitação
+      const controle=`${cnpj}-${sq}-${String(seq).padStart(6,'0')}/${ano}`;
+      if(itemAtualDrawer?.numero_controle_pncp===controle){
+        todosItens=data.data;renderItens(data.data);
+        aplicarOrgaoInfo(data.orgaoInfo);
+      }
+    }catch{}
+  }
+
+  async function _fetchItensComRetry(cnpj,ano,seq,sq,cacheKey,mostrarLoading){
+    const MAX_TENTATIVAS=3;
+    for(let i=0;i<MAX_TENTATIVAS;i++){
+      try{
+        const r=await fetch(`/api/itens?cnpj=${cnpj}&ano=${ano}&sequencial=${seq}&seqOrgao=${sq}`);
+        if(!r.ok)throw new Error('HTTP '+r.status);
+        const data=await r.json();
+        todosItens=data.data||[];
+        renderItens(todosItens);
+        aplicarOrgaoInfo(data.orgaoInfo);
+        try{localStorage.setItem(cacheKey,JSON.stringify({d:todosItens,ts:Date.now(),org:data.orgaoInfo}));}catch{}
+        return;
+      }catch(e){
+        if(i<MAX_TENTATIVAS-1){
+          const espera=(i+1)*1500;
+          document.getElementById('d-itens').innerHTML=`<div class="item-loading">⏳ Tentando novamente... (${i+2}/${MAX_TENTATIVAS})</div>`;
+          await new Promise(r=>setTimeout(r,espera));
+        }else{
+          document.getElementById('d-itens').innerHTML=`<div class="item-loading" style="display:flex;flex-direction:column;gap:8px;align-items:center">
+            <span>Erro ao carregar itens.</span>
+            <button onclick="recarregarItens()" style="background:var(--primary);color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.82rem">↻ Tentar novamente</button>
+          </div>`;
         }
       }
     }
+  }
+
+  function aplicarOrgaoInfo(orgaoInfo){
+    if(!orgaoInfo)return;
+    const {uasgLabel,codigoUnidade,linkSistemaOrigem,numeroCompra,anoCompra}=orgaoInfo;
+    if(numeroCompra&&itemAtualDrawer){
+      const mod=fmtModalidade(itemAtualDrawer.modalidade_licitacao_nome)||'';
+      const numReal=`${parseInt(numeroCompra)}/${anoCompra||itemAtualDrawer.ano||''}`;
+      const elNum=document.getElementById('d-num-header');
+      if(elNum) elNum.textContent=(mod?mod+' ':'')+'Nº '+numReal+(itemAtualDrawer.uf?' — '+itemAtualDrawer.uf:'');
+      atualizarNumeroNosCards(itemAtualDrawer.numero_controle_pncp, numeroCompra, anoCompra||itemAtualDrawer.ano);
+    }
+    const elUasgH=document.getElementById('d-uasg-header');
+    if(elUasgH&&codigoUnidade) elUasgH.textContent='UASG '+codigoUnidade+(uasgLabel?' — '+uasgLabel.split(' - ').slice(1).join(' - '):'');
+    const elU=document.getElementById('d-unidade');
+    if(elU&&uasgLabel) elU.textContent=uasgLabel;
+    if(itemAtualDrawer&&codigoUnidade){
+      itemAtualDrawer._uasg=codigoUnidade;
+      itemAtualDrawer._uasgLabel=uasgLabel;
+    }
+    if(linkSistemaOrigem){
+      const btnA=document.getElementById('d-btn-acessar');
+      if(btnA) btnA.onclick=()=>window.open(linkSistemaOrigem,'_blank');
+      const elFonte=document.getElementById('d-fonte-badge');
+      if(elFonte&&!elFonte.textContent.includes('BLL')&&!elFonte.textContent.includes('gov')){
+        const portalNome=detectarPortalUrl(linkSistemaOrigem);
+        if(portalNome) elFonte.textContent='🌐 '+portalNome;
+      }
+    }
+  }
     catch(e){document.getElementById('d-itens').innerHTML='<div class="item-loading">Erro ao carregar itens.</div>'}
   }
 
