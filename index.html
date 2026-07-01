@@ -139,12 +139,7 @@
     .select-trigger-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;font-size:.85rem}
 
     /* "Mais filtros" toggle */
-    .mais-filtros-toggle{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 0 2px;font-size:.8rem;color:var(--text3);cursor:pointer;border-top:1px solid var(--border);margin-top:14px;user-select:none}
-    .mais-filtros-toggle:hover{color:var(--text)}
-    .mais-filtros-toggle-chevron{transition:transform .2s;display:inline-block}
-    .mais-filtros-toggle-chevron.aberto{transform:rotate(180deg)}
-    .mais-filtros-corpo{display:none;padding-top:14px}
-    .mais-filtros-corpo.aberto{display:block}
+
 
     /* DATA ROW dentro de mais filtros */
     .data-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -889,27 +884,18 @@
       <div class="kw-lista" id="kwLista"></div>
     </div>
     <div class="modal-campo">
-      <label>Estado (opcional)</label>
-      <select id="jornalUF">
-        <option value="">Todos os estados</option>
-        <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
-        <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
-        <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
-        <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
-        <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
-        <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
-        <option>SP</option><option>SE</option><option>TO</option>
-      </select>
+      <label>Estados (opcional — múltipla seleção)</label>
+      <button class="select-trigger" id="jornalUFTrigger" onclick="abrirModalUFJornal()" type="button" style="width:100%">
+        <span class="select-trigger-txt" id="jornalUFTxt">📍 Todos os estados</span>
+        <span style="color:var(--text3);font-size:.72rem;flex-shrink:0">▼</span>
+      </button>
     </div>
     <div class="modal-campo">
-      <label>Modalidade (opcional)</label>
-      <select id="jornalModalidade">
-        <option value="">Todas</option>
-        <option value="6">Pregão Eletrônico</option>
-        <option value="8">Dispensa de Licitação</option>
-        <option value="4">Concorrência Eletrônica</option>
-        <option value="9">Inexigibilidade</option>
-      </select>
+      <label>Modalidades (opcional — múltipla seleção)</label>
+      <button class="select-trigger" id="jornalModTrigger" onclick="abrirModalModJornal()" type="button" style="width:100%">
+        <span class="select-trigger-txt" id="jornalModTxt">📋 Pregão Eletrônico</span>
+        <span style="color:var(--text3);font-size:.72rem;flex-shrink:0">▼</span>
+      </button>
     </div>
     <div class="modal-actions">
       <button class="modal-btn" onclick="fecharModalDireto()">Cancelar</button>
@@ -939,10 +925,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       Chat Monitor
     </button>
-    <button class="nav-btn" id="navDescobrir" onclick="irParaView('descobrir');setHeaderNav('navDescobrir')">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
-      Descobrir
-    </button>
+
     <button class="nav-mobile-btn" id="navMobileBtn" onclick="toggleMobileMenu()">☰</button>
   </nav>
 
@@ -1024,7 +1007,7 @@
   <div class="sb-divider"></div>
   <div class="sb-section-label">Ferramentas</div>
   <button class="sb-item" id="sbChat" onclick="irParaView('chatMonitor');setSidebarActive('sbChat')">💬 Chat Monitor</button>
-  <button class="sb-item" id="sbDescobrir" onclick="irParaView('descobrir');setSidebarActive('sbDescobrir')">✨ Descobrir</button>
+
   <div class="sb-divider"></div>
   <div class="sb-section-label">Análises</div>
   <button class="sb-item" id="sbHistorico" onclick="irParaView('historico');setSidebarActive('sbHistorico')">📈 Preços Praticados</button>
@@ -1210,7 +1193,7 @@
             <select id="chatModalidade" onchange="atualizarCodigoCompra()"
               style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:.88rem;background:var(--surface2);color:var(--text)">
               <option value="05">05 — Pregão Eletrônico</option>
-              <option value="06" selected>06 — Dispensa de Licitação</option>
+              <option value="06" selected>06 — Dispensa Eletrônica</option>
               <option value="07">07 — Inexigibilidade</option>
               <option value="03">03 — Concorrência</option>
               <option value="20">20 — Concurso</option>
@@ -1249,7 +1232,7 @@
             <th style="padding:8px 14px;text-align:left;color:var(--text3);font-weight:600">Quando usar</th>
           </tr>
           <tr style="border-top:1px solid var(--border)"><td style="padding:8px 14px;font-weight:700;color:var(--accent)">05</td><td style="padding:8px 14px">Pregão Eletrônico</td><td style="padding:8px 14px;color:var(--text2)">Bens e serviços comuns (mais frequente)</td></tr>
-          <tr style="border-top:1px solid var(--border);background:var(--surface2)"><td style="padding:8px 14px;font-weight:700;color:var(--accent)">06</td><td style="padding:8px 14px">Dispensa de Licitação</td><td style="padding:8px 14px;color:var(--text2)">Baixo valor ou emergência</td></tr>
+          <tr style="border-top:1px solid var(--border);background:var(--surface2)"><td style="padding:8px 14px;font-weight:700;color:var(--accent)">06</td><td style="padding:8px 14px">Dispensa Eletrônica</td><td style="padding:8px 14px;color:var(--text2)">Baixo valor ou emergência</td></tr>
           <tr style="border-top:1px solid var(--border)"><td style="padding:8px 14px;font-weight:700;color:var(--accent)">07</td><td style="padding:8px 14px">Inexigibilidade</td><td style="padding:8px 14px;color:var(--text2)">Fornecedor exclusivo</td></tr>
           <tr style="border-top:1px solid var(--border);background:var(--surface2)"><td style="padding:8px 14px;font-weight:700;color:var(--accent)">03</td><td style="padding:8px 14px">Concorrência</td><td style="padding:8px 14px;color:var(--text2)">Obras ou grande vulto</td></tr>
           <tr style="border-top:1px solid var(--border)"><td style="padding:8px 14px;font-weight:700;color:var(--accent)">22</td><td style="padding:8px 14px">Leilão</td><td style="padding:8px 14px;color:var(--text2)">Venda de bens inservíveis</td></tr>
@@ -1536,7 +1519,7 @@
   ];
   const MODALIDADES=[
     {id:'6',nome:'Pregão Eletrônico',short:'Pregão El.'},
-    {id:'8',nome:'Dispensa de Licitação',short:'Dispensa'},
+    {id:'8',nome:'Dispensa Eletrônica',short:'Dispensa'},
     {id:'7',nome:'Pregão Presencial',short:'Pregão Pres.'},
     {id:'4',nome:'Concorrência Eletrônica',short:'Conc. El.'},
     {id:'5',nome:'Concorrência Presencial',short:'Conc. Pres.'},
@@ -1676,12 +1659,7 @@
   });
 
   // ===== MAIS FILTROS (toggle) =====
-  let maisFiltrosAberto=false;
-  function toggleMaisFiltros(){
-    maisFiltrosAberto=!maisFiltrosAberto;
-    document.getElementById('maisFiltrosCorpo').classList.toggle('aberto',maisFiltrosAberto);
-    document.getElementById('maisFiltrosChevron').classList.toggle('aberto',maisFiltrosAberto);
-  }
+
 
   function atualizarPeriodoTrigger(){
     const ini=document.getElementById('dataInicial').value;
@@ -1762,7 +1740,10 @@
   function abrirModalUF(){renderModalUF();document.getElementById('modalUFOverlay').classList.add('aberto')}
   function fecharModalUF(e){if(e.target===document.getElementById('modalUFOverlay'))fecharModalUFDireto()}
   function fecharModalUFDireto(){document.getElementById('modalUFOverlay').classList.remove('aberto')}
-  function confirmarUFs(){atualizarBotaoUF();fecharModalUFDireto();atualizarChipsFiltrosAtivos();}
+  function confirmarUFs(){
+    if(_jornalMode){_atualizarBotoesJornal();fecharModalUFDireto();}
+    else{atualizarBotaoUF();fecharModalUFDireto();atualizarChipsFiltrosAtivos();}
+  }
   function atualizarBotaoUF(){
     const txt=document.getElementById('ufTriggerTxt');
     if(!selectedUFs.length)txt.textContent='📍 Todos os estados';
@@ -1786,7 +1767,10 @@
   function abrirModalMod(){renderModalMod();document.getElementById('modalModOverlay').classList.add('aberto')}
   function fecharModalMod(e){if(e.target===document.getElementById('modalModOverlay'))fecharModalModDireto()}
   function fecharModalModDireto(){document.getElementById('modalModOverlay').classList.remove('aberto')}
-  function confirmarMods(){atualizarBotaoMod();fecharModalModDireto();atualizarChipsFiltrosAtivos();}
+  function confirmarMods(){
+    if(_jornalMode){_atualizarBotoesJornal();fecharModalModDireto();}
+    else{atualizarBotaoMod();fecharModalModDireto();atualizarChipsFiltrosAtivos();}
+  }
   function atualizarBotaoMod(){
     const txt=document.getElementById('modTriggerTxt');
     if(!selectedMods.length)txt.textContent='📋 Todas as modalidades';
@@ -1877,7 +1861,7 @@
     if(['historico','empresa'].includes(view))setHeaderNav('navBusca');
     if(['negocios'].includes(view)){setHeaderNav('navNegociosBtn');mudarAbaNegocios('funil');}
     if(['minhaEmpresa','documentos'].includes(view)){setHeaderNav('navBusca');}
-    if(view==='jornais')renderJornais();
+    if(view==='jornais'){renderJornais();fetchJornais().then(()=>renderJornais());}
     if(view==='minhaEmpresa')renderMinhaEmpresa();
     if(view==='documentos')renderDocumentos();
     // Persiste a view atual no hash e localStorage
@@ -1931,31 +1915,120 @@
     if(panel.classList.contains('aberto')){salvarNotificacoes(getNotificacoes().map(n=>({...n,lida:true})));renderNotificacoes()}
   }
 
+  // ===== JORNAL MODAL STATE =====
+  let _jornalMode = false;
+  let _savedSearchUFs = [];
+  let _savedSearchMods = [];
+
+  function _jornalUFLabel(){
+    if(!selectedUFs.length)return'📍 Todos os estados';
+    if(selectedUFs.length<=3)return'📍 '+selectedUFs.join(', ');
+    return`📍 ${selectedUFs.slice(0,3).join(', ')} (+${selectedUFs.length-3})`;
+  }
+  function _jornalModLabel(){
+    if(!selectedMods.length)return'📋 Todas as modalidades';
+    const isMobile=window.innerWidth<=600;
+    const nomes=selectedMods.map(id=>{const m=MODALIDADES.find(m=>m.id===id);return isMobile?(m?.short||m?.nome||id):(m?.nome||id);});
+    if(nomes.length<=2)return'📋 '+nomes.join(', ');
+    return`📋 ${nomes.slice(0,2).join(', ')} (+${nomes.length-2})`;
+  }
+  function _atualizarBotoesJornal(){
+    const ufEl=document.getElementById('jornalUFTxt');
+    const modEl=document.getElementById('jornalModTxt');
+    if(ufEl)ufEl.textContent=_jornalUFLabel();
+    if(modEl)modEl.textContent=_jornalModLabel();
+  }
+  function abrirModalUFJornal(){
+    _jornalMode=true;
+    abrirModalUF();
+  }
+  function abrirModalModJornal(){
+    _jornalMode=true;
+    abrirModalMod();
+  }
+
   // ===== JORNAIS =====
+  let _jornaisSyncTimer = null;
+
   function getJornais(){try{return JSON.parse(localStorage.getItem(JORNAIS_KEY)||'[]')}catch{return[]}}
   function salvarJornaisLS(j){localStorage.setItem(JORNAIS_KEY,JSON.stringify(j))}
+
+  async function fetchJornais(){
+    try{
+      const r=await fetch('/api/jornais',{cache:'no-store'});
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      const resp=await r.json();
+      let apiList=Array.isArray(resp)?resp:(resp.jornais||[]);
+      if(typeof apiList==='string'){try{apiList=JSON.parse(apiList);}catch{apiList=[];}}
+      if(!Array.isArray(apiList))apiList=[];
+      // Merge: local items not in API get synced back
+      const local=getJornais();
+      const merged=[...apiList];
+      local.forEach(l=>{if(l.id&&!merged.find(a=>a.id===l.id))merged.push(l);});
+      salvarJornaisLS(merged);
+      // Sync-back local-only items
+      const apenasLocal=local.filter(l=>l.id&&!apiList.find(a=>a.id===l.id));
+      if(apenasLocal.length>0) salvarJornaisRemoto(merged);
+      return merged;
+    }catch(e){console.warn('fetchJornais falhou:',e.message);}
+    return getJornais();
+  }
+
+  function salvarJornaisRemoto(arr){
+    salvarJornaisLS(arr);
+    clearTimeout(_jornaisSyncTimer);
+    _jornaisSyncTimer=setTimeout(async()=>{
+      try{
+        await fetch('/api/jornais',{
+          method:'PUT',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({action:'replace_all',jornais:arr}),
+          cache:'no-store',
+        });
+      }catch(e){console.warn('salvarJornaisRemoto falhou:',e.message);}
+    },400);
+  }
   function abrirModalNovo(){
+    // Save current search state
+    _savedSearchUFs=[...selectedUFs];
+    _savedSearchMods=[...selectedMods];
+    // Set default jornal state: pregão eletrônico pre-selected
+    selectedUFs=[];
+    selectedMods=['6'];
     document.getElementById('modalTitulo').textContent='Novo Jornal';
     document.getElementById('modalJornalId').value='';
     document.getElementById('jornalNome').value='';
-    document.getElementById('jornalUF').value='';
-    document.getElementById('jornalModalidade').value='';
     kwAtual=[];renderKwLista();
+    _atualizarBotoesJornal();
     document.getElementById('modalOverlay').classList.add('aberto');
     setTimeout(()=>document.getElementById('kwInput').focus(),100);
   }
   function editarJornal(id){
     const j=getJornais().find(x=>x.id===id);if(!j)return;
+    // Save current search state
+    _savedSearchUFs=[...selectedUFs];
+    _savedSearchMods=[...selectedMods];
+    // Restore jornal's selection
+    selectedUFs=Array.isArray(j.ufs)?[...j.ufs]:(j.uf?[j.uf]:[]);
+    selectedMods=Array.isArray(j.modalidades)?[...j.modalidades]:(j.modalidade?[j.modalidade]:[]);
     document.getElementById('modalTitulo').textContent='Editar Jornal';
     document.getElementById('modalJornalId').value=id;
     document.getElementById('jornalNome').value=j.nome;
-    document.getElementById('jornalUF').value=j.uf||'';
-    document.getElementById('jornalModalidade').value=j.modalidade||'';
     kwAtual=[...j.palavrasChave];renderKwLista();
+    _atualizarBotoesJornal();
     document.getElementById('modalOverlay').classList.add('aberto');
   }
   function fecharModal(e){if(e.target===document.getElementById('modalOverlay'))fecharModalDireto()}
-  function fecharModalDireto(){document.getElementById('modalOverlay').classList.remove('aberto')}
+  function fecharModalDireto(){
+    if(_jornalMode){
+      _jornalMode=false;
+      selectedUFs=[..._savedSearchUFs];
+      selectedMods=[..._savedSearchMods];
+      atualizarBotaoUF();
+      atualizarBotaoMod();
+    }
+    document.getElementById('modalOverlay').classList.remove('aberto');
+  }
   function kwKeydown(e){if(e.key==='Enter'){e.preventDefault();adicionarKw()}}
   function adicionarKw(){const i=document.getElementById('kwInput'),v=i.value.trim();if(v&&!kwAtual.includes(v)){kwAtual.push(v);renderKwLista()}i.value='';i.focus()}
   function removerKw(i){kwAtual.splice(i,1);renderKwLista()}
@@ -1965,11 +2038,31 @@
     if(!nome){alert('Dê um nome ao jornal');return}
     if(!kwAtual.length){alert('Adicione ao menos uma palavra-chave');return}
     const jornais=getJornais(),id=document.getElementById('modalJornalId').value;
-    const jornal={id:id||Date.now().toString(),nome,palavrasChave:[...kwAtual],uf:document.getElementById('jornalUF').value,modalidade:document.getElementById('jornalModalidade').value,criadoEm:id?jornais.find(j=>j.id===id)?.criadoEm:new Date().toISOString(),ultimaVerificacao:null,ultimoTotal:0};
+    const jornal={
+      id:id||Date.now().toString(),
+      nome,
+      palavrasChave:[...kwAtual],
+      ufs:[...selectedUFs],
+      modalidades:[...selectedMods],
+      // Legacy compat fields
+      uf:selectedUFs[0]||'',
+      modalidade:selectedMods[0]||'',
+      criadoEm:id?jornais.find(j=>j.id===id)?.criadoEm:new Date().toISOString(),
+      ultimaVerificacao:null,
+      ultimoTotal:0
+    };
     if(id){const idx=jornais.findIndex(j=>j.id===id);if(idx>=0)jornais[idx]=jornal;else jornais.unshift(jornal)}else jornais.unshift(jornal);
-    salvarJornaisLS(jornais);fecharModalDireto();renderJornais();
+    // Restore search state before closing
+    _jornalMode=false;
+    selectedUFs=[..._savedSearchUFs];
+    selectedMods=[..._savedSearchMods];
+    atualizarBotaoUF();
+    atualizarBotaoMod();
+    document.getElementById('modalOverlay').classList.remove('aberto');
+    salvarJornaisRemoto(jornais);
+    renderJornais();
   }
-  function removerJornal(id){if(!confirm('Remover este jornal?'))return;salvarJornaisLS(getJornais().filter(j=>j.id!==id));renderJornais()}
+  function removerJornal(id){if(!confirm('Remover este jornal?'))return;const novos=getJornais().filter(j=>j.id!==id);salvarJornaisRemoto(novos);renderJornais()}
   async function verificarJornal(id){
     const jornais=getJornais(),j=jornais.find(x=>x.id===id);if(!j)return;
     const el=document.getElementById('jornal-resultado-'+id);if(el)el.textContent='⏳ Verificando...';
@@ -1977,23 +2070,26 @@
     for(const kw of j.palavrasChave){
       try{
         const params=new URLSearchParams({palavraChave:kw,pagina:1,status:'recebendo_proposta'});
-        if(j.uf)params.append('uf',j.uf);if(j.modalidade)params.append('modalidade',j.modalidade);
+        const ufsJ=Array.isArray(j.ufs)&&j.ufs.length?j.ufs:(j.uf?[j.uf]:[]);
+        const modsJ=Array.isArray(j.modalidades)&&j.modalidades.length?j.modalidades:(j.modalidade?[j.modalidade]:[]);
+        ufsJ.forEach(u=>params.append('uf',u));
+        modsJ.forEach(m=>params.append('modalidade',m));
         const r=await fetch(`/api/buscar?${params}`);const data=await r.json();
         totalNovos+=data.totalRegistros||0;
       }catch(e){}
     }
     const anterior=j.ultimoTotal||0;
     j.ultimaVerificacao=new Date().toISOString();j.ultimoTotal=totalNovos;
-    salvarJornaisLS(jornais);
+    salvarJornaisRemoto(jornais);
     if(totalNovos>anterior&&anterior>0)adicionarNotificacao(`📰 ${j.nome}`,`${totalNovos-anterior} nova(s) licitação(ões) para "${j.palavrasChave.join(', ')}"`);
     renderJornais();
   }
   async function verificarTodosJornais(){const jornais=getJornais();for(const j of jornais)await verificarJornal(j.id)}
-  function executarBuscaJornal(kws,uf,mod){
+  function executarBuscaJornal(kws,ufs,mods){
     irParaView('busca');
     document.getElementById('palavraChave').value=kws;
-    if(uf){selectedUFs=[uf];atualizarBotaoUF();}
-    if(mod){selectedMods=[mod];atualizarBotaoMod();}
+    if(ufs&&ufs.length){selectedUFs=[...ufs];atualizarBotaoUF();}
+    if(mods&&mods.length){selectedMods=[...mods];atualizarBotaoMod();}
     buscar(1);
   }
   function renderJornais(){
@@ -2007,11 +2103,12 @@
         </div>
         <div class="jornal-chips">
           ${j.palavrasChave.map(k=>`<span class="jornal-chip">🔍 ${k}</span>`).join('')}
-          ${j.uf?`<span class="jornal-chip">📍 ${j.uf}</span>`:''}
+          ${(Array.isArray(j.ufs)&&j.ufs.length?j.ufs:(j.uf?[j.uf]:[])).map(u=>`<span class="jornal-chip">📍 ${u}</span>`).join('')}
+          ${(Array.isArray(j.modalidades)&&j.modalidades.length?j.modalidades:(j.modalidade?[j.modalidade]:[])).map(m=>{const found=MODALIDADES.find(x=>x.id===m);return`<span class="jornal-chip">📋 ${found?found.nome:m}</span>`;}).join('')}
         </div>
         <div class="jornal-meta">${j.ultimaVerificacao?`Última verificação: ${new Date(j.ultimaVerificacao).toLocaleString('pt-BR')}`:'Ainda não verificado'}</div>
         <div class="jornal-actions">
-          <button class="jornal-btn jornal-btn-primary" onclick="executarBuscaJornal('${j.palavrasChave.join(';')}','${j.uf||''}','${j.modalidade||''}')">🔍 Ver licitações</button>
+          <button class="jornal-btn jornal-btn-primary" onclick="executarBuscaJornal('${j.palavrasChave.join(' OR ')}',${JSON.stringify(Array.isArray(j.ufs)?j.ufs:(j.uf?[j.uf]:undefined||[]))},${JSON.stringify(Array.isArray(j.modalidades)?j.modalidades:(j.modalidade?[j.modalidade]:undefined||[]))})">🔍 Ver licitações</button>
           <button class="jornal-btn" onclick="verificarJornal('${j.id}')">↻ Verificar agora</button>
           <button class="jornal-btn" onclick="editarJornal('${j.id}')">✎ Editar</button>
           <button class="jornal-btn jornal-btn-danger" onclick="removerJornal('${j.id}')">✕ Remover</button>
@@ -2615,7 +2712,7 @@
     el.innerHTML='<div class="finalizados-lista">'+negs.map(n=>{
       const m=n.numero_controle?.match(/-([0-9]+)\/([0-9]+)$/);
       const numFmt=m?`Nº ${parseInt(m[1])}/${m[2]}`:'';
-      const modFmt=(n.modalidade||'').replace('Pregão Eletrônico','PE').replace('Dispensa de Licitação','Dispensa');
+      const modFmt=(n.modalidade||'').replace('Pregão Eletrônico','PE').replace('Dispensa Eletrônica','Dispensa');
       const finEm=n.finalizado_em?new Date(n.finalizado_em).toLocaleDateString('pt-BR'):'—';
       return`<div class="finalizado-card" onclick="abrirDrawerNeg('${n.id}')">
         <div class="finalizado-card-body">
@@ -2645,7 +2742,7 @@
         ${itens.length===0?'<div class="fase-vazio">Nenhuma licitação nesta fase.</div>':`<div class="funil-fase-cards">${itens.map(n=>{
           const m=n.numero_controle?.match(/-([0-9]+)\/([0-9]+)$/);
           const numFmt=m?`Nº ${parseInt(m[1])}/${m[2]}`:'';
-          const modFmt=(n.modalidade||'').replace('Pregão Eletrônico','PE').replace('Dispensa de Licitação','Dispensa');
+          const modFmt=(n.modalidade||'').replace('Pregão Eletrônico','PE').replace('Dispensa Eletrônica','Dispensa');
           const orgaoLabel=n.uasgLabel||n.orgao||'';
           return`<div class="neg-card-vert" onclick="abrirDrawerNeg('${n.id}')">
             <div class="neg-card-vert-body">
