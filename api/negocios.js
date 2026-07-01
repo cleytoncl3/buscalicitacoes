@@ -8,13 +8,33 @@ const KEY = 'arantes_negocios_v2';
 // Cache em memória — fallback apenas, não é confiável em produção
 const memoryCache = { data: null };
 
-const hasUpstash = () => !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+// Upstash cria variáveis com nomes ligeiramente diferentes dependendo da integração usada.
+// Tentamos todas as variantes conhecidas.
+function getUpstashCreds() {
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL ||
+    process.env.UPSTASH_REDIS_REST_API_URL ||
+    process.env.UPSTASH_REST_URL ||
+    process.env.KV_REST_API_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_API_TOKEN ||
+    process.env.UPSTASH_REST_TOKEN ||
+    process.env.KV_REST_API_TOKEN;
+  return { url, token };
+}
+
+const hasUpstash = () => {
+  const { url, token } = getUpstashCreds();
+  return !!(url && token);
+};
 
 async function redisGet() {
   if (!hasUpstash()) return null;
+  const { url, token } = getUpstashCreds();
   try {
-    const r = await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/get/${KEY}`, {
-      headers: { Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}` }
+    const r = await fetch(`${url}/get/${KEY}`, {
+      headers: { Authorization: `Bearer ${token}` }
     });
     if (!r.ok) { console.error('Upstash GET error:', r.status); return null; }
     const { result } = await r.json();
@@ -24,10 +44,11 @@ async function redisGet() {
 
 async function redisSet(data) {
   if (!hasUpstash()) return false;
+  const { url, token } = getUpstashCreds();
   try {
-    const r = await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/set/${KEY}`, {
+    const r = await fetch(`${url}/set/${KEY}`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`, 'Content-Type': 'application/json' },
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(JSON.stringify(data))
     });
     if (!r.ok) { console.error('Upstash SET error:', r.status); return false; }
@@ -66,9 +87,11 @@ export default async function handler(req, res) {
   const negocios = await getNegocios();
 
   if (req.method === 'GET') {
+    const { url } = getUpstashCreds();
+    console.log(`[negocios] upstash=${hasUpstash()} url_prefix=${url ? url.substring(0,30) : 'none'} count=${negocios.length}`);
     return res.status(200).json({
       negocios,
-      upstash: hasUpstash(), // informa ao frontend se a persistência está configurada
+      upstash: hasUpstash(),
     });
   }
 
