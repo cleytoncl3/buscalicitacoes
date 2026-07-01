@@ -716,8 +716,9 @@
       .filtros-linha-selects{grid-template-columns:1fr 1fr;gap:6px}
       .filtro-campo{min-width:0}
       .filtro-campo-label{font-size:.6rem;letter-spacing:.1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;max-width:100%}
-      .select-trigger{font-size:.76rem;padding:6px 7px;min-width:0}
-      .select-trigger-txt{font-size:.76rem;min-width:0}
+      .select-trigger{font-size:.76rem;padding:6px 7px;min-width:0;overflow:hidden}
+      .select-trigger-txt{font-size:.76rem;min-width:0;max-width:100%}
+      .periodo-wrapper{min-width:0;width:100%}
       /* Labels curtos no mobile via data-short */
       .filtro-campo-label[data-short]::after{content:attr(data-short)}
       .filtro-campo-label[data-short] .label-full{display:none}
@@ -1519,16 +1520,16 @@
     {nome:'Sul',ufs:['PR','RS','SC']},
   ];
   const MODALIDADES=[
-    {id:'6',nome:'Pregão Eletrônico'},
-    {id:'8',nome:'Dispensa de Licitação'},
-    {id:'7',nome:'Pregão Presencial'},
-    {id:'4',nome:'Concorrência Eletrônica'},
-    {id:'5',nome:'Concorrência Presencial'},
-    {id:'9',nome:'Inexigibilidade'},
-    {id:'12',nome:'Credenciamento'},
-    {id:'3',nome:'Concurso'},
-    {id:'1',nome:'Leilão Eletrônico'},
-    {id:'13',nome:'Leilão Presencial'},
+    {id:'6',nome:'Pregão Eletrônico',short:'Pregão El.'},
+    {id:'8',nome:'Dispensa de Licitação',short:'Dispensa'},
+    {id:'7',nome:'Pregão Presencial',short:'Pregão Pres.'},
+    {id:'4',nome:'Concorrência Eletrônica',short:'Conc. El.'},
+    {id:'5',nome:'Concorrência Presencial',short:'Conc. Pres.'},
+    {id:'9',nome:'Inexigibilidade',short:'Inexigib.'},
+    {id:'12',nome:'Credenciamento',short:'Credenc.'},
+    {id:'3',nome:'Concurso',short:'Concurso'},
+    {id:'1',nome:'Leilão Eletrônico',short:'Leilão El.'},
+    {id:'13',nome:'Leilão Presencial',short:'Leilão Pres.'},
   ];
 
   // Portais organizados por grupo/esfera
@@ -1775,7 +1776,8 @@
     const txt=document.getElementById('modTriggerTxt');
     if(!selectedMods.length)txt.textContent='📋 Todas as modalidades';
     else{
-      const nomes=selectedMods.map(id=>MODALIDADES.find(m=>m.id===id)?.nome||id);
+      const isMobile=window.innerWidth<=600;
+      const nomes=selectedMods.map(id=>{const m=MODALIDADES.find(m=>m.id===id);return isMobile?(m?.short||m?.nome||id):(m?.nome||id);});
       if(nomes.length<=2)txt.textContent='📋 '+nomes.join(', ');
       else txt.textContent=`📋 ${nomes.slice(0,2).join(', ')} (+${nomes.length-2})`;
     }
