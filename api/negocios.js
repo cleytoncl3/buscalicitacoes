@@ -12,15 +12,17 @@ const memoryCache = { data: null };
 // Tentamos todas as variantes conhecidas.
 function getUpstashCreds() {
   const url =
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL ||   // seu caso específico
     process.env.UPSTASH_REDIS_REST_URL ||
     process.env.UPSTASH_REDIS_REST_API_URL ||
-    process.env.UPSTASH_REST_URL ||
-    process.env.KV_REST_API_URL;
+    process.env.KV_REST_API_URL ||
+    process.env.UPSTASH_REST_URL;
   const token =
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||  // seu caso específico
     process.env.UPSTASH_REDIS_REST_TOKEN ||
     process.env.UPSTASH_REDIS_REST_API_TOKEN ||
-    process.env.UPSTASH_REST_TOKEN ||
-    process.env.KV_REST_API_TOKEN;
+    process.env.KV_REST_API_TOKEN ||
+    process.env.UPSTASH_REST_TOKEN;
   return { url, token };
 }
 
