@@ -42,7 +42,11 @@ async function redisGet() {
     });
     if (!r.ok) { console.error('Upstash GET error:', r.status); return null; }
     const { result } = await r.json();
-    return result ? JSON.parse(result) : [];
+    if (!result) return [];
+    let parsed = JSON.parse(result);
+    // Migração: dado gravado com duplo JSON.stringify retorna string em vez de array
+    if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+    return Array.isArray(parsed) ? parsed : [];
   } catch (e) { console.error('Upstash GET exception:', e.message); return null; }
 }
 
@@ -53,7 +57,7 @@ async function redisSet(data) {
     const r = await fetch(`${url}/set/${KEY}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(JSON.stringify(data))
+      body: JSON.stringify(data)
     });
     if (!r.ok) { console.error('Upstash SET error:', r.status); return false; }
     return true;
