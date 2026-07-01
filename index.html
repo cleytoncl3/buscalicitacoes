@@ -382,6 +382,13 @@
     .neg-btn:hover{background:var(--chip-bg);color:var(--primary)}
     .neg-btn-danger{color:#ef4444;border-color:#fca5a5}
     .fase-vazio{color:var(--text3);font-size:.85rem;padding:10px 0}
+    /* Funil — cards verticais (portrait) */
+    .funil-fase-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:4px}
+    .neg-card-vert{background:var(--surface);border-radius:10px;box-shadow:var(--card-shadow);border:1px solid var(--border);border-top:3px solid var(--primary);cursor:pointer;display:flex;flex-direction:column;aspect-ratio:9/16;transition:box-shadow .2s}
+    .neg-card-vert:hover{box-shadow:var(--card-shadow-hover)}
+    .neg-card-vert-body{padding:14px;display:flex;flex-direction:column;gap:7px;flex:1;overflow:hidden}
+    .neg-card-vert-footer{padding:10px 14px;background:var(--surface2);border-top:1px solid var(--border);display:flex;flex-direction:column;gap:5px;border-radius:0 0 10px 10px}
+    @media(max-width:600px){.funil-fase-cards{grid-template-columns:1fr}.neg-card-vert{aspect-ratio:unset}}
     .kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;overflow-x:auto;padding-bottom:8px}
     .kanban-col{background:var(--surface2);border-radius:10px;padding:12px;border:1px solid var(--border);min-width:180px}
     .kanban-col-titulo{font-size:.82rem;font-weight:700;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
@@ -1851,7 +1858,7 @@
     if(['busca','jornais','orgaos','buscarNum'].includes(view))setHeaderNav('navBusca');
     if(view==='chatMonitor'){setHeaderNav('navChatBtn');setTimeout(()=>iniciarChatMonitor(),0);}
     if(['historico','empresa'].includes(view))setHeaderNav('navBusca');
-    if(['negocios'].includes(view)){setHeaderNav('navNegociosBtn');}
+    if(['negocios'].includes(view)){setHeaderNav('navNegociosBtn');mudarAbaNegocios('funil');}
     if(['minhaEmpresa','documentos'].includes(view)){setHeaderNav('navBusca');}
     if(view==='jornais')renderJornais();
     if(view==='minhaEmpresa')renderMinhaEmpresa();
@@ -1871,8 +1878,8 @@
     document.querySelectorAll('.neg-view').forEach(v=>v.classList.remove('ativo'));
     document.getElementById('tab'+aba.charAt(0).toUpperCase()+aba.slice(1)).classList.add('ativo');
     document.getElementById('neg'+aba.charAt(0).toUpperCase()+aba.slice(1)).classList.add('ativo');
-    if(aba==='funil'){renderFunil();fetchNegocios().then(d=>{if(d&&d.length>0)renderFunil();});}
-    if(aba==='quadros'){renderQuadros();fetchNegocios().then(d=>{if(d&&d.length>0)renderQuadros();});}
+    if(aba==='funil'){renderFunil();fetchNegocios().then(d=>{renderFunil();});}
+    if(aba==='quadros'){renderQuadros();fetchNegocios().then(d=>{renderQuadros();});}
     if(aba==='agenda')renderAgenda();
   }
 
@@ -2239,47 +2246,139 @@
     }
   }
 
-  // ===== NEGÓCIOS =====
-  // Negócios: API compartilhada (todos os funcionários veem) + localStorage como cache
+  // ===== NEGÓCIOS — Persistência compartilhada =====
+  // Fonte da verdade: Upstash Redis via /api/negocios
+  // localStorage = cache local para acesso offline e evitar flash vazio
+  let _negSyncTimer = null;
+  let _upstashOk = null; // null=desconhecido, true=ok, false=sem Redis
+
+  function _mostrarSyncStatus(status) {
+    let el = document.getElementById('neg-sync-status');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'neg-sync-status';
+      el.style.cssText = 'position:fixed;bottom:70px;right:16px;font-size:.72rem;padding:5px 10px;border-radius:20px;z-index:500;transition:opacity .4s;pointer-events:none';
+      document.body.appendChild(el);
+    }
+    if (status === 'saving') {
+      el.textContent = '⏳ Salvando...';
+      el.style.cssText += ';background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44;opacity:1';
+    } else if (status === 'ok') {
+      el.textContent = '✅ Salvo na nuvem';
+      el.style.cssText += ';background:#22c55e22;color:#22c55e;border:1px solid #22c55e44;opacity:1';
+      setTimeout(() => { el.style.opacity = '0'; }, 2500);
+    } else if (status === 'local') {
+      el.textContent = '⚠️ Salvo localmente';
+      el.style.cssText += ';background:#ef444422;color:#ef4444;border:1px solid #ef444444;opacity:1';
+    } else if (status === 'no-redis') {
+      el.textContent = '⚠️ Sem Redis — dados locais apenas';
+      el.style.cssText += ';background:#ef444422;color:#ef4444;border:1px solid #ef444444;opacity:1';
+    }
+  }
+
+  function getNegocios(){try{return JSON.parse(localStorage.getItem(NEG_KEY)||'[]')}catch{return[]}}
+
+  function _mergeNegocios(apiList, localList) {
+    // Merge inteligente: combina sem duplicatas, preservando a versão mais rica
+    const map = {};
+    // Processa todos, com local depois de API para que local possa ganhar em campos específicos
+    [...apiList, ...localList].forEach(n => {
+      const k = n.numero_controle || n.id;
+      if (!k) return;
+      if (!map[k]) { map[k] = n; return; }
+      // Já existe: preserva itensInteresse se o atual não tem
+      const existing = map[k];
+      if (!existing.itensInteresse?.length && n.itensInteresse?.length) {
+        map[k] = { ...existing, itensInteresse: n.itensInteresse };
+      }
+      // Preserva fase mais recente (local ganha se tiver sido alterada)
+      if (n._faseAtualizada && !existing._faseAtualizada) {
+        map[k].fase = n.fase;
+      }
+    });
+    return Object.values(map);
+  }
+
   async function fetchNegocios(){
     try{
-      const r=await fetch('/api/negocios');
-      if(r.ok){
-        const apiData=await r.json();
-        const local=getNegocios();
-        if(Array.isArray(apiData)){
-          // API é fonte de verdade; local só contribui com itens que a API ainda não tem
-          const map={};
-          // Coloca local primeiro (mais antigo), depois API sobrescreve (mais confiável)
-          [...local,...apiData].forEach(n=>{
-            const k=n.numero_controle||n.id;
-            if(k)map[k]=n; // API vence no merge
-          });
-          const merged=Object.values(map);
-          localStorage.setItem(NEG_KEY,JSON.stringify(merged));
-          // Sincroniza locais que a API não tem
-          local.filter(l=>!apiData.find(a=>a.numero_controle===l.numero_controle))
-            .forEach(n=>fetch('/api/negocios',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(n)}).catch(()=>{}));
-          return merged;
-        }
+      const r = await fetch('/api/negocios', { cache: 'no-store' });
+      if (!r.ok) throw new Error('HTTP '+r.status);
+      const resp = await r.json();
+      const apiList = Array.isArray(resp) ? resp : (resp.negocios || []);
+      _upstashOk = resp.upstash !== undefined ? resp.upstash : null;
+
+      if (!_upstashOk) _mostrarSyncStatus('no-redis');
+
+      const local = getNegocios();
+      const merged = _mergeNegocios(apiList, local);
+      localStorage.setItem(NEG_KEY, JSON.stringify(merged));
+
+      const apenasLocal = local.filter(l => l.numero_controle && !apiList.find(a => a.numero_controle === l.numero_controle));
+      if (apenasLocal.length > 0) {
+        fetch('/api/negocios', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(apenasLocal)
+        }).catch(() => {});
       }
-    }catch{}
+      return merged;
+    } catch(e) {
+      console.warn('fetchNegocios falhou:', e.message);
+    }
     return getNegocios();
   }
-  function getNegocios(){try{return JSON.parse(localStorage.getItem(NEG_KEY)||'[]')}catch{return[]}}
-  async function salvarNegocios(arr){
-    localStorage.setItem(NEG_KEY,JSON.stringify(arr));
-    // Sincroniza com servidor de forma assíncrona
+
+  async function _apiPost(body) {
+    const r = await fetch('/api/negocios', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      cache: 'no-store',
+    });
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
   }
-  async function apiSalvarNegocio(neg){
-    try{await fetch('/api/negocios',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(neg)});}catch{}
+
+  async function salvarNegocios(arr, { sync = true } = {}) {
+    localStorage.setItem(NEG_KEY, JSON.stringify(arr));
+    if (!sync) return;
+    // Debounce: agrupa saves rápidos (ex: mover fase) num único POST
+    clearTimeout(_negSyncTimer);
+    _negSyncTimer = setTimeout(async () => {
+      _mostrarSyncStatus('saving');
+      try {
+        // replace_all garante que deleções também sejam propagadas
+        const r = await fetch('/api/negocios', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'replace_all', negocios: arr }),
+          cache: 'no-store',
+        });
+        if (!r.ok) throw new Error('HTTP '+r.status);
+        _mostrarSyncStatus('ok');
+      } catch {
+        _mostrarSyncStatus('local');
+      }
+    }, 400);
   }
-  async function apiMoverFase(id,fase){
-    try{await fetch('/api/negocios',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,fase})});}catch{}
+
+  async function apiMoverFase(id, fase) {
+    try {
+      await fetch('/api/negocios', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, fase }),
+        cache: 'no-store',
+      });
+    } catch {}
   }
-  async function apiRemoverNegocio(id){
-    try{await fetch('/api/negocios?id='+id,{method:'DELETE'});}catch{}
+
+  async function apiRemoverNegocio(id) {
+    try {
+      await fetch('/api/negocios?id=' + id, { method: 'DELETE', cache: 'no-store' });
+    } catch {}
   }
+
   function adicionarAosNegocios(){
     if(!itemAtualDrawer)return;
     const negs=getNegocios();
@@ -2290,7 +2389,6 @@
     const novoNeg={id:Date.now().toString(),titulo:itemAtualDrawer.title||'',objeto:itemAtualDrawer.description||'',orgao:itemAtualDrawer.orgao_nome||'',uf:itemAtualDrawer.uf||'',modalidade:itemAtualDrawer.modalidade_licitacao_nome||'',abertura:itemAtualDrawer.data_inicio_vigencia||'',encerramento:itemAtualDrawer.data_fim_vigencia||'',numero_controle:itemAtualDrawer.numero_controle_pncp||'',link_pncp:p?`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`:'',fase:'oportunidade',adicionado_em:new Date().toISOString(),itemData:JSON.stringify(itemAtualDrawer)};
     negs.unshift(novoNeg);
     salvarNegocios(negs);
-    apiSalvarNegocio(novoNeg);
     const btn=document.getElementById('d-btn-negocio');
     btn.textContent='✅ Adicionado!';btn.classList.add('adicionado');
     setTimeout(()=>{btn.textContent='💼 Adicionar aos meus negócios';btn.classList.remove('adicionado')},2500);
@@ -2436,7 +2534,6 @@
     };
     negs.unshift(novoNeg);
     salvarNegocios(negs);
-    apiSalvarNegocio(novoNeg);
     fecharModalItens();
 
     // Feedback no drawer
@@ -2465,8 +2562,8 @@
   // Itens salvos do negócio (quando drawer aberto via meus negócios)
   let _itensNegocio = null;
 
-  function moverFase(id,fase){const negs=getNegocios(),n=negs.find(x=>x.id===id);if(n){n.fase=fase;salvarNegocios(negs);apiMoverFase(id,fase);renderFunil();renderQuadros()}}
-  function removerNegocio(id){if(!confirm('Remover?'))return;salvarNegocios(getNegocios().filter(n=>n.id!==id));apiRemoverNegocio(id);renderFunil();renderQuadros();renderAgenda()}
+  function moverFase(id,fase){const negs=getNegocios(),n=negs.find(x=>x.id===id);if(n){n.fase=fase;salvarNegocios(negs);renderFunil();renderQuadros()}}
+  function removerNegocio(id){if(!confirm('Remover licitação do pipeline?'))return;const novos=getNegocios().filter(n=>n.id!==id);salvarNegocios(novos);apiRemoverNegocio(id);renderFunil();renderQuadros();renderAgenda()}
   function renderFunil(){
     const negs=getNegocios();
     document.getElementById('funilConteudo').innerHTML=FASES.map(f=>{
