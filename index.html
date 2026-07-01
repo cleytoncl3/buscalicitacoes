@@ -358,6 +358,19 @@
     .funil-fase-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
     .neg-card-vert{background:var(--surface);border-radius:10px;box-shadow:var(--card-shadow);border:1px solid var(--border);border-top:3px solid var(--primary);cursor:pointer;display:flex;flex-direction:column;aspect-ratio:9/16;transition:box-shadow .2s;overflow:hidden}
     .neg-card-vert:hover{box-shadow:var(--card-shadow-hover);border-top-color:var(--accent)}
+    .neg-btn-success{background:#d1fae5;color:#065f46}
+    .neg-btn-success:hover{background:#6ee7b7}
+    [data-tema="escuro"] .neg-btn-danger{background:#450a0a;color:#fca5a5}
+    [data-tema="escuro"] .neg-btn-success{background:#022c22;color:#6ee7b7}
+    .finalizados-lista{display:flex;flex-direction:column;gap:12px}
+    .finalizado-card{background:var(--surface);border:1px solid var(--border);border-left:4px solid #10b981;border-radius:10px;padding:14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;cursor:pointer}
+    .finalizado-card:hover{border-left-color:#059669;box-shadow:var(--card-shadow-hover)}
+    .finalizado-card-body{flex:1;min-width:0}
+    .finalizado-card-titulo{font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:4px}
+    .finalizado-card-orgao{font-size:.78rem;color:var(--text2);margin-bottom:4px}
+    .finalizado-card-meta{font-size:.72rem;color:var(--text3);display:flex;gap:12px;flex-wrap:wrap}
+    .finalizado-card-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+    .finalizado-vazio{text-align:center;padding:48px 16px;color:var(--text3);font-size:.9rem}
     .neg-card-vert-body{padding:14px;display:flex;flex-direction:column;gap:6px;flex:1;overflow:hidden}
     .neg-card-vert-footer{padding:10px 14px;background:var(--surface2);border-top:1px solid var(--border);display:flex;flex-direction:column;gap:5px}
     .fase-titulo{display:flex;align-items:center;gap:10px;margin-bottom:12px}
@@ -540,8 +553,8 @@
     .mobile-menu-sep{height:1px;background:var(--border);margin:3px 0}
     /* Bottom nav mobile */
     .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--surface);border-top:1px solid var(--border);z-index:498;padding:0 4px;padding-bottom:env(safe-area-inset-bottom)}
-    .bottom-nav-inner{display:flex;height:100%}
-    .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border-radius:8px;margin:4px 2px;position:relative}
+    .bottom-nav-inner{display:flex;height:100%;width:100%}
+    .bn-item{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border-radius:8px;margin:4px 2px;position:relative}
     .bn-item-icon{font-size:1.1rem;line-height:1}
     .bn-item-label{font-size:.62rem;font-weight:600;color:var(--text3);font-family:'DM Sans',sans-serif}
     .bn-item.on .bn-item-label{color:var(--primary)}
@@ -693,7 +706,7 @@
       header{padding:0 12px;height:52px;grid-template-columns:auto 1fr auto;gap:8px}
       .nav{justify-content:flex-start;gap:0}
       .nav-btn:not(#navMobileBtn){display:none}
-      .nav-mobile-btn{display:flex}
+      .nav-mobile-btn{display:none !important}
       .header-right{gap:6px}
       .btn-tema,.btn-sino{width:30px;height:30px;font-size:.9rem}
       /* Sidebar oculta, bottom nav aparece no mobile */
@@ -1144,9 +1157,11 @@
       <button class="neg-tab ativo" id="tabFunil" onclick="mudarAbaNegocios('funil')">📊 Funil</button>
       <button class="neg-tab" id="tabQuadros" onclick="mudarAbaNegocios('quadros')">🗂️ Quadros</button>
       <button class="neg-tab" id="tabAgenda" onclick="mudarAbaNegocios('agenda')">📅 Agenda</button>
+      <button class="neg-tab" id="tabFinalizados" onclick="mudarAbaNegocios('finalizados')">🏁 Pregão Finalizado</button>
     </div>
     <div class="neg-view ativo" id="negFunil"><div class="funil" id="funilConteudo"></div></div>
     <div class="neg-view" id="negQuadros"><div class="kanban" id="kanbanConteudo"></div></div>
+    <div class="neg-view" id="negFinalizados"><div id="finalizadosConteudo"></div></div>
     <div class="neg-view" id="negAgenda">
       <div class="agenda-header">
         <div class="agenda-mes" id="agendaMes"></div>
@@ -1883,6 +1898,7 @@
     if(aba==='funil'){renderFunil();fetchNegocios().then(d=>{renderFunil();});}
     if(aba==='quadros'){renderQuadros();fetchNegocios().then(d=>{renderQuadros();});}
     if(aba==='agenda')renderAgenda();
+    if(aba==='finalizados'){renderFinalizados();fetchNegocios().then(d=>{renderFinalizados();});}
   }
 
   // ===== NOTIFICAÇÕES =====
@@ -2567,10 +2583,62 @@
   // Itens salvos do negócio (quando drawer aberto via meus negócios)
   let _itensNegocio = null;
 
-  function moverFase(id,fase){const negs=getNegocios(),n=negs.find(x=>x.id===id);if(n){n.fase=fase;salvarNegocios(negs);renderFunil();renderQuadros()}}
-  function removerNegocio(id){if(!confirm('Remover licitação do pipeline?'))return;const novos=getNegocios().filter(n=>n.id!==id);salvarNegocios(novos);apiRemoverNegocio(id);renderFunil();renderQuadros();renderAgenda()}
-  function renderFunil(){
+  function finalizarNegocio(id){
+    if(!confirm('Mover esta licitação para Pregão Finalizado?'))return;
     const negs=getNegocios();
+    const idx=negs.findIndex(n=>n.id===id);
+    if(idx<0)return;
+    negs[idx].finalizado=true;
+    negs[idx].finalizado_em=new Date().toISOString();
+    salvarNegocios(negs);
+    renderFunil();
+    renderQuadros();
+    renderFinalizados();
+  }
+
+  function reabrirNegocio(id){
+    const negs=getNegocios();
+    const idx=negs.findIndex(n=>n.id===id);
+    if(idx<0)return;
+    delete negs[idx].finalizado;
+    delete negs[idx].finalizado_em;
+    salvarNegocios(negs);
+    renderFunil();
+    renderFinalizados();
+  }
+
+  function renderFinalizados(){
+    const el=document.getElementById('finalizadosConteudo');
+    if(!el)return;
+    const negs=getNegocios().filter(n=>n.finalizado);
+    if(!negs.length){el.innerHTML='<div class="finalizado-vazio">🏁 Nenhum pregão finalizado ainda.<br>Use o botão ✅ no Funil para mover licitações para cá.</div>';return;}
+    el.innerHTML='<div class="finalizados-lista">'+negs.map(n=>{
+      const m=n.numero_controle?.match(/-([0-9]+)\/([0-9]+)$/);
+      const numFmt=m?`Nº ${parseInt(m[1])}/${m[2]}`:'';
+      const modFmt=(n.modalidade||'').replace('Pregão Eletrônico','PE').replace('Dispensa de Licitação','Dispensa');
+      const finEm=n.finalizado_em?new Date(n.finalizado_em).toLocaleDateString('pt-BR'):'—';
+      return`<div class="finalizado-card" onclick="abrirDrawerNeg('${n.id}')">
+        <div class="finalizado-card-body">
+          <div class="finalizado-card-titulo">${n.orgao||n.titulo||'—'}</div>
+          <div class="finalizado-card-orgao">${modFmt}${numFmt?' · '+numFmt:''} · ${n.uf||''}</div>
+          ${n.objeto?`<div class="finalizado-card-orgao" style="margin-top:2px">${n.objeto.substring(0,100)}${n.objeto.length>100?'…':''}</div>`:''}
+          <div class="finalizado-card-meta">
+            ${n.encerramento?`<span>⏰ ${new Date(n.encerramento).toLocaleDateString('pt-BR')}</span>`:''}
+            <span>🏁 Finalizado em ${finEm}</span>
+          </div>
+        </div>
+        <div class="finalizado-card-actions" onclick="event.stopPropagation()">
+          <button class="neg-btn neg-btn-success" onclick="reabrirNegocio('${n.id}')" title="Reabrir no Funil">↩ Reabrir</button>
+          <button class="neg-btn neg-btn-danger" onclick="removerNegocio('${n.id}')" title="Remover">✕ Remover</button>
+        </div>
+      </div>`;
+    }).join('')+'</div>';
+  }
+
+  function moverFase(id,fase){const negs=getNegocios(),n=negs.find(x=>x.id===id);if(n){n.fase=fase;salvarNegocios(negs);renderFunil();renderQuadros()}}
+  function removerNegocio(id){if(!confirm('Remover licitação do pipeline?'))return;const novos=getNegocios().filter(n=>n.id!==id);salvarNegocios(novos);renderFunil();renderQuadros();renderAgenda();renderFinalizados()}
+  function renderFunil(){
+    const negs=getNegocios().filter(n=>!n.finalizado);
     document.getElementById('funilConteudo').innerHTML=FASES.map(f=>{
       const itens=negs.filter(n=>n.fase===f.id);
       return`<div><div class="fase-titulo"><span class="fase-badge ${f.cls}">${f.emoji} ${f.nome}</span><span class="fase-count">${itens.length} licitação(ões)</span></div>
@@ -2599,7 +2667,8 @@
                 <select onchange="moverFase('${n.id}',this.value)" style="font-size:.72rem;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);cursor:pointer;flex:1">
                   ${FASES.map(f2=>`<option value="${f2.id}"${f2.id===n.fase?' selected':''}>${f2.emoji} ${f2.nome}</option>`).join('')}
                 </select>
-                <button class="neg-btn neg-btn-danger" onclick="event.stopPropagation();removerNegocio('${n.id}')">✕</button>
+                <button class="neg-btn neg-btn-success" onclick="event.stopPropagation();finalizarNegocio('${n.id}')" title="Mover para Pregão Finalizado">✅</button>
+                <button class="neg-btn neg-btn-danger" onclick="event.stopPropagation();removerNegocio('${n.id}')" title="Remover do pipeline">✕</button>
               </div>
             </div>
           </div>`;}).join('')}</div>`}
@@ -2607,7 +2676,7 @@
     }).join('');
   }
   function renderQuadros(){
-    const negs=getNegocios();
+    const negs=getNegocios().filter(n=>!n.finalizado);
     document.getElementById('kanbanConteudo').innerHTML=FASES.map(f=>{
       const itens=negs.filter(n=>n.fase===f.id);
       return`<div class="kanban-col"><div class="kanban-col-titulo"><span class="fase-badge ${f.cls}">${f.emoji} ${f.nome}</span></div>
