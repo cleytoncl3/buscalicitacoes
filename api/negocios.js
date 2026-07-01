@@ -1,83 +1,125 @@
-// api/negocios.js — banco compartilhado
-// SEM Upstash: usa memória (dados resetam ao redeployar, mas funciona entre abas no mesmo servidor)
-// COM Upstash: dados persistem para sempre entre todos dispositivos
+// api/negocios.js — banco compartilhado (todos os dispositivos e funcionários)
+// COM Upstash: dados persistem permanentemente entre todos os dispositivos
+// SEM Upstash: cache em memória (reseta em cold starts — NÃO use em produção sem Upstash)
 // Setup Upstash: vercel.com/dashboard → Integrations → Upstash → New Redis
 
-const KEY = 'arantes_negocios_v1';
+const KEY = 'arantes_negocios_v2';
 
-// Cache em memória para quando não tem Upstash
+// Cache em memória — fallback apenas, não é confiável em produção
 const memoryCache = { data: null };
 
+const hasUpstash = () => !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+
 async function redisGet() {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) return null; // Upstash não configurado
+  if (!hasUpstash()) return null;
   try {
-    const r = await fetch(`${url}/get/${KEY}`, {
-      headers: { Authorization: `Bearer ${token}` }
+    const r = await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/get/${KEY}`, {
+      headers: { Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}` }
     });
+    if (!r.ok) { console.error('Upstash GET error:', r.status); return null; }
     const { result } = await r.json();
     return result ? JSON.parse(result) : [];
-  } catch { return null; }
+  } catch (e) { console.error('Upstash GET exception:', e.message); return null; }
 }
 
 async function redisSet(data) {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) return false;
+  if (!hasUpstash()) return false;
   try {
-    await fetch(`${url}/set/${KEY}`, {
+    const r = await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/set/${KEY}`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      headers: { Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(JSON.stringify(data))
     });
+    if (!r.ok) { console.error('Upstash SET error:', r.status); return false; }
     return true;
-  } catch { return false; }
+  } catch (e) { console.error('Upstash SET exception:', e.message); return false; }
+}
+
+async function getNegocios() {
+  const fromRedis = await redisGet();
+  if (fromRedis !== null) {
+    memoryCache.data = fromRedis; // atualiza cache local com dado do Redis
+    return fromRedis;
+  }
+  return memoryCache.data || [];
+}
+
+async function setNegocios(data) {
+  memoryCache.data = data;
+  const saved = await redisSet(data);
+  if (!saved && !hasUpstash()) {
+    console.warn('Upstash não configurado — dados apenas em memória (voláteis)');
+  }
+  return saved;
 }
 
 export default async function handler(req, res) {
+  // Impede caching pelo browser e CDN — dados de negócios devem ser sempre frescos
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  // Tenta Upstash primeiro, senão usa cache em memória
-  let negocios = await redisGet();
-  if (negocios === null) {
-    negocios = memoryCache.data || [];
-  }
+  const negocios = await getNegocios();
 
   if (req.method === 'GET') {
-    return res.status(200).json(negocios);
+    return res.status(200).json({
+      negocios,
+      upstash: hasUpstash(), // informa ao frontend se a persistência está configurada
+    });
   }
 
   if (req.method === 'POST') {
-    const novo = { ...req.body, id: req.body.id || Date.now().toString() };
-    const idx = negocios.findIndex(n => n.numero_controle === novo.numero_controle);
-    if (idx >= 0) negocios[idx] = { ...negocios[idx], ...novo };
-    else negocios.unshift(novo);
-    memoryCache.data = negocios;
-    await redisSet(negocios);
-    return res.status(200).json({ ok: true });
+    const body = req.body;
+    // Suporta salvar múltiplos de uma vez (array) ou um só (objeto)
+    const novos = Array.isArray(body) ? body : [body];
+    for (const novo of novos) {
+      if (!novo || !novo.numero_controle) continue;
+      novo.id = novo.id || Date.now().toString();
+      const idx = negocios.findIndex(n => n.numero_controle === novo.numero_controle);
+      if (idx >= 0) {
+        // Preserva itensInteresse se novo não tiver (merge cuidadoso)
+        const antigo = negocios[idx];
+        negocios[idx] = {
+          ...antigo,
+          ...novo,
+          itensInteresse: novo.itensInteresse?.length ? novo.itensInteresse : (antigo.itensInteresse || []),
+        };
+      } else {
+        negocios.unshift(novo);
+      }
+    }
+    await setNegocios(negocios);
+    return res.status(200).json({ ok: true, total: negocios.length });
   }
 
   if (req.method === 'PUT') {
-    const { id, fase } = req.body;
+    const body = req.body;
+    // Suporta: replace_all (sincronização completa) ou update de item individual
+    if (body.action === 'replace_all' && Array.isArray(body.negocios)) {
+      // Substitui toda a lista — propaga deleções entre dispositivos
+      await setNegocios(body.negocios);
+      return res.status(200).json({ ok: true, total: body.negocios.length });
+    }
+    const { id, fase, updates } = body;
     const n = negocios.find(x => x.id === id);
     if (n) {
-      n.fase = fase;
-      memoryCache.data = negocios;
-      await redisSet(negocios);
+      if (fase !== undefined) n.fase = fase;
+      if (updates && typeof updates === 'object') Object.assign(n, updates);
+      await setNegocios(negocios);
     }
     return res.status(200).json({ ok: true });
   }
 
   if (req.method === 'DELETE') {
     const { id } = req.query;
+    if (!id) return res.status(400).json({ erro: 'ID obrigatório' });
     const novos = negocios.filter(n => n.id !== id);
-    memoryCache.data = novos;
-    await redisSet(novos);
-    return res.status(200).json({ ok: true });
+    await setNegocios(novos);
+    return res.status(200).json({ ok: true, total: novos.length });
   }
 
   return res.status(405).json({ erro: 'Método não permitido' });

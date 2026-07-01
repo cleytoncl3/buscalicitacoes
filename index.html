@@ -347,6 +347,13 @@
     .neg-btn:hover{background:var(--chip-bg);color:var(--primary)}
     .neg-btn-danger{color:#ef4444;border-color:#fca5a5}
     .fase-vazio{color:var(--text3);font-size:.85rem;padding:10px 0}
+    /* Funil — cards verticais (portrait) */
+    .funil-fase-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:4px}
+    .neg-card-vert{background:var(--surface);border-radius:10px;box-shadow:var(--card-shadow);border:1px solid var(--border);border-top:3px solid var(--primary);cursor:pointer;display:flex;flex-direction:column;aspect-ratio:9/16;transition:box-shadow .2s}
+    .neg-card-vert:hover{box-shadow:var(--card-shadow-hover)}
+    .neg-card-vert-body{padding:14px;display:flex;flex-direction:column;gap:7px;flex:1;overflow:hidden}
+    .neg-card-vert-footer{padding:10px 14px;background:var(--surface2);border-top:1px solid var(--border);display:flex;flex-direction:column;gap:5px;border-radius:0 0 10px 10px}
+    @media(max-width:600px){.funil-fase-cards{grid-template-columns:1fr}.neg-card-vert{aspect-ratio:unset}}
     .kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;overflow-x:auto;padding-bottom:8px}
     .kanban-col{background:var(--surface2);border-radius:10px;padding:12px;border:1px solid var(--border);min-width:180px}
     .kanban-col-titulo{font-size:.82rem;font-weight:700;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
@@ -2054,48 +2061,141 @@
     }
   }
 
-  // ===== NEGÓCIOS =====
-  // Negócios: API compartilhada (todos os funcionários veem) + localStorage como cache
+  // ===== NEGÓCIOS — Persistência compartilhada =====
+  // Fonte da verdade: Upstash Redis via /api/negocios
+  // localStorage = cache local para acesso offline e evitar flash vazio
+  let _negSyncTimer = null;
+  let _upstashOk = null; // null=desconhecido, true=ok, false=sem Redis
+
+  function _mostrarSyncStatus(status) {
+    let el = document.getElementById('neg-sync-status');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'neg-sync-status';
+      el.style.cssText = 'position:fixed;bottom:70px;right:16px;font-size:.72rem;padding:5px 10px;border-radius:20px;z-index:500;transition:opacity .4s;pointer-events:none';
+      document.body.appendChild(el);
+    }
+    if (status === 'saving') {
+      el.textContent = '⏳ Salvando...';
+      el.style.cssText += ';background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44;opacity:1';
+    } else if (status === 'ok') {
+      el.textContent = '✅ Salvo na nuvem';
+      el.style.cssText += ';background:#22c55e22;color:#22c55e;border:1px solid #22c55e44;opacity:1';
+      setTimeout(() => { el.style.opacity = '0'; }, 2500);
+    } else if (status === 'local') {
+      el.textContent = '⚠️ Salvo localmente';
+      el.style.cssText += ';background:#ef444422;color:#ef4444;border:1px solid #ef444444;opacity:1';
+    } else if (status === 'no-redis') {
+      el.textContent = '⚠️ Sem Redis — dados locais apenas';
+      el.style.cssText += ';background:#ef444422;color:#ef4444;border:1px solid #ef444444;opacity:1';
+    }
+  }
+
+  function getNegocios(){try{return JSON.parse(localStorage.getItem(NEG_KEY)||'[]')}catch{return[]}}
+
+  function _mergeNegocios(apiList, localList) {
+    // Merge inteligente: combina sem duplicatas, preservando a versão mais rica
+    const map = {};
+    // Processa todos, com local depois de API para que local possa ganhar em campos específicos
+    [...apiList, ...localList].forEach(n => {
+      const k = n.numero_controle || n.id;
+      if (!k) return;
+      if (!map[k]) { map[k] = n; return; }
+      // Já existe: preserva itensInteresse se o atual não tem
+      const existing = map[k];
+      if (!existing.itensInteresse?.length && n.itensInteresse?.length) {
+        map[k] = { ...existing, itensInteresse: n.itensInteresse };
+      }
+      // Preserva fase mais recente (local ganha se tiver sido alterada)
+      if (n._faseAtualizada && !existing._faseAtualizada) {
+        map[k].fase = n.fase;
+      }
+    });
+    return Object.values(map);
+  }
+
   async function fetchNegocios(){
     try{
-      const r=await fetch('/api/negocios');
-      if(r.ok){
-        const apiData=await r.json();
-        const local=getNegocios();
-        if(Array.isArray(apiData)){
-          // Merge: combina API + local por numero_controle (sem duplicatas)
-          const map={};
-          [...apiData,...local].forEach(n=>{
-            const k=n.numero_controle||n.id;
-            if(k&&!map[k])map[k]=n;
-          });
-          const merged=Object.values(map);
-          localStorage.setItem(NEG_KEY,JSON.stringify(merged));
-          // Se local tinha itens que a API não tinha, sincroniza de volta
-          if(merged.length>apiData.length){
-            merged.filter(m=>!apiData.find(a=>a.numero_controle===m.numero_controle))
-              .forEach(n=>fetch('/api/negocios',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(n)}).catch(()=>{}));
-          }
-          return merged;
-        }
+      const r = await fetch('/api/negocios', { cache: 'no-store' });
+      if (!r.ok) throw new Error('HTTP '+r.status);
+      const resp = await r.json();
+      // API retorna { negocios: [...], upstash: bool }
+      const apiList = Array.isArray(resp) ? resp : (resp.negocios || []);
+      _upstashOk = resp.upstash !== undefined ? resp.upstash : null;
+
+      if (!_upstashOk) _mostrarSyncStatus('no-redis');
+
+      const local = getNegocios();
+      const merged = _mergeNegocios(apiList, local);
+      localStorage.setItem(NEG_KEY, JSON.stringify(merged));
+
+      // Sincroniza de volta para API itens que estão só no local
+      const apenasLocal = local.filter(l => l.numero_controle && !apiList.find(a => a.numero_controle === l.numero_controle));
+      if (apenasLocal.length > 0) {
+        fetch('/api/negocios', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(apenasLocal)
+        }).catch(() => {});
       }
-    }catch{}
+      return merged;
+    } catch(e) {
+      console.warn('fetchNegocios falhou:', e.message);
+    }
     return getNegocios();
   }
-  function getNegocios(){try{return JSON.parse(localStorage.getItem(NEG_KEY)||'[]')}catch{return[]}}
-  async function salvarNegocios(arr){
-    localStorage.setItem(NEG_KEY,JSON.stringify(arr));
-    // Sincroniza com servidor de forma assíncrona
+
+  async function _apiPost(body) {
+    const r = await fetch('/api/negocios', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      cache: 'no-store',
+    });
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
   }
-  async function apiSalvarNegocio(neg){
-    try{await fetch('/api/negocios',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(neg)});}catch{}
+
+  async function salvarNegocios(arr, { sync = true } = {}) {
+    localStorage.setItem(NEG_KEY, JSON.stringify(arr));
+    if (!sync) return;
+    // Debounce: agrupa saves rápidos (ex: mover fase) num único POST
+    clearTimeout(_negSyncTimer);
+    _negSyncTimer = setTimeout(async () => {
+      _mostrarSyncStatus('saving');
+      try {
+        // replace_all garante que deleções também sejam propagadas
+        const r = await fetch('/api/negocios', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'replace_all', negocios: arr }),
+          cache: 'no-store',
+        });
+        if (!r.ok) throw new Error('HTTP '+r.status);
+        _mostrarSyncStatus('ok');
+      } catch {
+        _mostrarSyncStatus('local');
+      }
+    }, 400);
   }
-  async function apiMoverFase(id,fase){
-    try{await fetch('/api/negocios',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,fase})});}catch{}
+
+  async function apiMoverFase(id, fase) {
+    try {
+      await fetch('/api/negocios', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, fase }),
+        cache: 'no-store',
+      });
+    } catch {}
   }
-  async function apiRemoverNegocio(id){
-    try{await fetch('/api/negocios?id='+id,{method:'DELETE'});}catch{}
+
+  async function apiRemoverNegocio(id) {
+    try {
+      await fetch('/api/negocios?id=' + id, { method: 'DELETE', cache: 'no-store' });
+    } catch {}
   }
+
   function adicionarAosNegocios(){
     if(!itemAtualDrawer)return;
     const negs=getNegocios();
@@ -2106,7 +2206,6 @@
     const novoNeg={id:Date.now().toString(),titulo:itemAtualDrawer.title||'',objeto:itemAtualDrawer.description||'',orgao:itemAtualDrawer.orgao_nome||'',uf:itemAtualDrawer.uf||'',modalidade:itemAtualDrawer.modalidade_licitacao_nome||'',abertura:itemAtualDrawer.data_inicio_vigencia||'',encerramento:itemAtualDrawer.data_fim_vigencia||'',numero_controle:itemAtualDrawer.numero_controle_pncp||'',link_pncp:p?`https://pncp.gov.br/app/editais/${p.cnpj}/${p.ano}/${p.seq}`:'',fase:'oportunidade',adicionado_em:new Date().toISOString(),itemData:JSON.stringify(itemAtualDrawer)};
     negs.unshift(novoNeg);
     salvarNegocios(negs);
-    apiSalvarNegocio(novoNeg);
     const btn=document.getElementById('d-btn-negocio');
     btn.textContent='✅ Adicionado!';btn.classList.add('adicionado');
     setTimeout(()=>{btn.textContent='💼 Adicionar aos meus negócios';btn.classList.remove('adicionado')},2500);
@@ -2238,7 +2337,6 @@
     };
     negs.unshift(novoNeg);
     salvarNegocios(negs);
-    apiSalvarNegocio(novoNeg);
     fecharModalItens();
 
     // Feedback no drawer
@@ -2253,46 +2351,43 @@
     try{abrirDrawer(JSON.parse(n.itemData));}catch(e){alert('Não foi possível abrir os detalhes.');}
   }
 
-  function moverFase(id,fase){const negs=getNegocios(),n=negs.find(x=>x.id===id);if(n){n.fase=fase;salvarNegocios(negs);apiMoverFase(id,fase);renderFunil();renderQuadros()}}
-  function removerNegocio(id){if(!confirm('Remover?'))return;salvarNegocios(getNegocios().filter(n=>n.id!==id));apiRemoverNegocio(id);renderFunil();renderQuadros();renderAgenda()}
+  function moverFase(id,fase){const negs=getNegocios(),n=negs.find(x=>x.id===id);if(n){n.fase=fase;salvarNegocios(negs);renderFunil();renderQuadros()}}
+  function removerNegocio(id){if(!confirm('Remover licitação do pipeline?'))return;const novos=getNegocios().filter(n=>n.id!==id);salvarNegocios(novos);apiRemoverNegocio(id);renderFunil();renderQuadros();renderAgenda()}
   function renderFunil(){
     const negs=getNegocios();
     document.getElementById('funilConteudo').innerHTML=FASES.map(f=>{
       const itens=negs.filter(n=>n.fase===f.id);
       return`<div><div class="fase-titulo"><span class="fase-badge ${f.cls}">${f.emoji} ${f.nome}</span><span class="fase-count">${itens.length} licitação(ões)</span></div>
-        ${itens.length===0?'<div class="fase-vazio">Nenhuma licitação nesta fase.</div>':itens.map(n=>{
+        ${itens.length===0?'<div class="fase-vazio">Nenhuma licitação nesta fase.</div>':`<div class="funil-fase-cards">${itens.map(n=>{
           const m=n.numero_controle?.match(/-([0-9]+)\/([0-9]+)$/);
-          const numFmt=m?`N\u00ba ${parseInt(m[1])}/${m[2]}`:'';
-          const modFmt=(n.modalidade||'').replace(' - ',' ');
+          const numFmt=m?`Nº ${parseInt(m[1])}/${m[2]}`:'';
+          const modFmt=(n.modalidade||'').replace('Pregão Eletrônico','PE').replace('Dispensa de Licitação','Dispensa');
           const orgaoLabel=n.uasgLabel||n.orgao||'';
-          const tituloCard=[modFmt,numFmt].filter(Boolean).join(' ')+' — '+orgaoLabel+(orgaoLabel&&n.uf?' / ':'')+(!n.uasgLabel&&n.uf?n.uf:'');
-          return`<div class="neg-card" onclick="abrirDrawerNeg('${n.id}')">
-          <div style="display:grid;grid-template-columns:${n.itensInteresse?.length?'1fr 1fr':'1fr'};gap:0;margin-bottom:8px">
-            <div style="padding-right:${n.itensInteresse?.length?'12px':'0'};${n.itensInteresse?.length?'border-right:1px solid var(--border)':''};">
-              <div class="neg-card-titulo" style="font-size:.78rem;margin-bottom:5px">${tituloCard}</div>
-              ${n.objeto?`<div style="font-size:.72rem;color:var(--text2);line-height:1.45;margin-bottom:8px">${n.objeto.substring(0,150)}${n.objeto.length>150?'…':''}</div>`:''}
-              <div style="display:flex;flex-direction:column;gap:3px">
-                ${n.uasg?`<div style="font-size:.7rem;color:var(--accent);font-weight:700;margin-bottom:2px">UASG ${n.uasg}</div>`:''}
-                ${n.abertura?`<div style="font-size:.72rem;color:var(--text2)">📅 <span style="color:var(--text3)">Início:</span> <strong style="color:var(--text)">${new Date(n.abertura).toLocaleDateString('pt-BR')}</strong></div>`:''}
-                ${n.encerramento?`<div style="font-size:.72rem;color:var(--text2)">⏰ <span style="color:var(--text3)">Encerra:</span> <strong style="color:var(--text)">${new Date(n.encerramento).toLocaleDateString('pt-BR')}</strong></div>`:''}
+          return`<div class="neg-card-vert" onclick="abrirDrawerNeg('${n.id}')">
+            <div class="neg-card-vert-body">
+              <div style="font-size:.68rem;font-weight:700;color:var(--text3);font-family:monospace;letter-spacing:.3px">${modFmt}${numFmt?' '+numFmt:''}</div>
+              <div style="font-size:.84rem;font-weight:700;color:var(--text);line-height:1.3">${orgaoLabel||'—'}</div>
+              ${n.objeto?`<div style="font-size:.75rem;color:var(--text2);line-height:1.4;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden">${n.objeto}</div>`:''}
+              ${n.itensInteresse?.length?`<div style="margin-top:4px;display:flex;flex-direction:column;gap:3px;flex:1;overflow:hidden">
+                <div style="font-size:.65rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Itens (${n.itensInteresse.length})</div>
+                ${n.itensInteresse.slice(0,5).map(i=>`<div style="display:flex;align-items:center;gap:5px;padding:3px 7px;background:var(--surface2);border-radius:5px;border:1px solid var(--border)">
+                  <span style="font-size:.65rem;font-weight:700;color:var(--text3);flex-shrink:0">#${i.numeroItem||'—'}</span>
+                  <span style="font-size:.73rem;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(i.descricao||'').substring(0,40)}${(i.descricao||'').length>40?'…':''}</span>
+                </div>`).join('')}
+              </div>`:''}
+            </div>
+            <div class="neg-card-vert-footer">
+              ${n.abertura?`<div style="display:flex;justify-content:space-between;font-size:.72rem"><span style="color:var(--text3)">📅 Abertura</span><strong style="color:var(--text)">${new Date(n.abertura).toLocaleDateString('pt-BR')}</strong></div>`:''}
+              ${n.encerramento?`<div style="display:flex;justify-content:space-between;font-size:.72rem"><span style="color:var(--text3)">⏰ Encerra</span><strong style="color:var(--text)">${new Date(n.encerramento).toLocaleDateString('pt-BR')}</strong></div>`:''}
+              <div style="display:flex;gap:5px;flex-wrap:wrap;padding-top:4px;border-top:1px solid var(--border)" onclick="event.stopPropagation()">
+                <select onchange="moverFase('${n.id}',this.value)" style="font-size:.72rem;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);cursor:pointer;flex:1">
+                  ${FASES.map(f2=>`<option value="${f2.id}"${f2.id===n.fase?' selected':''}>${f2.emoji} ${f2.nome}</option>`).join('')}
+                </select>
+                <button class="neg-btn neg-btn-danger" onclick="event.stopPropagation();removerNegocio('${n.id}')">✕</button>
               </div>
             </div>
-            ${n.itensInteresse?.length?`<div style="padding-left:12px;max-height:140px;overflow-y:auto;display:flex;flex-direction:column;gap:3px">
-              <div style="font-size:.68rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Itens de interesse (${n.itensInteresse.length})</div>
-              ${n.itensInteresse.map(i=>`<div style="display:flex;align-items:center;gap:6px;padding:4px 8px;background:var(--surface2);border-radius:5px;border:1px solid var(--border)">
-                <span style="font-size:.67rem;font-weight:700;color:var(--accent);flex-shrink:0;min-width:28px">#${i.numeroItem||'—'}</span>
-                <span style="font-size:.76rem;color:#fff;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(i.descricao||'').substring(0,45)}${(i.descricao||'').length>45?'…':''}</span>
-                <span style="font-size:.7rem;color:var(--text3);white-space:nowrap;flex-shrink:0"><strong style="color:#fff">${i.quantidade||'—'}</strong> ${i.unidadeMedida||''}</span>
-              </div>`).join('')}
-            </div>`:''}
-          </div>
-          <div class="neg-card-actions" onclick="event.stopPropagation()">
-            <select onchange="moverFase('${n.id}',this.value)" style="font-size:.75rem;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);cursor:pointer">
-              ${FASES.map(f2=>`<option value="${f2.id}"${f2.id===n.fase?' selected':''}>${f2.emoji} ${f2.nome}</option>`).join('')}
-            </select>
-            ${n.link_pncp?`<button class="neg-btn" onclick="window.open('${n.link_pncp}','_blank')">🔗 PNCP</button>`:''}
-            <button class="neg-btn neg-btn-danger" onclick="removerNegocio('${n.id}')">✕</button>
-          </div></div>`;}).join('')}</div>`;
+          </div>`;}).join('')}</div>`}
+      </div>`;
     }).join('');
   }
   function renderQuadros(){
